@@ -14,8 +14,8 @@ namespace DataAccessLayer.Models
         public DateTime CreatedAt { get; set; }
         public string CreatedByIp { get; set; }
         public DateTime? RevokedAt { get; set; }
-        public string RevokedByIp { get; set; }
-        public string ReplacedByTokenHash { get; set; }
+        public string? RevokedByIp { get; set; }
+        public string? ReplacedByTokenHash { get; set; }
 
         public bool IsActive => RevokedAt == null && ExpiresAt > DateTime.UtcNow;
 

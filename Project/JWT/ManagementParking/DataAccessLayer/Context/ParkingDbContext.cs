@@ -22,6 +22,7 @@ namespace DataAccessLayer.Context
         public DbSet<ParkingRecord> ParkingRecords { get; set; }
         public DbSet<ParkingFeeRule> ParkingFeeRules { get; set; }
         public DbSet<MonthlyPass> MonthlyPasses { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder model)
         {
@@ -64,6 +65,12 @@ namespace DataAccessLayer.Context
                 .WithMany(u => u.MonthlyPasses)
                 .HasForeignKey(mp => mp.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            model.Entity<RefreshToken>()
+               .HasOne(rt => rt.User)
+               .WithMany(u => u.RefreshTokens)
+               .HasForeignKey(rt => rt.UserId)
+               .OnDelete(DeleteBehavior.Cascade); // hoặc Restrict tùy nhu cầu
 
             // Seed roles
             model.Entity<Role>().HasData(

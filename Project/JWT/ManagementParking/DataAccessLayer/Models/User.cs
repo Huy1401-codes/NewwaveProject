@@ -30,6 +30,9 @@ namespace DataAccessLayer.Models
         public ICollection<UserRole> UserRoles { get; set; }
         public ICollection<Vehicle> Vehicles { get; set; }
         public ICollection<MonthlyPass> MonthlyPasses { get; set; }
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; }
+
     }
 
 
