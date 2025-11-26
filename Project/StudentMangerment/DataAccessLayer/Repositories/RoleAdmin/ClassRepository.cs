@@ -18,7 +18,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         public IQueryable<Class> GetAllQueryable()
         {
             return _context.Classes
-                .Where(c => !c.IsStatus)
+                .Where(c => c.IsStatus==true)
                 .Include(c => c.Subject)
                 .Include(c => c.Teacher)
                 .Include(c => c.Semester)
@@ -31,7 +31,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .Include(c => c.Subject)
                 .Include(c => c.Teacher)
                 .Include(c => c.Semester)
-                .FirstOrDefaultAsync(c => c.ClassId == id && !c.IsStatus);
+                .FirstOrDefaultAsync(c => c.ClassId == id && c.IsStatus==true);
         }
 
         public async Task AddAsync(Class cls) => await _context.Classes.AddAsync(cls);

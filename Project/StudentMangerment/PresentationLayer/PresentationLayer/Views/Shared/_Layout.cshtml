@@ -1,8 +1,7 @@
-﻿@inject IHttpContextAccessor HttpContextAccessor
+﻿@using System.Security.Claims
 @{
-    var ctx = HttpContextAccessor.HttpContext;
-    var role = ctx?.Session.GetString("Role") ?? "Student";
-    var username = ctx?.Session.GetString("Username") ?? "User";
+    var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value ?? "Student";
+    var username = User.Identity?.Name ?? "User";
 }
 
 <!DOCTYPE html>
@@ -85,6 +84,7 @@
                         <h3 class="welcome-sub-text">Your performance summary this week</h3>
                     </li>
                 </ul>
+               
                 <ul class="navbar-nav ms-auto">
                     <!-- Category Dropdown -->
                     <li class="nav-item dropdown d-none d-lg-block">
@@ -174,11 +174,15 @@
                                 <p class="mb-1 mt-3 fw-semibold">@username</p>
                                 <p class="fw-light text-muted mb-0">Role: @role</p>
                             </div>
-                            <a class="dropdown-item" asp-page="/Profile/Index"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>My Profile</a>
-                            <a class="dropdown-item" asp-page="/Messages"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i>Messages</a>
-                            <a class="dropdown-item" asp-page="/Activity"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i>Activity</a>
-                            <a class="dropdown-item" asp-page="/FAQ"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i>FAQ</a>
-                            <a class="dropdown-item" asp-page="/Authen/Logout"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                            <a class="dropdown-item" href="#"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>My Profile</a>
+
+                            <form method="post" asp-controller="Auth" asp-action="Logout">
+                                <button class="dropdown-item" type="submit" style="background:none;border:none;">
+                                    <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out
+                                </button>
+                            </form>
+
+
                         </div>
                     </li>
                 </ul>
@@ -190,10 +194,13 @@
 
         <div class="container-fluid page-body-wrapper">
             <!-- Sidebar -->
-            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <!-- Sidebar -->
+                <nav class="sidebar sidebar-offcanvas" id="sidebar">
                 <ul class="nav">
+
+                    <!-- DASHBOARD -->
                     <li class="nav-item">
-                        <a class="nav-link" asp-page="/Index">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
                             <i class="mdi mdi-grid-large menu-icon"></i>
                             <span class="menu-title">Dashboard</span>
                         </a>
@@ -201,7 +208,7 @@
 
                     @if (role == "Admin")
                     {
-                        <!-- Quản lý Tài khoản -->
+                        <!-- QUẢN LÝ TÀI KHOẢN -->
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="collapse" href="#manageAccountMenu" aria-expanded="false">
                                 <i class="menu-icon mdi mdi-account-cog"></i>
@@ -210,30 +217,44 @@
                             </a>
                             <div class="collapse" id="manageAccountMenu">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link">Danh sách tài khoản (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Thêm tài khoản mới (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Phân quyền (fake)</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Admin" asp-action="List">
+                                            Danh sách tài khoản
+                                        </a>
+                                    </li>
+
+
+
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Role" asp-action="Index">Phân quyền</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- Quản lý Giáo viên -->
+                        <!-- QUẢN LÝ GIÁO VIÊN -->
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="collapse" href="#manageTeacherMenu" aria-expanded="false">
-                                <i class='fas fa-atom' style='font-size:24px'></i>
-                                <span class="menu-title" > Quản lý Giáo viên</span>
+                                <i class='fas fa-atom menu-icon'></i>
+                                <span class="menu-title">Quản lý Giáo viên</span>
                                 <i class="menu-arrow"></i>
                             </a>
                             <div class="collapse" id="manageTeacherMenu">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link">Danh sách giáo viên (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Thêm giáo viên (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Phân công giảng dạy (fake)</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Teacher" asp-action="Index">Danh sách giáo viên</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Teacher" asp-action="Create">Thêm giáo viên</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Teaching" asp-action="Assign">Phân công giảng dạy</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- Quản lý Sinh Viên -->
+                        <!-- QUẢN LÝ SINH VIÊN -->
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="collapse" href="#manageStudentMenu" aria-expanded="false">
                                 <i class="menu-icon mdi mdi-school"></i>
@@ -242,14 +263,20 @@
                             </a>
                             <div class="collapse" id="manageStudentMenu">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link">Danh sách sinh viên (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Thêm sinh viên (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Điểm sinh viên (fake)</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Student" asp-action="Index">Danh sách sinh viên</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Student" asp-action="Create">Thêm sinh viên</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Student" asp-action="Scores">Điểm sinh viên</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- Quản lý Môn học -->
+                        <!-- QUẢN LÝ MÔN HỌC -->
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="collapse" href="#manageSubjectMenu" aria-expanded="false">
                                 <i class="menu-icon mdi mdi-book-open-page-variant"></i>
@@ -258,14 +285,20 @@
                             </a>
                             <div class="collapse" id="manageSubjectMenu">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link">Danh sách môn học (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Thêm môn học (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Chương trình học (fake)</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Subject" asp-action="Index">Danh sách môn học</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Subject" asp-action="Create">Thêm môn học</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Curriculum" asp-action="Index">Chương trình học</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
 
-                        <!-- Quản lý Kì học -->
+                        <!-- QUẢN LÝ KÌ HỌC -->
                         <li class="nav-item">
                             <a class="nav-link" data-bs-toggle="collapse" href="#manageSemesterMenu" aria-expanded="false">
                                 <i class="menu-icon mdi mdi-calendar-text"></i>
@@ -274,49 +307,56 @@
                             </a>
                             <div class="collapse" id="manageSemesterMenu">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link">Danh sách kì học (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Tạo kì học mới (fake)</a></li>
-                                    <li class="nav-item"><a class="nav-link">Thời khóa biểu (fake)</a></li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Semester" asp-action="Index">Danh sách kì học</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Semester" asp-action="Create">Tạo kì học mới</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Schedule" asp-action="Index">Thời khóa biểu</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
                     }
-
 
                     @if (role == "Teacher")
                     {
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false" aria-controls="tables">
+                            <a class="nav-link" data-bs-toggle="collapse" href="#tables" aria-expanded="false">
                                 <i class="menu-icon mdi mdi-table"></i>
-                                <span class="menu-title">Tables</span>
+                                <span class="menu-title">Bảng dữ liệu</span>
                                 <i class="menu-arrow"></i>
                             </a>
                             <div class="collapse" id="tables">
                                 <ul class="nav flex-column sub-menu">
-                                    <li class="nav-item"><a class="nav-link" asp-page="/Doctors/Index">Doctor</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/MedicalRecords/Index">MedicalRecord</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/TestPage/Index">TestPage</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/TestResultPage/Index">TestResult</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/MedicinePage/Index">Medicine</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/Patient/PatientList">Patient</a></li>
-                                    <li class="nav-item"><a class="nav-link" asp-page="/Prescription/ListPrescription">Prescription</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Doctor" asp-action="Index">Doctor</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="MedicalRecords" asp-action="Index">MedicalRecord</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Test" asp-action="Index">TestPage</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="TestResult" asp-action="Index">TestResult</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Medicine" asp-action="Index">Medicine</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Patient" asp-action="List">Patient</a></li>
+                                    <li class="nav-item"><a class="nav-link" asp-controller="Prescription" asp-action="List">Prescription</a></li>
                                 </ul>
                             </div>
                         </li>
                     }
-                    @* Student chỉ xem các page của mình, ví dụ MyTests *@
+
                     @if (role == "Student")
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-page="/Student/Tests">
+                            <a class="nav-link" asp-controller="Student" asp-action="MyTests">
                                 <i class="mdi mdi-book-open-page-variant menu-icon"></i>
                                 <span class="menu-title">My Tests</span>
                             </a>
                         </li>
                     }
+
                 </ul>
 
-            </nav>
+                </nav>
+
 
             <!-- Main Panel -->
             <div class="main-panel">
@@ -357,7 +397,26 @@
     <!-- Custom js for this page-->
     <script src="~/assets/js/jquery.cookie.js" type="text/javascript"></script>
     <script src="~/assets/js/dashboard.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Đảm bảo tất cả collapse trong sidebar mặc định đóng
+            document.querySelectorAll("#sidebar .collapse").forEach(function(collapse) {
+                collapse.classList.remove("show");          // remove show class
+                collapse.style.height = null;               // reset inline height nếu có
+            });
+
+            // Set aria-expanded=false cho tất cả toggle links
+            document.querySelectorAll("#sidebar .nav-link[data-bs-toggle='collapse']").forEach(function(link) {
+                link.setAttribute("aria-expanded", "false");
+            });
+
+            // Optional: ngăn template.js tự mở menu dựa trên link active
+            // Nếu template có code tự mở dựa trên active, đoạn trên sẽ ghi đè lại
+        });
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>
+

@@ -1,0 +1,289 @@
+﻿@using BusinessLogicLayer.DTOs.Admin
+@model IEnumerable<BusinessLogicLayer.DTOs.Admin.UserListDto>
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Quản lý Tài Khoản";
+
+    int pageIndex = ViewBag.PageIndex ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalRecords = ViewBag.Total ?? 0;
+    int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+    string search = ViewBag.Search ?? "";
+    int? roleId = ViewBag.RoleId;
+    bool? status = ViewBag.Status;
+    var roles = ViewBag.Roles as IEnumerable<DataAccessLayer.Models.Role>;
+}
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="card-title mb-0">Quản lý Tài Khoản</h4>
+                        <p class="card-description">Quản lý, tìm kiếm và lọc tài khoản người dùng</p>
+                    </div>
+                    <a asp-action="Create"  class="btn btn-primary btn-sm">
+                        <i class="mdi mdi-plus"></i> Tạo Tài Khoản Mới
+                    </a>
+                </div>
+
+                <!-- Search & Filter Section -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Tìm kiếm & Lọc</h6>
+                                <form method="get">
+                                    <div class="row">
+                                        <!-- Search Term -->
+                                        <div class="col-md-4 mb-3">
+                                            <label class="form-label">Tìm kiếm:</label>
+                                            <input type="text" class="form-control form-control-sm" name="search"
+                                                   value="@search" placeholder="Tên, email, username..." />
+                                        </div>
+
+                                        <!-- Role Filter -->
+                                      <!-- Role Filter -->
+<div class="col-md-3 mb-3">
+    <label class="form-label">Vai trò:</label>
+<select class="form-select form-select-sm" name="roleId">
+    <option value="">Tất cả</option>
+    @if (roles != null)
+    {
+        foreach (var role in roles)
+        {
+            @:<option value="@role.RoleId" @(role.RoleId == roleId ? "selected" : "")>@role.RoleName</option>
+        }
+    }
+</select>
+
+
+
+</div>
+
+
+                                        <!-- Status Filter -->
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Trạng thái:</label>
+                                            <select class="form-select form-select-sm" name="status">
+                                                <option value="">Tất cả</option>
+                                                @if (status == true)
+                                                {
+                                                    <option value="true" selected>Hoạt động</option>
+                                                    <option value="false">Vô hiệu hóa</option>
+                                                }
+                                                else if (status == false)
+                                                {
+                                                    <option value="true">Hoạt động</option>
+                                                    <option value="false" selected>Vô hiệu hóa</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="true">Hoạt động</option>
+                                                    <option value="false">Vô hiệu hóa</option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <!-- Search Buttons -->
+                                        <div class="col-md-2 mb-3">
+                                            <label class="form-label">&nbsp;</label>
+                                            <div class="d-flex gap-2">
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="mdi mdi-magnify"></i> Tìm kiếm
+                                                </button>
+                                                <a href="@Url.Action("List")" class="btn btn-outline-secondary btn-sm">
+                                                    <i class="mdi mdi-close"></i> Xóa
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <input type="hidden" name="pageIndex" value="@pageIndex" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Summary -->
+                @if (Model != null && Model.Any())
+                {
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge badge-info">
+                                @totalRecords tài khoản
+                                @if (!string.IsNullOrEmpty(search))
+                                {
+                                    <span> cho "@search"</span>
+                                }
+                            </span>
+                            <small class="text-muted ms-2">
+                                Hiển thị @(((pageIndex - 1) * pageSize) + 1) đến @(Math.Min(pageIndex * pageSize, totalRecords))
+                                trong tổng số @totalRecords kết quả
+                            </small>
+                        </div>
+                    </div>
+                }
+
+                <!-- Results Table -->
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>                                   
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Vai trò</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var user in Model)
+                                {
+                                    <tr>
+                                        <td>@user.Username</td>
+                                        <td>@user.Email</td>
+                                        <td>@user.Phone</td>
+                                    <td>
+                                             @foreach (var role in user.Roles)
+                                          {
+                                       <span class="badge bg-secondary">@role</span>  <!-- Hiển thị từng vai trò -->
+                                              }
+                                        </td>
+                                        <td>@(user.IsStatus==true ? "Hoạt động" : "Vô hiệu hóa")</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="Details" asp-route-id="@user.UserId" class="btn btn-outline-info btn-sm btn-icon-text">
+                                                    <i class="mdi mdi-eye"></i> Chi tiết
+                                                </a>
+                                                <a asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-warning btn-sm btn-icon-text">
+                                                    <i class="mdi mdi-pencil"></i> Sửa
+                                                </a>
+                                                <a asp-action="Delete" asp-route-id="@user.UserId" class="btn btn-outline-danger btn-sm btn-icon-text )">
+                                                    <i class="mdi mdi-delete"></i> Xóa
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages >= 1)
+                    {
+                        <nav aria-label="Pagination" class="mt-4">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="?pageIndex=@(pageIndex - 1)&search=@search&roleId=@roleId&status=@status">
+                                        <i class="mdi mdi-chevron-left"></i>
+                                    </a>
+                                </li>
+
+                                @{
+                                    var startPage = Math.Max(1, pageIndex - 2);
+                                    var endPage = Math.Min(totalPages, pageIndex + 2);
+                                }
+
+                                @if (startPage > 1)
+                                {
+                                    <li class="page-item"><a class="page-link" href="?pageIndex=1&search=@search&roleId=@roleId&status=@status">1</a></li>
+                                    @if (startPage > 2)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == pageIndex ? "active" : "")">
+                                        @if (i == pageIndex)
+                                        {
+                                            <span class="page-link">@i</span>
+                                        }
+                                        else
+                                        {
+                                            <a class="page-link" href="?pageIndex=@i&search=@search&roleId=@roleId&status=@status">@i</a>
+                                        }
+                                    </li>
+                                }
+
+                                @if (endPage < totalPages)
+                                {
+                                    @if (endPage < totalPages - 1)
+                                    {
+                                        <li class="page-item disabled"><span class="page-link">...</span></li>
+                                    }
+                                    <li class="page-item">
+                                        <a class="page-link" href="?pageIndex=@totalPages&search=@search&roleId=@roleId&status=@status">@totalPages</a>
+                                    </li>
+                                }
+
+                                <li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+                                    <a class="page-link" href="?pageIndex=@(pageIndex + 1)&search=@search&roleId=@roleId&status=@status">
+                                        <i class="mdi mdi-chevron-right"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                }
+                else
+                {
+                    <!-- No Results -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body text-center py-5">
+                                    <div class="empty-state">
+                                        <i class="mdi mdi-account-off-outline display-1 text-muted mb-4"></i>
+                                        <h4 class="mb-3">Không có tài khoản</h4>
+                                        @if (!string.IsNullOrEmpty(search))
+                                        {
+                                            <p class="text-muted mb-4">
+                                                Không tìm thấy tài khoản với "<strong>@search</strong>".
+                                                <br>Thử điều chỉnh tìm kiếm hoặc <a href="@Url.Action("Index")" class="text-primary">xem tất cả</a>.
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-muted mb-4">Hiện tại chưa có tài khoản nào.</p>
+                                        }
+                                        <a asp-action="Create" class="btn btn-primary">
+                                            <i class="mdi mdi-plus"></i> Tạo Tài Khoản Mới
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card-title { color: #6c7293; font-weight: 500; }
+        .card-description { color: #a7a7a7; font-size: 0.875rem; margin-bottom: 0; }
+        .badge-info { background-color: #17a2b8; color: white; }
+        .table th a { color: #6c7293; font-weight: 500; }
+        .table th a:hover { color: #007bff; }
+        .btn-group .btn { margin-right: 4px; }
+        .btn-group .btn:last-child { margin-right: 0; }
+        .btn-icon-text { display: inline-flex; align-items: center; gap: 4px; }
+        .empty-state { padding: 2rem 0; }
+        .form-label { color: #6c7293; font-weight: 500; margin-bottom: 0.5rem; }
+        .pagination-sm .page-link { padding: 0.375rem 0.75rem; }
+        .gap-2 { gap: 0.5rem; }
+
+    </style>
+}

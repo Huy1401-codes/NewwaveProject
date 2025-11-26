@@ -35,7 +35,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
             var query = _context.Classes
                 .Include(c => c.Subject)
                 .Include(c => c.Semester)
-                .Where(c => c.TeacherId == teacherId && !c.IsStatus);
+                .Where(c => c.TeacherId == teacherId && c.IsStatus==true);
 
             if (!string.IsNullOrEmpty(search))
                 query = query.Where(c => c.ClassName.Contains(search)

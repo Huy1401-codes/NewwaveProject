@@ -1,13 +1,19 @@
-﻿namespace PresentationLayer.DTOs
+﻿namespace BusinessLogicLayer.DTOs.Admin
 {
-    public class UserDto
+    public class UserDetailDto
     {
         public int UserId { get; set; }
+
         public string Username { get; set; }
         public string FullName { get; set; }
+
         public string Email { get; set; }
         public string Phone { get; set; }
-        public bool IsStatus { get; set; }
-        public string RoleName { get; set; } // Tên vai trò
+
+        public bool? IsStatus { get; set; }
+
+        public List<int> RoleIds { get; set; }
+
+        public List<string> RoleNames { get; set; }
     }
 }

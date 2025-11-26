@@ -18,7 +18,7 @@ namespace DataAccessLayer.Models
         [Range(1, 10)]
         public int Credit { get; set; }
 
-        public bool IsStatus { get; set; } = false;
+        public bool? IsStatus { get; set; }
 
     }
 }

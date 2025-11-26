@@ -1,11 +1,13 @@
-﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
+﻿using BusinessLogicLayer.DTOs.Admin;
+using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PresentationLayer.Middleware;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace PresentationLayer.Controllers
 {
-    [RequireRole("Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IUserService _userService;
@@ -15,11 +17,31 @@ namespace PresentationLayer.Controllers
             _userService = userService;
         }
 
-        // GET: /User/Index
-        public async Task<IActionResult> Index(string search, int pageIndex = 1, int pageSize = 10, int? roleId = null, bool? status = null)
+        public IActionResult Index()
         {
+            return View();
+        }
+
+        /// <summary>
+        /// danh sách account
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="roleId"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        // GET: /User/
+        public async Task<IActionResult> List(string search, int pageIndex = 1, int pageSize = 10, int? roleId = null, bool? status = null)
+        {
+            // Lấy danh sách user
             var (users, total) = await _userService.GetPagedUsersAsync(search, pageIndex, pageSize, roleId, status);
 
+            // Lấy danh sách role để hiển thị dropdown filter
+            var roles = await _userService.GetAllAsync(); // hoặc repository trực tiếp
+            ViewBag.Roles = roles;
+
+            // Gán các thông tin paging + filter
             ViewBag.Total = total;
             ViewBag.PageIndex = pageIndex;
             ViewBag.PageSize = pageSize;
@@ -27,8 +49,9 @@ namespace PresentationLayer.Controllers
             ViewBag.RoleId = roleId;
             ViewBag.Status = status;
 
-            return View(users);
+            return View("Account/List", users);
         }
+
 
         // GET: /User/Details/5
         public async Task<IActionResult> Details(int id)
@@ -40,22 +63,44 @@ namespace PresentationLayer.Controllers
             return View(user);
         }
 
+
+
         // GET: /User/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            // Lấy tất cả role trừ Admin
+            var rolesFromDb = await _userService.GetAllAsync();
+
+            // Chuyển thành SelectListItem để bind dropdown
+            ViewBag.Roles = rolesFromDb.Select(r => new SelectListItem
+            {
+                Value = r.RoleId.ToString(),
+                Text = r.RoleName
+            }).ToList();
+
+            return View("Account/Create", new UserCreateDto());
         }
 
         // POST: /User/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(User user)
+        public async Task<IActionResult> Create(UserCreateDto user)
         {
             if (!ModelState.IsValid)
-                return View(user);
+            {
+                // Repopulate Roles nếu form lỗi
+                var rolesFromDb = await _userService.GetAllAsync();
+                ViewBag.Roles = rolesFromDb.Select(r => new SelectListItem
+                {
+                    Value = r.RoleId.ToString(),
+                    Text = r.RoleName
+                }).ToList();
+
+                return View("Account/Create", user);
+            }
 
             await _userService.AddAsync(user);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Account/List");
         }
 
         // GET: /User/Edit/5
@@ -71,7 +116,7 @@ namespace PresentationLayer.Controllers
         // POST: /User/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, User user)
+        public async Task<IActionResult> Edit(int id, UserUpdateDto user)
         {
             if (id != user.UserId)
                 return BadRequest();
@@ -101,5 +146,12 @@ namespace PresentationLayer.Controllers
             await _userService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+
+
+
+
+
+
     }
 }

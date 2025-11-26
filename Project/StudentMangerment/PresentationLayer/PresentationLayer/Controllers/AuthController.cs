@@ -1,6 +1,9 @@
 ﻿using BusinessLogicLayer.DTOs;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
@@ -14,52 +17,62 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() => View();
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid)
-                return View(model);
+            if (!ModelState.IsValid) return View(model);
 
             var user = await _service.LoginAsync(model.Email, model.Password);
-
             if (user == null)
             {
                 ModelState.AddModelError("", "Tên người dùng hoặc mật khẩu không hợp lệ.");
                 return View(model);
             }
 
-            // lưu session
-            HttpContext.Session.SetInt32("UserId", user.UserId);
-            HttpContext.Session.SetString("Username", user.Username);
+            // Lấy role
+            var role = user.UserRoles.FirstOrDefault()?.Role.RoleName ?? "Student";
 
-            // lấy role
-            var role = user.UserRoles.First().Role.RoleName;
-            HttpContext.Session.SetString("Role", role);
+            // Tạo claims
+            var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Name, user.Username),
+            new Claim(ClaimTypes.Email, user.Email ?? ""),
+            new Claim(ClaimTypes.Role, role)
+        };
 
-            // điều hướng theo role
-            if (role == "Admin") return RedirectToAction("Index", "Admin");
-            if (role == "Teacher") return RedirectToAction("Index", "Teacher");
-            if (role == "Student") return RedirectToAction("Index", "Student");
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = false
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties
+            );
+
+            return role switch
+            {
+                "Admin" => RedirectToAction("Index", "Admin"),
+                "Teacher" => RedirectToAction("Index", "Teacher"),
+                "Student" => RedirectToAction("Index", "Student"),
+                _ => RedirectToAction("Login")
+            };
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
 
-        public IActionResult Logout()
-        {
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
-        }
-
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
-
+        public IActionResult AccessDenied() => View();
     }
 
 }

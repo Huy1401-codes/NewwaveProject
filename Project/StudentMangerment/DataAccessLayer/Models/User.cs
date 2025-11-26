@@ -31,7 +31,7 @@ namespace DataAccessLayer.Models
         [DataType(DataType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
-        public bool IsStatus { get; set; } = false;
+        public bool? IsStatus { get; set; }
 
         public ICollection<UserRole> UserRoles { get; set; }
         public Student Student { get; set; }

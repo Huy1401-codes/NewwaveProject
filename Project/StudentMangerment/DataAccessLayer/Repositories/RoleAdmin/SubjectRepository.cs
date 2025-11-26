@@ -15,10 +15,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         private readonly SchoolContext _context;
         public SubjectRepository(SchoolContext context) => _context = context;
 
-        public IQueryable<Subject> GetAllQueryable() => _context.Subjects.Where(s => !s.IsStatus);
+        public IQueryable<Subject> GetAllQueryable() => _context.Subjects.Where(s => s.IsStatus==true);
 
         public async Task<Subject> GetByIdAsync(int id) =>
-            await _context.Subjects.FirstOrDefaultAsync(s => s.SubjectId == id && !s.IsStatus);
+            await _context.Subjects.FirstOrDefaultAsync(s => s.SubjectId == id && s.IsStatus==true);
 
         public async Task AddAsync(Subject sub) => await _context.Subjects.AddAsync(sub);
 

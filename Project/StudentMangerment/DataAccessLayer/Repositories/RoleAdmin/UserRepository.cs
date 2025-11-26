@@ -18,24 +18,26 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         public IQueryable<User> GetAllQueryable()
         {
             return _context.Users
-                .Where(u => !u.IsStatus)
+                .Where(u => u.IsStatus == true)
+                .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName != "Admin")) 
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
                 .AsQueryable();
         }
 
+
         public async Task<User> GetByIdAsync(int id)
         {
             return await _context.Users
                 .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && !u.IsStatus);
+                .FirstOrDefaultAsync(u => u.UserId == id && u.IsStatus==true);
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await _context.Users
                 .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Username == username && !u.IsStatus);
+                .FirstOrDefaultAsync(u => u.Username == username && u.IsStatus==true);
         }
 
         public async Task AddAsync(User user) => await _context.Users.AddAsync(user);

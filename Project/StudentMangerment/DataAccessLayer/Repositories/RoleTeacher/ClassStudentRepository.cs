@@ -34,7 +34,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
                 .Include(cs => cs.Student)
                     .ThenInclude(s => s.User)
                 .Where(cs => cs.ClassId == classId
-                    && cs.Student.User.IsStatus);
+                    && cs.Student.User.IsStatus==true);
 
             if (!string.IsNullOrWhiteSpace(search))
             {
