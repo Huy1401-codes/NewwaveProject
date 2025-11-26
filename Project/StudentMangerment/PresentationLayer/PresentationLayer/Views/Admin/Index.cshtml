@@ -1,6 +1,147 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IEnumerable<PresentationLayer.DTOs.Admin.UserDto>
 @{
-    Layout = "_Layout";
+    Layout = "_Layout"; // hoặc null nếu muốn full-page
+    ViewData["Title"] = "Quản lý Tài Khoản";
+
+    // Pagination
+    int pageIndex = ViewBag.PageIndex ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalRecords = ViewBag.Total ?? 0;
+    int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+
+    string search = ViewBag.Search ?? "";
+    int? roleId = ViewBag.RoleId;
+    bool? status = ViewBag.Status;
+    var roles = ViewBag.Roles as IEnumerable<DataAccessLayer.Models.Role>; // nếu cần
 }
+
+<h2>Quản lý Tài Khoản</h2>
+<a asp-action="Create" class="btn btn-success mb-3">Tạo Tài Khoản Mới</a>
+
+<form method="get">
+    <input type="hidden" name="pageIndex" value="@pageIndex" />
+
+    <div class="row">
+        <!-- Tìm kiếm -->
+        <div class="row align-items-end mb-3">
+            <div class="col-md-9">
+                <div class="form-group">
+                    <label for="Search">Tìm kiếm</label>
+                    <input type="text" id="Search" name="search" class="form-control" value="@search" placeholder="Tìm theo tên, email, username" />
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="invisible">Tìm kiếm</label>
+                    <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+
+       <div class="row mb-3">
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="RoleId">Vai trò</label>
+                    <select id="RoleId" name="roleId" class="form-control">
+                        <option value="">Tất cả</option>
+                        @if (roles != null)
+                        {
+                            foreach (var role in roles)
+                            {
+                                if (role.RoleId == roleId)
+                                {
+                                    <option value="@role.RoleId" selected="selected">@role.RoleName</option>
+                                }
+                                else
+                                {
+                                    <option value="@role.RoleId">@role.RoleName</option>
+                                }
+                            }
+                        }
+                    </select>
+
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="form-group">
+            <label for="Status">Trạng thái</label>
+                    <select id="Status" name="status" class="form-control">
+                        <option value="">Tất cả</option>
+                        @if (status.HasValue && status.Value)
+                        {
+                            <option value="true" selected="selected">Hoạt động</option>
+                            <option value="false">Vô hiệu hóa</option>
+                        }
+                        else if (status.HasValue && !status.Value)
+                        {
+                            <option value="true">Hoạt động</option>
+                            <option value="false" selected="selected">Vô hiệu hóa</option>
+                        }
+                        else
+                        {
+                            <option value="true">Hoạt động</option>
+                            <option value="false">Vô hiệu hóa</option>
+                        }
+                    </select>
+
+        </div>
+    </div>
+</div>
+
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Vai trò</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var account in Model)
+            {
+                <tr>
+                    <td>@account.Username</td>
+                    <td>@account.RoleName</td>
+                    <td>@(account.IsStatus ? "Hoạt động" : "Vô hiệu hóa")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@account.UserId" class="btn btn-info btn-sm">Chi tiết</a>
+                        <a asp-action="Edit" asp-route-id="@account.UserId" class="btn btn-warning btn-sm">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@account.UserId" class="btn btn-danger btn-sm @(account.IsStatus ? "disabled" : "")">Xóa</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center">Không có dữ liệu</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav>
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" href="?pageIndex=@(pageIndex - 1)&search=@search&roleId=@roleId&status=@status">Trước</a>
+        </li>
+
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == pageIndex ? "active" : "")">
+                <a class="page-link" href="?pageIndex=@i&search=@search&roleId=@roleId&status=@status">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+            <a class="page-link" href="?pageIndex=@(pageIndex + 1)&search=@search&roleId=@roleId&status=@status">Sau</a>
+        </li>
+    </ul>
+</nav>
