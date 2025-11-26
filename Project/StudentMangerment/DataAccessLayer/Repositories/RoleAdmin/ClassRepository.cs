@@ -1,6 +1,6 @@
 ﻿using DataAccessLayer.Context;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface;
+using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DataAccessLayer.Repositories
+namespace DataAccessLayer.Repositories.RoleAdmin
 {
     public class ClassRepository : IClassRepository
     {

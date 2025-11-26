@@ -1,5 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs;
-using BusinessLogicLayer.Services.Interface;
+using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PresentationLayer.Controllers
@@ -54,6 +54,12 @@ namespace PresentationLayer.Controllers
             HttpContext.Session.Clear();
             return RedirectToAction("Login");
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
     }
 
 }

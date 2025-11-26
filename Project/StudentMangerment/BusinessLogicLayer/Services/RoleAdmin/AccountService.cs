@@ -1,13 +1,13 @@
-﻿using BusinessLogicLayer.Services.Interface;
+﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface;
+using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessLogicLayer.Services
+namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class AccountService : IAccountService
     {

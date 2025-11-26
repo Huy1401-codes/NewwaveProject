@@ -27,5 +27,8 @@ namespace DataAccessLayer.Models
         [Required]
         public int TeacherId { get; set; }
         public Teacher Teacher { get; set; }
+
+        public ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+
     }
 }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Models
 {
-    public class Grade
+    public class StudentGrade
     {
         [Key]
-        public int GradeId { get; set; }
+        public int StudentGradeId { get; set; }
 
         [Required]
         public int StudentId { get; set; }
@@ -24,13 +24,14 @@ namespace DataAccessLayer.Models
         public int ClassId { get; set; }
         public Class Class { get; set; }
 
-        [Range(0, 10)]
-        public double MidtermScore { get; set; }
+        [Required]
+        public int GradeComponentId { get; set; }
+        public GradeComponent GradeComponent { get; set; }
 
         [Range(0, 10)]
-        public double FinalScore { get; set; }
+        public double? Score { get; set; }  // có thể null nếu chưa nhập
 
-        public double AverageScore { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 
 }

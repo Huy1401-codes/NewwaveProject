@@ -21,5 +21,9 @@ namespace DataAccessLayer.Models
 
         [StringLength(50)]
         public string Degree { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
+        public string? Status { get; set; }
     }
 }

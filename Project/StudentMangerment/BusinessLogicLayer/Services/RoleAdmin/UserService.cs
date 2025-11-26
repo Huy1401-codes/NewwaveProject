@@ -1,9 +1,9 @@
-﻿using BusinessLogicLayer.Services.Interface;
+﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface;
+using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using Microsoft.EntityFrameworkCore;
 
-namespace BusinessLogicLayer.Services
+namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class UserService : IUserService
     {
@@ -14,6 +14,15 @@ namespace BusinessLogicLayer.Services
             _userRepo = userRepo;
         }
 
+        /// <summary>
+        /// Lấy danh sách người dùng
+        /// </summary>
+        /// <param name="search">Tìm kiếm theo tên</param>
+        /// <param name="pageIndex">Phân trang</param>
+        /// <param name="pageSize">Số lượng hiển thị trên 1 trang</param>
+        /// <param name="roleId">Lọc theo vai trò</param>
+        /// <param name="status">Lọc theo trạng thái account</param>
+        /// <returns></returns>
         public async Task<(IEnumerable<User> Users, int Total)> GetPagedUsersAsync(
          string search, int pageIndex, int pageSize, int? roleId, bool? status)
         {

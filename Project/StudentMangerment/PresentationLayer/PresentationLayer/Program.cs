@@ -1,4 +1,8 @@
-﻿using DataAccessLayer.Context;
+﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
+using BusinessLogicLayer.Services.RoleAdmin;
+using DataAccessLayer.Context;
+using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.Repositories.RoleAdmin;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +12,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<SchoolContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Defaul")));
+
+
+
+builder.Services.AddHttpContextAccessor();
+
+// Thêm Session
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // thời gian sống của session
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<IAccountService, AccountService>();
+
+
+
+
+
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -17,6 +43,8 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+app.UseSession();
+
 // Middleware kiểm tra quyền
 app.UseMiddleware<AuthorizationMiddleware>();
 app.UseHttpsRedirection();

@@ -24,6 +24,10 @@ namespace DataAccessLayer.Models
 
         [StringLength(10)]
         public string Gender { get; set; }
+
+        public bool IsDeleted { get; set; } = false;
+
+        public string? Status { get; set; }
     }
 
 }
