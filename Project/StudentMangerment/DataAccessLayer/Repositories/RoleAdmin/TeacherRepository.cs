@@ -84,5 +84,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         {
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Teacher>> GetAllNameAsync()
+        {
+            return await _context.Teachers.Include(a=>a.User).OrderBy(t => t.User.FullName).ToListAsync();
+        }
     }
 }

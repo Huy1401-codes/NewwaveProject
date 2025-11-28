@@ -16,5 +16,8 @@ namespace DataAccessLayer.Repositories.Interface.RoleAdmin
         Task UpdateAsync(Teacher teacher);
         Task SoftDeleteAsync(int id);
         Task SaveAsync();
+
+        Task<IEnumerable<Teacher>> GetAllNameAsync();
+
     }
 }

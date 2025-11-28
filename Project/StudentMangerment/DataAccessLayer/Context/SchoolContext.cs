@@ -22,50 +22,34 @@ namespace DataAccessLayer.Context
         public DbSet<GradeComponent> GradeComponents { get; set; }
         public DbSet<StudentGrade> StudentGrades { get; set; }
 
+        public DbSet<ClassSemester> ClassSemesters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // =============================
-            // USER - ROLE MANY TO MANY
-            // =============================
+            // User - Role N:N
             modelBuilder.Entity<UserRole>()
                 .HasKey(ur => new { ur.UserId, ur.RoleId });
 
-
-            // =============================
-            // USER - STUDENT (1 - 1)
-            // =============================
+            // User - Student / Teacher 1:1
             modelBuilder.Entity<Student>()
                 .HasOne(s => s.User)
                 .WithOne(u => u.Student)
                 .HasForeignKey<Student>(s => s.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =============================
-            // USER - TEACHER (1 - 1)
-            // =============================
             modelBuilder.Entity<Teacher>()
                 .HasOne(t => t.User)
                 .WithOne(u => u.Teacher)
                 .HasForeignKey<Teacher>(t => t.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-            // =============================
-            // CLASS RELATIONSHIP
-            // =============================
+            // Class ↔ Subject / Teacher
             modelBuilder.Entity<Class>()
                 .HasOne(c => c.Subject)
                 .WithMany()
                 .HasForeignKey(c => c.SubjectId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Class>()
-                .HasOne(c => c.Semester)
-                .WithMany()
-                .HasForeignKey(c => c.SemesterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Class>()
@@ -74,48 +58,50 @@ namespace DataAccessLayer.Context
                 .HasForeignKey(c => c.TeacherId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-            // =============================
-            // CLASS SCHEDULE
-            // =============================
-            modelBuilder.Entity<ClassSchedule>()
+            // ClassSemester N:N
+            modelBuilder.Entity<ClassSemester>()
                 .HasOne(cs => cs.Class)
-                .WithMany()
+                .WithMany(c => c.ClassSemesters)
                 .HasForeignKey(cs => cs.ClassId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ClassSemester>()
+                .HasOne(cs => cs.Semester)
+                .WithMany(s => s.ClassSemesters)
+                .HasForeignKey(cs => cs.SemesterId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // =============================
-            // CLASS - STUDENT (MANY TO MANY)
-            // =============================
+            // ClassSchedule ↔ ClassSemester
+            modelBuilder.Entity<ClassSchedule>()
+                .HasOne(cs => cs.ClassSemester)
+                .WithMany(cs2 => cs2.ClassSchedules)
+                .HasForeignKey(cs => cs.ClassSemesterId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Class - Student N:N
             modelBuilder.Entity<ClassStudent>()
                 .HasKey(cs => new { cs.ClassId, cs.StudentId });
 
             modelBuilder.Entity<ClassStudent>()
                 .HasOne(cs => cs.Class)
-                .WithMany()
+                .WithMany(c => c.ClassStudents)
                 .HasForeignKey(cs => cs.ClassId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<ClassStudent>()
                 .HasOne(cs => cs.Student)
-                .WithMany()
+                .WithMany(s => s.ClassStudents)
                 .HasForeignKey(cs => cs.StudentId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
-            // =============================
-            // GRADE COMPONENT
-            // =============================
+            // GradeComponent ↔ Subject
             modelBuilder.Entity<GradeComponent>()
                 .HasOne(gc => gc.Subject)
                 .WithMany()
                 .HasForeignKey(gc => gc.SubjectId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // =============================
-            // STUDENT GRADE
-            // =============================
+            // StudentGrade
             modelBuilder.Entity<StudentGrade>()
                 .HasOne(sg => sg.Student)
                 .WithMany()
@@ -129,9 +115,9 @@ namespace DataAccessLayer.Context
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StudentGrade>()
-                .HasOne(sg => sg.Class)
+                .HasOne(sg => sg.ClassSemester)
                 .WithMany()
-                .HasForeignKey(sg => sg.ClassId)
+                .HasForeignKey(sg => sg.ClassSemesterId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StudentGrade>()
@@ -140,5 +126,6 @@ namespace DataAccessLayer.Context
                 .HasForeignKey(sg => sg.GradeComponentId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
+
     }
 }

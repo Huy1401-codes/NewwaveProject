@@ -84,5 +84,10 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             return await _subjectRepo.GetAllQueryable().ToListAsync();
         }
+
+        public async Task<IEnumerable<Subject>> GetAllNameAsync()
+        {
+            return await _subjectRepo.GetAllAsync();
+        }
     }
 }

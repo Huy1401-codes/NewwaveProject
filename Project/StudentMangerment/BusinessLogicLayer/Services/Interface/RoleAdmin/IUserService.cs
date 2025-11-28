@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.DTOs.Admin;
 using DataAccessLayer.Models;
+using System.Linq.Expressions;
 
 namespace BusinessLogicLayer.Services.Interface.RoleAdmin
 {
@@ -11,6 +12,10 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
         Task<(IEnumerable<UserListDto> Users, int Total)> GetPagedUsersAsync(
             string search, int pageIndex, int pageSize, int? roleId, bool? status);
 
+        Task<(IEnumerable<UserListDto> Users, int Total)> GetRestoreUsersAsync(
+          string search, int pageIndex, int pageSize, int? roleId);
+
+
         /// <summary>
         /// Lấy chi tiết 1 user (dùng DTO)
         /// </summary>
@@ -19,19 +24,28 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
         /// <summary>
         /// Tạo user mới (bao gồm gán nhiều role)
         /// </summary>
-        Task AddAsync(UserCreateDto dto);
+        Task<(bool Success, List<string> Errors)> AddAsync(UserCreateDto dto);
 
         /// <summary>
         /// Cập nhật user + cập nhật vai trò
         /// </summary>
-        Task UpdateAsync(UserUpdateDto dto);
+        Task<(bool Success, List<string> Errors)> UpdateAsync(UserUpdateDto dto);
 
+
+        /// <summary>
+        /// Cấp lại mật khẩu
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        Task<bool> ResetPasswordAsync(int userId, string newPassword);
         /// <summary>
         /// Xóa mềm user
         /// </summary>
         Task DeleteAsync(int id);
 
         Task<List<Role>> GetAllAsync();
+
     }
 
 }

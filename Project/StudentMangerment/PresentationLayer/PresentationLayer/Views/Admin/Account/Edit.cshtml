@@ -1,0 +1,193 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.UserUpdateDto
+
+@{
+    ViewData["Title"] = "Chỉnh sửa người dùng";
+    var roles = ViewBag.Roles as List<SelectListItem> ?? new List<SelectListItem>();
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["SuccessMessage"])", "success");
+        });
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["ErrorMessage"])", "error");
+        });
+    </script>
+}
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="p-4 rounded shadow-sm border bg-white">
+    <h3 class="mb-4 fw-semibold text-primary">
+        <i class="mdi mdi-account-edit-outline"></i> Chỉnh Sửa Người Dùng
+    </h3>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="UserId" />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label fw-semibold">Tên đăng nhập</label>
+                    <input class="form-control form-control-sm border-primary" asp-for="Username" placeholder="Nhập tên đăng nhập..." />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label fw-semibold">Họ và tên</label>
+                    <input class="form-control form-control-sm border-success" asp-for="FullName" placeholder="Nhập họ tên..." />
+                    <span asp-validation-for="FullName" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label fw-semibold">Email</label>
+                    <input type="email" class="form-control form-control-sm border-info" asp-for="Email" placeholder="Nhập email..." readonly/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="form-label fw-semibold">Số điện thoại</label>
+                    <input class="form-control form-control-sm border-warning" asp-for="Phone" placeholder="Nhập số điện thoại..." />
+                    <span asp-validation-for="Phone" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <select class="form-select form-select-sm border-info" asp-for="IsStatus" id="IsStatus">
+                    <option value="">-- Chọn trạng thái --</option>
+                    <option value="true">Đang hoạt động</option>
+                    <option value="false">Tạm khóa</option>
+                </select>
+                <span asp-validation-for="IsStatus" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label fw-semibold">Vai trò</label>
+                    <select class="form-select form-select-sm border-info" asp-for="RoleId" id="RoleId">
+                        <option value="">-- Chọn vai trò --</option>
+                        @foreach (var role in roles)
+                        {
+                            <option value="@role.Value">@role.Text</option>
+                        }
+                    </select>
+                    <span asp-validation-for="RoleId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 text-end">
+            <button type="button" class="btn btn-warning fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#resetPasswordModal">
+                <i class="mdi mdi-lock-reset"></i> Cấp lại mật khẩu
+            </button>
+
+            <button type="submit" class="btn btn-primary fw-semibold shadow-sm">
+                <i class="mdi mdi-content-save-outline"></i> Lưu
+            </button>
+            <a asp-action="List" class="btn btn-secondary fw-semibold ms-2 shadow-sm">
+                <i class="mdi mdi-cancel"></i> Hủy
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade" id="resetPasswordModal" tabindex="-1" aria-labelledby="resetPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="ResetPassword" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="UserId" />
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="resetPasswordModalLabel">Cấp lại mật khẩu</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label fw-semibold">Mật khẩu mới</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="NewPassword" name="NewPassword" readonly />
+                            <button type="button" class="btn btn-outline-secondary" id="generatePassword">Sinh mật khẩu</button>
+                        </div>
+                    </div>
+                    <div class="form-group mt-2">
+                        <label class="form-label fw-semibold">Xác nhận mật khẩu</label>
+                        <input type="text" class="form-control" id="ConfirmPassword" name="ConfirmPassword" readonly />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu mật khẩu mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+@section Scripts {
+<script>
+    function generateRandomPassword(length = 10) {
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!#$%^&*()";
+        let password = "";
+        for (let i = 0; i < length; i++) {
+            password += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return password;
+    }
+
+    document.getElementById("generatePassword").addEventListener("click", function() {
+        const pwd = generateRandomPassword(8); // độ dài 8 ký tự
+        document.getElementById("NewPassword").value = pwd;
+        document.getElementById("ConfirmPassword").value = pwd;
+    });
+
+        function showToast(message, type) {
+
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+
+            toastBody.innerText = message;
+
+            // Reset màu
+            toastEl.classList.remove("bg-success", "bg-danger");
+
+            // Gán màu theo loại
+            if (type === "success") {
+                toastEl.classList.add("bg-success");
+            } else {
+                toastEl.classList.add("bg-danger");
+            }
+
+            // Cấu hình tự tắt sau 3 giây
+            const toast = new bootstrap.Toast(toastEl, {
+                delay: 3000,
+                autohide: true
+            });
+
+            toast.show();
+        }
+</script>
+}

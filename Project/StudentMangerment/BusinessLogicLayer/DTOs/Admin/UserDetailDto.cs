@@ -12,7 +12,7 @@
 
         public bool? IsStatus { get; set; }
 
-        public List<int> RoleIds { get; set; }
+        public int RoleIds { get; set; }
 
         public List<string> RoleNames { get; set; }
     }

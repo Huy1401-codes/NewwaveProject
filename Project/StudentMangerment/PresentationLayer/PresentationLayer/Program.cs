@@ -34,6 +34,23 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
+
+builder.Services.AddScoped<ISemesterRepository, SemesterRepository>();
+builder.Services.AddScoped<ISemesterService, SemesterService>();
+
+builder.Services.AddScoped<IClassSemesterRepository,ClassSemesterRepository>();
+builder.Services.AddScoped<IClassSemesterService,ClassSemesterService>();
+
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<IStudentService, StudentService>();
+
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
+builder.Services.AddScoped<ISubjectService, SubjectService>();
+
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+builder.Services.AddScoped<ITeacherService, TeacherService>();
+
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {

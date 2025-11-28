@@ -1,0 +1,37 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.UserDetailDto
+
+@{
+    ViewData["Title"] = "Khôi phục tài khoản";
+}
+
+@if (Model != null) 
+{
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Xác nhận khôi phục tài khoản</h4>
+
+        <p>Bạn có chắc muốn khôi phục tài khoản sau?</p>
+
+        <ul>
+            <li><strong>Username:</strong> @Model.Username</li>
+            <li><strong>Email:</strong> @Model.Email</li>
+            <li><strong>Họ tên:</strong> @Model.FullName</li>
+        </ul>
+
+        <form method="post" asp-action="EditStatus" asp-route-id="@Model.UserId">
+            @* Thêm Anti-Forgery Token cho bảo mật *@
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-success">Khôi phục</button>
+            <a asp-action="ListRestore" asp-controller="Admin" class="btn btn-secondary">Hủy</a> @* Sửa controller thành Admin *@
+        </form>
+    </div>
+    </div>
+}
+else
+{
+    {
+        // Hiển thị thông báo hoặc chuyển hướng nếu Model bị null
+        <div class="alert alert-danger">Không tìm thấy thông tin tài khoản để hiển thị.</div>
+        <a asp-action="ListRestore" asp-controller="Admin" class="btn btn-secondary">Quay lại danh sách</a>
+    }
+}

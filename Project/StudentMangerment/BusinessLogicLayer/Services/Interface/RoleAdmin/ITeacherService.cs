@@ -14,6 +14,9 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
         Task<bool> CreateAsync(Teacher teacher);
         Task<bool> UpdateAsync(Teacher teacher);
         Task<bool> SoftDeleteAsync(int id);
+
+        Task<IEnumerable<Teacher>> GetAllAsync();
+
     }
 
 }

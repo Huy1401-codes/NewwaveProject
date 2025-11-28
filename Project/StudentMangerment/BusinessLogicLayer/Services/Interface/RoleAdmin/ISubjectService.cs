@@ -17,7 +17,8 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
         Task<bool> UpdateAsync(Subject subject);
         Task<bool> DeleteAsync(int id);
 
-        Task<List<Subject>> GetAllAsync(); // dùng cho dropdown
+        Task<IEnumerable<Subject>> GetAllNameAsync();
+
     }
 
 }

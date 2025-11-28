@@ -68,5 +68,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             await _studentRepo.SaveAsync();
             return true;
         }
+
+        public async Task<IEnumerable<Student>> GetAllAsync()
+        {
+            return await _studentRepo.GetAllAsync();
+        }
+
+     
     }
 }

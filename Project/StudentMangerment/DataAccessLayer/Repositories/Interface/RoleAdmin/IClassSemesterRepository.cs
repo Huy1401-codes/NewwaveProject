@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories.Interface.RoleAdmin
 {
-    public interface IClassRepository
+    public interface IClassSemesterRepository
     {
-        IQueryable<Class> GetAllQueryable();
         Task<Class> GetByIdAsync(int id);
-        Task AddAsync(Class cls);
-        Task UpdateAsync(Class cls);
-        Task SoftDeleteAsync(int id);
-        Task SaveAsync();
+        Task<List<Class>> GetAllAsync();
+        Task AddAsync(Class entity);
+        Task UpdateAsync(Class entity);
+        Task DeleteAsync(int id);
     }
-
 }

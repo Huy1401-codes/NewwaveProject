@@ -1,0 +1,61 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.ManagerClass.ClassCreateDto
+
+@{
+    ViewData["Title"] = "Create New Class";
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold mb-3">Create New Class</h2>
+
+    <form asp-action="Create" method="post">
+
+        <!-- CLASS NAME -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Class Name</label>
+            <input asp-for="ClassName" class="form-control" placeholder="Enter class name" />
+            <span asp-validation-for="ClassName" class="text-danger"></span>
+        </div>
+
+        <!-- SEMESTER -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Semester</label>
+            <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
+                <option value="">-- Select Semester --</option>
+            </select>
+            <span asp-validation-for="SemesterId" class="text-danger"></span>
+        </div>
+
+        <!-- SUBJECT -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Subject</label>
+            <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
+                <option value="">-- Select Subject --</option>
+            </select>
+            <span asp-validation-for="SubjectId" class="text-danger"></span>
+        </div>
+
+        <!-- TEACHER -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Teacher</label>
+            <select asp-for="TeacherId" class="form-control" asp-items="ViewBag.Teachers">
+                <option value="">-- Select Teacher --</option>
+            </select>
+            <span asp-validation-for="TeacherId" class="text-danger"></span>
+        </div>
+
+        <!-- STUDENTS MULTI-SELECT -->
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Students</label>
+            <select asp-for="StudentIds" multiple class="form-select" asp-items="ViewBag.Students" size="10">
+            </select>
+            <span class="text-muted">Hold CTRL to select multiple students</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Create
+        </button>
+        <a href="@Url.Action("Index", "Class")" class="btn btn-secondary">Cancel</a>
+
+    </form>
+</div>

@@ -35,6 +35,12 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         }
 
         public async Task SaveAsync() => await _context.SaveChangesAsync();
+
+
+        public async Task<IEnumerable<Subject>> GetAllAsync()
+        {
+            return await _context.Subjects.OrderBy(s => s.Name).ToListAsync();
+        }
     }
 
 }

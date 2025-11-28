@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,7 +26,15 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .AsQueryable();
         }
 
-
+        public IQueryable<User> GetAllRestoreQueryable()
+        {
+            return _context.Users
+                .Where(u => u.IsStatus == false)
+                .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName != "Admin"))
+                .Include(u => u.UserRoles)
+                    .ThenInclude(ur => ur.Role)
+                .AsQueryable();
+        }
         public async Task<User> GetByIdAsync(int id)
         {
             return await _context.Users
@@ -55,6 +64,12 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         }
 
         public async Task SaveAsync() => await _context.SaveChangesAsync();
+
+        public async Task<User> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users.FirstOrDefaultAsync(predicate);
+        }
+
     }
 
 

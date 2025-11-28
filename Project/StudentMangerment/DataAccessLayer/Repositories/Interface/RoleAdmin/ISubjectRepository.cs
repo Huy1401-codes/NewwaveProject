@@ -15,6 +15,10 @@ namespace DataAccessLayer.Repositories.Interface.RoleAdmin
         Task UpdateAsync(Subject sub);
         Task SoftDeleteAsync(int id);
         Task SaveAsync();
+
+        Task<IEnumerable<Subject>> GetAllAsync();
+
     }
+
 
 }

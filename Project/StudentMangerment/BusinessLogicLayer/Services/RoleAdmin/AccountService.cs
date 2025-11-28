@@ -21,11 +21,27 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         public async Task<User> LoginAsync(string email, string password)
         {
             var user = await _account.GetByUsernameAsync(email);
+            if (user == null)
+                return null;
 
-            if (user == null) return null;
-            if (user.PasswordHash != password) return null; 
+            string storedPassword = user.PasswordHash;
 
-            return user;
+            //1. Nếu mật khẩu đã mã hoá
+            if (!string.IsNullOrEmpty(storedPassword) && storedPassword.StartsWith("$2"))
+            {
+                bool isMatch = BCrypt.Net.BCrypt.Verify(password, storedPassword);
+                return isMatch ? user : null;
+            }
+
+            //2. Nếu mật khẩu chưa mã hoá  so sánh trực tiếp
+            if (storedPassword == password)
+            {
+                return user;
+            }
+
+            return null;
         }
+
+
     }
 }

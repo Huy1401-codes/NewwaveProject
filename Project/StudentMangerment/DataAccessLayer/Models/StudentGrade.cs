@@ -28,6 +28,10 @@ namespace DataAccessLayer.Models
         public int GradeComponentId { get; set; }
         public GradeComponent GradeComponent { get; set; }
 
+        [Required]
+        public int ClassSemesterId { get; set; }   // mới
+        public ClassSemester ClassSemester { get; set; }  // navigation property
+
         [Range(0, 10)]
         public double? Score { get; set; }  // có thể null nếu chưa nhập
 

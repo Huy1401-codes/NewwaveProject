@@ -14,6 +14,33 @@
     bool? status = ViewBag.Status;
     var roles = ViewBag.Roles as IEnumerable<DataAccessLayer.Models.Role>;
 }
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["SuccessMessage"])", "success");
+        });
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["ErrorMessage"])", "error");
+        });
+    </script>
+}
+
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
 
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
@@ -27,6 +54,7 @@
                     <a asp-action="Create"  class="btn btn-primary btn-sm">
                         <i class="mdi mdi-plus"></i> Tạo Tài Khoản Mới
                     </a>
+                   
                 </div>
 
                 <!-- Search & Filter Section -->
@@ -44,24 +72,14 @@
                                                    value="@search" placeholder="Tên, email, username..." />
                                         </div>
 
-                                        <!-- Role Filter -->
-                                      <!-- Role Filter -->
-<div class="col-md-3 mb-3">
-    <label class="form-label">Vai trò:</label>
-<select class="form-select form-select-sm" name="roleId">
-    <option value="">Tất cả</option>
-    @if (roles != null)
-    {
-        foreach (var role in roles)
-        {
-            @:<option value="@role.RoleId" @(role.RoleId == roleId ? "selected" : "")>@role.RoleName</option>
-        }
-    }
-</select>
-
-
-
-</div>
+                                       <!-- Role Filter -->
+                                         <div class="col-md-3 mb-3">
+                                               <label class="form-label">Vai trò:</label>
+                                                <select class="form-control" name="roleId" 
+                                                       asp-items="@(new SelectList(ViewBag.Roles, "Value", "Text", ViewBag.RoleId))">
+                                                     <option value="">-- Tất cả --</option>
+                                                </select>
+                                                </div>
 
 
                                         <!-- Status Filter -->
@@ -159,15 +177,27 @@
                                         <td>@(user.IsStatus==true ? "Hoạt động" : "Vô hiệu hóa")</td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a asp-action="Details" asp-route-id="@user.UserId" class="btn btn-outline-info btn-sm btn-icon-text">
-                                                    <i class="mdi mdi-eye"></i> Chi tiết
-                                                </a>
-                                                <a asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-warning btn-sm btn-icon-text">
+                                               <a asp-controller="Account" asp-action="Detail" asp-route-id="@user.UserId" class="btn btn-outline-info btn-sm btn-icon-text">
+    <i class="mdi mdi-eye"></i> Chi tiết
+</a>
+                                                <a asp-controller="Account" asp-action="Edit" asp-route-id="@user.UserId" class="btn btn-outline-warning btn-sm btn-icon-text">
                                                     <i class="mdi mdi-pencil"></i> Sửa
                                                 </a>
-                                                <a asp-action="Delete" asp-route-id="@user.UserId" class="btn btn-outline-danger btn-sm btn-icon-text )">
-                                                    <i class="mdi mdi-delete"></i> Xóa
-                                                </a>
+                                           @if (user.IsStatus==true)
+{
+    <a asp-action="Delete" asp-controller="Account" asp-route-id="@user.UserId" class="btn btn-outline-warning btn-sm btn-icon-text">
+        <i class="mdi mdi-delete"></i> Xóa
+    </a>
+}
+else
+{
+<a asp-action="Restore" asp-controller="Account"  asp-route-id="@user.UserId" class="btn btn-outline-success btn-sm">
+    <i class="mdi mdi-backup-restore"></i> Khôi phục
+</a>
+
+
+}
+
                                             </div>
                                         </td>
                                     </tr>
@@ -175,6 +205,7 @@
                             </tbody>
                         </table>
                     </div>
+                   
 
                     <!-- Pagination -->
                     @if (totalPages >= 1)
@@ -287,3 +318,32 @@
 
     </style>
 }
+<script>
+    function showToast(message, type) {
+
+        const toastEl = document.getElementById("toastNotification");
+        const toastBody = document.getElementById("toastMessage");
+
+        toastBody.innerText = message;
+
+        // Reset màu
+        toastEl.classList.remove("bg-success", "bg-danger");
+
+        // Gán màu theo loại
+        if (type === "success") {
+            toastEl.classList.add("bg-success");
+        } else {
+            toastEl.classList.add("bg-danger");
+        }
+
+        // Cấu hình tự tắt sau 3 giây
+        const toast = new bootstrap.Toast(toastEl, {
+            delay: 3000,
+            autohide: true
+        });
+
+        toast.show();
+    }
+
+
+</script>

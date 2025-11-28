@@ -1,0 +1,57 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.UserDetailDto
+
+@{
+    ViewData["Title"] = "Chi tiết người dùng";
+}
+
+<div class="p-4 rounded shadow-sm border bg-white">
+    <h3 class="mb-4 fw-semibold text-primary">
+        <i class="mdi mdi-account-details-outline"></i> Chi Tiết Người Dùng
+    </h3>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Tên đăng nhập</label>
+                <input class="form-control form-control-sm border-primary" value="@Model.Username" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Họ và tên</label>
+                <input class="form-control form-control-sm border-success" value="@Model.FullName" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Email</label>
+                <input class="form-control form-control-sm border-info" value="@Model.Email" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Số điện thoại</label>
+                <input class="form-control form-control-sm border-warning" value="@Model.Phone" readonly />
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Trạng thái</label>
+                <input class="form-control form-control-sm border-info" value="@(Model.IsStatus == true ? "Đang hoạt động" : "Tạm khóa")" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold">Vai trò</label>
+                <input class="form-control form-control-sm border-info"
+                       value="@string.Join(", ", Model.RoleNames ?? new List<string>())" readonly />
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <a asp-action="List" class="btn btn-secondary fw-semibold shadow-sm">
+            <i class="mdi mdi-arrow-left"></i> Quay lại
+        </a>
+        <a asp-action="Edit" asp-route-id="@Model.UserId" class="btn btn-primary fw-semibold shadow-sm ms-2">
+            <i class="mdi mdi-account-edit-outline"></i> Chỉnh sửa
+        </a>
+    </div>
+</div>

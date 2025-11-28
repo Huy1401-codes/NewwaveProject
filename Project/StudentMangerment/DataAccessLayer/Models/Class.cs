@@ -29,6 +29,7 @@ namespace DataAccessLayer.Models
         public Teacher Teacher { get; set; }
 
         public ICollection<ClassStudent> ClassStudents { get; set; } = new List<ClassStudent>();
+        public ICollection<ClassSemester> ClassSemesters { get; set; } = new List<ClassSemester>();
 
     }
 }

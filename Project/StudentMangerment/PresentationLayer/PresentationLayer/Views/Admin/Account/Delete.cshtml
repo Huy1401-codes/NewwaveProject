@@ -1,0 +1,126 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.UserDetailDto
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Xóa Tài Khoản";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["SuccessMessage"])", "success");
+        });
+    </script>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["ErrorMessage"])", "error");
+        });
+    </script>
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="mdi mdi-alert-circle-outline"></i> Xác nhận xóa tài khoản</h5>
+            </div>
+            <div class="card-body">
+                <p>Bạn có chắc chắn muốn xóa tài khoản <strong>@Model.Username</strong> không?</p>
+
+                <div class="mb-3">
+                    <label class="form-label">Họ tên:</label>
+                    <p>@Model.FullName</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email:</label>
+                    <p>@Model.Email</p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Vai trò:</label>
+                    <p>
+                        @if (Model.RoleNames != null && Model.RoleNames.Any())
+                        {
+                            @foreach (var role in Model.RoleNames)
+                            {
+                                <span class="badge bg-secondary">@role</span>
+                            }
+                        }
+                        else
+                        {
+                            <span>Chưa phân quyền</span>
+                        }
+                    </p>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Trạng thái:</label>
+                    <p>@(Model.IsStatus.HasValue ? (Model.IsStatus.Value ? "Hoạt động" : "Vô hiệu hóa") : "Chưa xác định")</p>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="List" class="btn btn-secondary"><i class="mdi mdi-arrow-left"></i> Hủy</a>
+
+                    <form asp-action="Delete" asp-route-id="@Model.UserId" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-icon-text">
+                            <i class="mdi mdi-delete"></i> Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card-header h5 {
+            font-weight: 500;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #6c7293;
+            margin-bottom: 0.25rem;
+        }
+
+        .btn-icon-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function showToast(message, type) {
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+
+            toastBody.innerText = message;
+            toastEl.classList.remove("bg-success", "bg-danger");
+            if (type === "success") toastEl.classList.add("bg-success");
+            else toastEl.classList.add("bg-danger");
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000, autohide: true });
+            toast.show();
+        }
+    </script>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+            <div class="d-flex">
+                <div id="toastMessage" class="toast-body"></div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+}

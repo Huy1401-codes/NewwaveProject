@@ -35,7 +35,7 @@ namespace DataAccessLayer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<bool>("IsStatus")
+                    b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
 
                     b.Property<int>("SemesterId")
@@ -69,6 +69,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ClassSemesterId")
+                        .HasColumnType("int");
+
                     b.Property<int>("DayOfWeek")
                         .HasColumnType("int");
 
@@ -87,7 +90,35 @@ namespace DataAccessLayer.Migrations
 
                     b.HasIndex("ClassId");
 
+                    b.HasIndex("ClassSemesterId");
+
                     b.ToTable("ClassSchedules");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Models.ClassSemester", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassId")
+                        .HasColumnType("int");
+
+                    b.Property<bool?>("IsStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SemesterId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("SemesterId");
+
+                    b.ToTable("ClassSemesters");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Models.ClassStudent", b =>
@@ -228,6 +259,12 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("ClassId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ClassSemesterId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClassSemesterId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("GradeComponentId")
                         .HasColumnType("int");
 
@@ -246,6 +283,10 @@ namespace DataAccessLayer.Migrations
                     b.HasKey("StudentGradeId");
 
                     b.HasIndex("ClassId");
+
+                    b.HasIndex("ClassSemesterId");
+
+                    b.HasIndex("ClassSemesterId1");
 
                     b.HasIndex("GradeComponentId");
 
@@ -267,7 +308,7 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("Credit")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsStatus")
+                    b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
@@ -336,7 +377,7 @@ namespace DataAccessLayer.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<bool>("IsStatus")
+                    b.Property<bool?>("IsStatus")
                         .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
@@ -377,7 +418,7 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("DataAccessLayer.Models.Semester", "Semester")
                         .WithMany()
                         .HasForeignKey("SemesterId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DataAccessLayer.Models.Subject", "Subject")
@@ -404,22 +445,49 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("DataAccessLayer.Models.Class", "Class")
                         .WithMany()
                         .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Models.ClassSemester", "ClassSemester")
+                        .WithMany("ClassSchedules")
+                        .HasForeignKey("ClassSemesterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Class");
+
+                    b.Navigation("ClassSemester");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Models.ClassSemester", b =>
+                {
+                    b.HasOne("DataAccessLayer.Models.Class", "Class")
+                        .WithMany("ClassSemesters")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Models.Semester", "Semester")
+                        .WithMany("ClassSemesters")
+                        .HasForeignKey("SemesterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Class");
+
+                    b.Navigation("Semester");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Models.ClassStudent", b =>
                 {
                     b.HasOne("DataAccessLayer.Models.Class", "Class")
-                        .WithMany()
+                        .WithMany("ClassStudents")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DataAccessLayer.Models.Student", "Student")
-                        .WithMany()
+                        .WithMany("ClassStudents")
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -456,8 +524,18 @@ namespace DataAccessLayer.Migrations
                     b.HasOne("DataAccessLayer.Models.Class", "Class")
                         .WithMany()
                         .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Models.ClassSemester", "ClassSemester")
+                        .WithMany()
+                        .HasForeignKey("ClassSemesterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("DataAccessLayer.Models.ClassSemester", null)
+                        .WithMany("StudentGrades")
+                        .HasForeignKey("ClassSemesterId1");
 
                     b.HasOne("DataAccessLayer.Models.GradeComponent", "GradeComponent")
                         .WithMany("StudentGrades")
@@ -478,6 +556,8 @@ namespace DataAccessLayer.Migrations
                         .IsRequired();
 
                     b.Navigation("Class");
+
+                    b.Navigation("ClassSemester");
 
                     b.Navigation("GradeComponent");
 
@@ -516,6 +596,20 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DataAccessLayer.Models.Class", b =>
+                {
+                    b.Navigation("ClassSemesters");
+
+                    b.Navigation("ClassStudents");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Models.ClassSemester", b =>
+                {
+                    b.Navigation("ClassSchedules");
+
+                    b.Navigation("StudentGrades");
+                });
+
             modelBuilder.Entity("DataAccessLayer.Models.GradeComponent", b =>
                 {
                     b.Navigation("StudentGrades");
@@ -524,6 +618,16 @@ namespace DataAccessLayer.Migrations
             modelBuilder.Entity("DataAccessLayer.Models.Role", b =>
                 {
                     b.Navigation("UserRoles");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Models.Semester", b =>
+                {
+                    b.Navigation("ClassSemesters");
+                });
+
+            modelBuilder.Entity("DataAccessLayer.Models.Student", b =>
+                {
+                    b.Navigation("ClassStudents");
                 });
 
             modelBuilder.Entity("DataAccessLayer.Models.User", b =>

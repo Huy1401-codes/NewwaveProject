@@ -15,6 +15,8 @@ namespace DataAccessLayer.Models
 
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
+        public ICollection<ClassSemester> ClassSemesters { get; set; } = new List<ClassSemester>();
+
     }
 
 }
