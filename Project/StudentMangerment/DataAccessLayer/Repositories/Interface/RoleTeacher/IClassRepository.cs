@@ -13,6 +13,14 @@ namespace DataAccessLayer.Repositories.Interface.RoleTeacher
             GetTeacherClassesAsync(int teacherId, int page, int pageSize, string search, int? semesterId);
 
         Task<Class> GetByIdAsync(int classId);
+
+        /// <summary>
+        /// Teacher xem danh sách student
+        /// </summary>
+        /// <param name="teacherId"></param>
+        /// <returns></returns>
+        Task<List<Class>> GetClassesByTeacherAsync(int teacherId);
+        Task<Class?> GetClassWithStudentsAsync(int classId);
     }
 
 }

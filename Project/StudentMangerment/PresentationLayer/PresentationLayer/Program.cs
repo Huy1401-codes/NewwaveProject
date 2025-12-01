@@ -6,6 +6,8 @@ using DataAccessLayer.Repositories.RoleAdmin;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +53,25 @@ builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<ITeacherService, TeacherService>();
 
 
+/////Teacher
+
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IGradeRepository, DataAccessLayer.Repositories.RoleTeacher.GradeRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassStudentRepository, DataAccessLayer.Repositories.RoleTeacher.ClassStudentRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassRepository, DataAccessLayer.Repositories.RoleTeacher.ClassRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassSemesterRepository, DataAccessLayer.Repositories.RoleTeacher.ClassSemesterRepository>();
+
+builder.Services.AddScoped<BusinessLogicLayer.Services.Interface.RoleTeacher.ITeacherService, BusinessLogicLayer.Services.RoleTeacher.TeacherService>();
+
+//////Student
+///
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentGradeRepository, DataAccessLayer.Repositories.RoleStudent.StudentGradeRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentRepository, DataAccessLayer.Repositories.RoleStudent.StudentRepository>();
+
+
+builder.Services.AddScoped<BusinessLogicLayer.Services.Interface.RoleStudent.IStudentService, BusinessLogicLayer.Services.RoleStudent.StudentService>();
+
+
+
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -58,6 +79,11 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Auth/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
     });
+
+
+// EPPlus 8+ license setup
+ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+
 
 var app = builder.Build();
 

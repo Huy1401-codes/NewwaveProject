@@ -71,6 +71,14 @@ namespace DataAccessLayer.Repositories.RoleTeacher
                 .ToListAsync();
         }
 
+
+        public async Task<Student> GetStudentByIdAsync(int studentId)
+        {
+            return await _context.Students
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+        }
+
     }
 
 }

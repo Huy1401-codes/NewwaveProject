@@ -1,0 +1,83 @@
+﻿@model BusinessLogicLayer.DTOs.ClassStatisticsDto
+@using System.Text.Json
+
+<div class="container mt-3">
+    <h2>Thống kê kết quả lớp</h2>
+    <!-- Nút quay lại -->
+    <a asp-controller="Teacher" asp-action="Classes" class="btn btn-secondary mb-3">
+        ← Quay lại
+    </a>
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="border p-3 rounded">
+                <h5>Tổng học sinh</h5>
+                <h2>@Model.TotalStudents</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="border p-3 rounded">
+                <h5>Đậu (> 5 )</h5>
+                <h2>@Model.Passed</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="border p-3 rounded">
+                <h5>Rớt (< 5 ) </h5>
+                <h2>@Model.Failed</h2>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="border p-3 rounded">
+                <h5>Điểm TB</h5>
+                <h2>@Model.AverageClassScore.ToString("0.00")</h2>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="mt-4">Tỷ lệ đậu/trượt</h3>
+    <div style="width: 300px; height: 300px; margin: auto;">
+        <canvas id="passFailChart"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Biểu đồ pie/doughnut nhỏ gọn
+    var passFailData = {
+        labels: ['Đậu', 'Trượt'],
+        datasets: [{
+            label: 'Số lượng học sinh',
+            data: [@Model.Passed, @Model.Failed],
+            backgroundColor: [
+                'rgba(75, 192, 192, 0.7)',
+                'rgba(255, 99, 132, 0.7)'
+            ],
+            borderColor: [
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 99, 132, 1)'
+            ],
+            borderWidth: 1
+        }]
+    };
+
+    new Chart(document.getElementById('passFailChart'), {
+        type: 'doughnut',
+        data: passFailData,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.label + ': ' + context.raw + ' học sinh';
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>

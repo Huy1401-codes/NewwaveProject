@@ -1,0 +1,33 @@
+﻿@model BusinessLogicLayer.DTOs.Teacher.EnterGradeViewModel
+
+<div class="modal fade" id="scoreModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form method="post" action="/Teacher/UpdateGrade">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nhập điểm cho @Model.StudentName</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="classId" value="@Model.ClassId" />
+                    <input type="hidden" name="studentId" value="@Model.StudentId" />
+
+                    @foreach (var comp in Model.Components)
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">@comp.ComponentName (Trọng số: @comp.Weight%)</label>
+                            <input class="form-control" type="number" step="0.1" min="0" max="10"
+                                   name="scores[@comp.GradeComponentId]"
+                                   value="@(comp.Score.HasValue? comp.Score.Value.ToString("0.##") : "")"
+                                   placeholder="Nhập điểm" />
+
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary">Lưu</button>
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

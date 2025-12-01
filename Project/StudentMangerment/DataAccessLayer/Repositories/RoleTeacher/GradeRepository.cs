@@ -29,14 +29,15 @@ namespace DataAccessLayer.Repositories.RoleTeacher
         }
 
         // Lấy 1 điểm theo từng thành phần
-        public async Task<StudentGrade?> GetSingleGradeAsync(int studentId, int classId, int componentId)
+        public async Task<StudentGrade?> GetSingleGradeAsync(int studentId, int classSemesterId, int componentId)
         {
             return await _context.StudentGrades
                 .FirstOrDefaultAsync(g =>
                     g.StudentId == studentId &&
-                    g.ClassId == classId &&
+                    g.ClassSemesterId == classSemesterId &&
                     g.GradeComponentId == componentId);
         }
+
 
         /// <summary>
         /// Add hoặc update điểm cho từng thành phần
@@ -83,9 +84,13 @@ namespace DataAccessLayer.Repositories.RoleTeacher
         public async Task<List<GradeComponent>> GetGradeComponentsAsync(int subjectId)
         {
             return await _context.GradeComponents
-                .Where(gc => gc.SubjectId == subjectId && !gc.IsDeleted)
+                .Where(gc => gc.SubjectId == subjectId)
+                    .Include(c => c.StudentGrades) // <--- phải Include
                 .ToListAsync();
         }
+
+
+
 
     }
 

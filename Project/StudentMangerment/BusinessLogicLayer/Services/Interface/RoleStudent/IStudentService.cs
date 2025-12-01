@@ -18,5 +18,8 @@ namespace BusinessLogicLayer.Services.Interface.RoleStudent
             string? search = null,
             int page = 1,
             int pageSize = 10);
+
+
+        Task<List<StudentGradeDto>> GetGradesAsync(int studentId);
     }
 }

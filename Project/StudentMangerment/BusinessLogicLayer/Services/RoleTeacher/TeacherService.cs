@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.DTOs.Teacher;
 using BusinessLogicLayer.Services.Interface.RoleTeacher;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleTeacher;
@@ -12,15 +13,17 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         private readonly IClassRepository _classRepo;
         private readonly IClassStudentRepository _classStudentRepo;
         private readonly IGradeRepository _gradeRepo;
-
+        private readonly IClassSemesterRepository _classSemesterRepo;
         public TeacherService(
             IClassRepository classRepo,
             IClassStudentRepository classStudentRepo,
-            IGradeRepository gradeRepo)
+            IGradeRepository gradeRepo,
+            IClassSemesterRepository classSemester)
         {
             _classRepo = classRepo;
             _classStudentRepo = classStudentRepo;
             _gradeRepo = gradeRepo;
+            _classSemesterRepo = classSemester;
         }
 
         /// <summary>
@@ -46,44 +49,81 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <param name="size"></param>
         /// <param name="search"></param>
         /// <returns></returns>
-        public Task<(IEnumerable<Student>, int)> GetStudentsInClassAsync(int classId, int page, int size, string search)
+        public async Task<(IEnumerable<StudentDto>, int)> GetStudentsInClassAsync(
+       int classId, int page, int size, string search)
         {
-            return _classStudentRepo.GetStudentsByClassAsync(classId, page, size, search);
+            var (students, total) = await _classStudentRepo.GetStudentsByClassAsync(classId, page, size, search);
+
+            var dtos = students.Select(s => new StudentDto
+            {
+                StudentId = s.StudentId,
+                StudentCode = s.StudentCode,
+                FullName = s.User?.FullName,
+                Email = s.User?.Email
+            });
+
+            return (dtos, total);
         }
 
-       /// <summary>
-       /// Cập nhật điểm cho từng học sinh của lớp theo môn học
-       /// </summary>
-       /// <param name="classId"></param>
-       /// <param name="studentId"></param>
-       /// <param name="scores"></param>
-       /// <returns></returns>
+
+        /// <summary>
+        /// Cập nhật điểm cho từng học sinh của lớp theo môn học
+        /// </summary>
+        /// <param name="classId"></param>
+        /// <param name="studentId"></param>
+        /// <param name="scores"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateGradeAsync(int classId, int studentId, Dictionary<int, double> scores)
         {
-            int subjectId = (await _classRepo.GetByIdAsync(classId)).SubjectId;
+            // Lấy thông tin lớp
+            var classInfo = await _classRepo.GetByIdAsync(classId);
+            if (classInfo == null)
+                throw new Exception("Class not found");
 
-            foreach (var item in scores)
+            int subjectId = classInfo.SubjectId;
+
+            // Lấy ClassSemester hiện tại 
+            var classSemester = await _classSemesterRepo.GetClassSemesterAsync(classId);
+            if (classSemester == null)
+                throw new Exception("ClassSemester not found");
+
+            foreach (var (componentId, score) in scores)
             {
-                int componentId = item.Key;
-                double score = item.Value;
+                // Kiểm tra grade hiện có
+                var existingGrade = await _gradeRepo.GetSingleGradeAsync(
+                    studentId,
+                    classSemester.Id, // dùng ClassSemesterId
+                    componentId
+                );
 
-                var grade = new StudentGrade
+                if (existingGrade != null)
                 {
-                    StudentId = studentId,
-                    ClassId = classId,
-                    SubjectId = subjectId,
-                    GradeComponentId = componentId,
-                    Score = score,
-                    UpdatedAt = DateTime.Now
-                };
+                    // Nếu đã có điểm → cập nhật
+                    existingGrade.Score = score;
+                    existingGrade.UpdatedAt = DateTime.Now;
+                }
+                else
+                {
+                    // Nếu chưa có → tạo mới
+                    var newGrade = new StudentGrade
+                    {
+                        StudentId = studentId,
+                        ClassId = classId,               // cần gán để thoả FK
+                        ClassSemesterId = classSemester.Id, // bắt buộc phải có
+                        SubjectId = subjectId,
+                        GradeComponentId = componentId,
+                        Score = score,
+                        UpdatedAt = DateTime.Now
+                    };
 
-                await _gradeRepo.AddOrUpdateGradeAsync(grade);
+                    await _gradeRepo.AddOrUpdateGradeAsync(newGrade);
+                }
             }
 
+            // Lưu tất cả thay đổi 1 lần
             await _gradeRepo.SaveAsync();
             return true;
         }
-
 
 
         /// <summary>
@@ -94,31 +134,74 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <returns></returns>
         public async Task<bool> ImportGradesAsync(int classId, IFormFile file)
         {
+            // 1. Lấy thông tin lớp
             var classInfo = await _classRepo.GetByIdAsync(classId);
-            var components = await _gradeRepo.GetGradeComponentsAsync(classInfo.SubjectId);
+            if (classInfo == null)
+                throw new Exception("Class not found");
 
+            int subjectId = classInfo.SubjectId;
+
+            // 2. Lấy ClassSemester hiện tại
+            var classSemester = await _classSemesterRepo.GetClassSemesterAsync(classId);
+            if (classSemester == null)
+                throw new Exception("ClassSemester not found");
+
+            // 3. Lấy danh sách GradeComponent của lớp
+            var components = await _gradeRepo.GetGradeComponentsAsync(subjectId);
+
+            // 4. Đọc file Excel
             using var package = new ExcelPackage(file.OpenReadStream());
             var ws = package.Workbook.Worksheets[0];
 
-            for (int row = 2; row <= ws.Dimension.End.Row; row++)
+            for (int row = 2; row <= ws.Dimension.End.Row; row++) // bỏ qua header
             {
-                int studentId = int.Parse(ws.Cells[row, 1].Value.ToString());
-                var scores = new Dictionary<int, double>();
+                if (!int.TryParse(ws.Cells[row, 1].Value?.ToString(), out int studentId))
+                    continue; // bỏ qua nếu studentId không hợp lệ
 
-                int col = 2;
-
+                int col = 2; // cột điểm bắt đầu từ 2
                 foreach (var comp in components)
                 {
-                    double score = double.Parse(ws.Cells[row, col].Value.ToString());
-                    scores.Add(comp.GradeComponentId, score);
+                    var cellValue = ws.Cells[row, col].Value?.ToString();
+                    if (!string.IsNullOrWhiteSpace(cellValue) && double.TryParse(cellValue, out double score))
+                    {
+                        // Kiểm tra grade hiện có
+                        var existingGrade = await _gradeRepo.GetSingleGradeAsync(studentId, classSemester.Id, comp.GradeComponentId);
+
+                        if (existingGrade != null)
+                        {
+                            // Nếu đã có điểm → cập nhật
+                            existingGrade.Score = score;
+                            existingGrade.UpdatedAt = DateTime.Now;
+                        }
+                        else
+                        {
+                            // Nếu chưa có → tạo mới
+                            var newGrade = new StudentGrade
+                            {
+                                StudentId = studentId,
+                                ClassId = classId,               // cần để thoả FK
+                                ClassSemesterId = classSemester.Id,
+                                SubjectId = subjectId,
+                                GradeComponentId = comp.GradeComponentId,
+                                Score = score,
+                                UpdatedAt = DateTime.Now
+                            };
+
+                            await _gradeRepo.AddOrUpdateGradeAsync(newGrade);
+                        }
+                    }
+
                     col++;
                 }
-
-                await UpdateGradeAsync(classId, studentId, scores);
             }
 
+            // 5. Lưu tất cả thay đổi 1 lần
+            await _gradeRepo.SaveAsync();
             return true;
         }
+
+
+
 
 
         /// <summary>
@@ -128,14 +211,19 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <returns></returns>
         public async Task<byte[]> ExportGradesAsync(int classId)
         {
+            // Lấy thông tin lớp, các thành phần điểm và danh sách học sinh
             var classInfo = await _classRepo.GetByIdAsync(classId);
             var components = await _gradeRepo.GetGradeComponentsAsync(classInfo.SubjectId);
             var students = await _classStudentRepo.GetStudentsWithUserByClassAsync(classId);
 
+            // Lấy tất cả điểm của lớp một lần
+            var allGrades = await _gradeRepo.GetGradesByClassAsync(classId);
+            // allGrades là List<Grade> có StudentId, GradeComponentId, Score
+
             using var package = new ExcelPackage();
             var ws = package.Workbook.Worksheets.Add("Grades");
 
-            // Header
+            // Tạo header
             ws.Cells[1, 1].Value = "Student ID";
             ws.Cells[1, 2].Value = "Full Name";
 
@@ -146,6 +234,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 col++;
             }
 
+            // Điền dữ liệu từng học sinh
             int row = 2;
             foreach (var s in students)
             {
@@ -155,9 +244,8 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 col = 3;
                 foreach (var comp in components)
                 {
-                    var grade = await _gradeRepo.GetSingleGradeAsync(
-                        s.StudentId, classId, comp.GradeComponentId);
-
+                    var grade = allGrades
+                        .FirstOrDefault(g => g.StudentId == s.StudentId && g.GradeComponentId == comp.GradeComponentId);
                     ws.Cells[row, col].Value = grade?.Score ?? 0;
                     col++;
                 }
@@ -165,9 +253,12 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 row++;
             }
 
+            // Tự động căn chỉnh cột
             ws.Cells.AutoFitColumns();
+
             return package.GetAsByteArray();
         }
+
 
 
 
@@ -194,7 +285,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 foreach (var g in group)
                 {
                     var comp = components.First(c => c.GradeComponentId == g.GradeComponentId);
-                    avg += (g.Score ?? 0) * comp.Weight;
+                    avg += (g.Score ?? 0) * (comp.Weight / 100.0);
                 }
 
                 avgScores.Add(Math.Round(avg, 2));
@@ -220,6 +311,37 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                     .GroupBy(a => (int)a)
                     .ToDictionary(g => g.Key, g => g.Count())
             };
+        }
+
+        public async Task<StudentDto> GetStudentByIdAsync(int studentId)
+        {
+            var s = await _classStudentRepo.GetStudentByIdAsync(studentId);
+            if (s == null) return null;
+
+            return new StudentDto
+            {
+                StudentId = s.StudentId,
+                StudentCode = s.StudentCode,
+                FullName = s.User.FullName,
+                Email = s.User.Email
+            };
+        }
+
+
+        public async Task<IEnumerable<GradeComponentDto>> GetGradeComponentsByClassIdAsync(int classId, int studentId)
+        {
+            var cls = await _classRepo.GetByIdAsync(classId);
+            if (cls == null) return new List<GradeComponentDto>();
+
+            var components = await _gradeRepo.GetGradeComponentsAsync(cls.SubjectId);
+
+            return components.Select(c => new GradeComponentDto
+            {
+                GradeComponentId = c.GradeComponentId,
+                ComponentName = c.ComponentName,
+                Weight = c.Weight,
+                Score = c.StudentGrades?.FirstOrDefault(g => g.StudentId == studentId)?.Score
+            }).ToList();
         }
 
 

@@ -14,7 +14,7 @@ namespace DataAccessLayer.Models
 
         [Required, StringLength(50)]
         public string ClassName { get; set; }
-        public bool? IsStatus { get; set; }
+        public bool IsStatus { get; set; } 
 
         [Required]
         public int SubjectId { get; set; }

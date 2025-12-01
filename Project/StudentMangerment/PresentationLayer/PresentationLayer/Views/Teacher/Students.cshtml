@@ -1,0 +1,161 @@
+﻿@using System.Text.Json
+@model IEnumerable<BusinessLogicLayer.DTOs.Teacher.StudentDto>
+
+@{
+    ViewData["Title"] = "Danh sách học sinh";
+
+    int classId = 0;
+    if (int.TryParse(Context.Request.Query["classId"], out var cid))
+    {
+        classId = cid;
+    }
+}
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Danh sách học sinh của lớp</h3>
+        <a asp-controller="Teacher" asp-action="Classes" class="btn btn-outline-secondary btn-sm btn-icon-text">
+            <i class="mdi mdi-arrow-left"></i> Quay lại
+        </a>
+    </div>
+
+    <!-- Form tìm kiếm -->
+    <form method="get" class="row g-2 mb-3">
+        <input type="hidden" name="classId" value="@classId" />
+        <div class="col-md-8">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Tìm kiếm học sinh..." />
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-primary btn-sm w-100 btn-icon-text">
+                <i class="mdi mdi-magnify"></i> Tìm kiếm
+            </button>
+        </div>
+    </form>
+
+    <!-- Form import Excel -->
+    <form action="/Teacher/ImportExcel" enctype="multipart/form-data" method="post" class="row g-2 mb-3">
+        <input type="hidden" name="classId" value="@classId" />
+        <div class="col-md-8">
+            <input type="file" name="file" class="form-control form-control-sm" required />
+        </div>
+        <div class="col-md-4">
+            <button class="btn btn-success btn-sm w-100 btn-icon-text">
+                <i class="mdi mdi-file-import"></i> Import Excel
+            </button>
+        </div>
+    </form>
+
+    <!-- Bảng danh sách học sinh -->
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã học sinh</th>
+                    <th>Tên</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>@s.StudentCode</td>
+                            <td>@s.FullName</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm btn-icon-text" data-bs-toggle="modal"
+                                        data-bs-target="#scoreModal"
+                                        onclick="loadGradeModal(@classId, @s.StudentId)">
+                                    <i class="mdi mdi-pencil"></i> Nhập điểm
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">Không có học sinh để hiển thị</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modalContainer"></div>
+
+@section Scripts {
+    <script>
+        function loadGradeModal(classId, studentId) {
+            fetch(`/Teacher/EnterGrades?classId=${classId}&studentId=${studentId}`)
+                .then(r => r.text())
+                .then(html => {
+                    document.getElementById("modalContainer").innerHTML = html;
+                    var modal = new bootstrap.Modal(document.getElementById("scoreModal"));
+                    modal.show();
+                });
+        }
+
+        function showToast(message, type) {
+            if (!message) return;
+
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+
+            toastBody.innerText = message;
+
+            toastEl.classList.remove("bg-success", "bg-danger");
+            toastEl.classList.add(type === "success" ? "bg-success" : "bg-danger");
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000, autohide: true });
+            toast.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = @Html.Raw(JsonSerializer.Serialize(TempData["SuccessMessage"] ?? ""));
+            const error = @Html.Raw(JsonSerializer.Serialize(TempData["ErrorMessage"] ?? ""));
+
+            if (success) showToast(success, "success");
+            if (error) showToast(error, "error");
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table-light th {
+            color: #6c7293;
+        }
+
+        .btn-icon-text i {
+            margin-right: 4px;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+}

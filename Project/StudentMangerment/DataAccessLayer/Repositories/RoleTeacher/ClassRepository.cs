@@ -62,6 +62,29 @@ namespace DataAccessLayer.Repositories.RoleTeacher
                 .Include(c => c.Semester)
                 .FirstOrDefaultAsync(c => c.ClassId == classId);
         }
+
+        /// <summary>
+        /// Teacher xem danh sách học sinh trong lớp
+        /// </summary>
+        /// <param name="teacherId"></param>
+        /// <returns></returns>
+        public async Task<List<Class>> GetClassesByTeacherAsync(int teacherId)
+        {
+            return await _context.Classes
+                .Include(c => c.Subject)
+                .Where(c => c.TeacherId == teacherId)
+                .ToListAsync();
+        }
+
+        public async Task<Class?> GetClassWithStudentsAsync(int classId)
+        {
+            return await _context.Classes
+                .Include(c => c.ClassStudents)
+                    .ThenInclude(cs => cs.Student)
+                        .ThenInclude(s => s.User)
+                .Include(c => c.Subject)
+                .FirstOrDefaultAsync(c => c.ClassId == classId);
+        }
     }
 
 }

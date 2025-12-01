@@ -1,0 +1,138 @@
+﻿@using System.Text.Json
+@model IEnumerable<DataAccessLayer.Models.Class>
+
+@{
+    ViewData["Title"] = "Danh sách lớp đang dạy";
+}
+
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Danh sách lớp đang dạy</h2>
+    </div>
+
+    <!-- Form tìm kiếm -->
+    <form method="get" class="row g-2 mb-3">
+        <div class="col-md-9">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Tìm kiếm lớp..." />
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary btn-sm w-100 btn-icon-text">
+                <i class="mdi mdi-magnify"></i> Tìm kiếm
+            </button>
+        </div>
+    </form>
+
+    <!-- Bảng danh sách lớp -->
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Mã lớp</th>
+                    <th>Môn học</th>
+                    <th>Kỳ học</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.ClassName</td>
+                            <td>@item.Subject?.Name</td>
+                            <td>@item.Semester?.Name</td>
+                            <td>
+                                <a class="btn btn-info btn-sm btn-icon-text mb-1"
+                                   href="/Teacher/Students?classId=@item.ClassId">
+                                    <i class="mdi mdi-account-multiple"></i> Xem học sinh
+                                </a>
+                                <a class="btn btn-success btn-sm btn-icon-text mb-1"
+                                   href="/Teacher/Statistics?classId=@item.ClassId">
+                                    <i class="mdi mdi-chart-bar"></i> Thống kê
+                                </a>
+                                <a class="btn btn-primary btn-sm btn-icon-text mb-1"
+                                   href="/Teacher/ExportExcel?classId=@item.ClassId">
+                                    <i class="mdi mdi-file-excel"></i> Xuất Excel
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Không có lớp nào để hiển thị</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showToast(message, type) {
+            if (!message) return;
+
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+
+            toastBody.innerText = message;
+
+            toastEl.classList.remove("bg-success", "bg-danger");
+            toastEl.classList.add(type === "success" ? "bg-success" : "bg-danger");
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000, autohide: true });
+            toast.show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = @Html.Raw(JsonSerializer.Serialize(TempData["SuccessMessage"] ?? ""));
+            const error = @Html.Raw(JsonSerializer.Serialize(TempData["ErrorMessage"] ?? ""));
+
+            if (success) showToast(success, "success");
+            if (error) showToast(error, "error");
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .btn-icon-text i {
+            margin-right: 4px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table-light th {
+            color: #6c7293;
+        }
+
+        a.btn:hover {
+            opacity: 0.9;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+}

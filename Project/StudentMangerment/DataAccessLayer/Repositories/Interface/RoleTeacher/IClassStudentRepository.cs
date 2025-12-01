@@ -14,6 +14,8 @@ namespace DataAccessLayer.Repositories.Interface.RoleTeacher
 
         Task<List<Student>> GetStudentsWithUserByClassAsync(int classId);
 
+        Task<Student> GetStudentByIdAsync(int studentId);
+
     }
 
 }

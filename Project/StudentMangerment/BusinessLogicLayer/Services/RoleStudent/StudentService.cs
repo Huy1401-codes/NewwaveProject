@@ -1,20 +1,16 @@
 ﻿using BusinessLogicLayer.DTOs;
 using BusinessLogicLayer.Services.Interface.RoleStudent;
+using DataAccessLayer.Repositories.Interface.RoleStudent;
 using DataAccessLayer.Repositories.RoleStudent;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services.RoleStudent
 {
     public class StudentService : IStudentService
     {
-        private readonly StudentRepository _repo;
+        private readonly IStudentRepository _repo;
 
-        public StudentService(StudentRepository repo)
+        public StudentService(IStudentRepository repo)
         {
             _repo = repo;
         }
@@ -94,6 +90,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
                         Weight = x.GradeComponent.Weight
                     }).ToList(),
                     AverageScore = g.Sum(x => (x.Score ?? 0) * x.GradeComponent.Weight)
+               / g.Sum(x => x.GradeComponent.Weight)
                 }).ToList();
 
             return result;

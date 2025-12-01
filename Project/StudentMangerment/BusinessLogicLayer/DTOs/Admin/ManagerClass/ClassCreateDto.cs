@@ -9,7 +9,8 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
     public class ClassCreateDto
     {
         public string ClassName { get; set; }
-        public bool? IsStatus { get; set; }
+        public bool IsStatus { get; set; } = true;
+
 
         public int SubjectId { get; set; }
         public int SemesterId { get; set; }

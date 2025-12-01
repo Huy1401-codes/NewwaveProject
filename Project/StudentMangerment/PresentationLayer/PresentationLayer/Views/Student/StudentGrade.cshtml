@@ -1,0 +1,82 @@
+﻿@model List<BusinessLogicLayer.DTOs.StudentGradeDto>
+
+@{
+    ViewData["Title"] = "Điểm của tôi";
+}
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title mb-4">Điểm của tôi</h4>
+                <p class="card-description">Xem điểm từng môn, điểm thành phần và trung bình</p>
+
+                @if (Model != null && Model.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Lớp</th>
+                                    <th>Môn</th>
+                                    <th>Điểm thành phần</th>
+                                    <th>Trung bình</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.ClassName</td>
+                                        <td>@item.SubjectName</td>
+                                        <td>
+                                            <ul class="mb-0 ps-3">
+                                                @foreach (var g in item.Grades)
+                                                {
+                                                    <li>@g.ComponentName: @g.Score (trọng số @g.Weight %)</li>
+                                                }
+                                            </ul>
+                                        </td>
+                                        <td><b>@String.Format("{0:0.##}", item.AverageScore)</b></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5 text-muted">
+                        <i class="mdi mdi-school-outline display-1 mb-3"></i>
+                        <h5>Chưa có điểm nào để hiển thị</h5>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card-title {
+            color: #6c7293;
+            font-weight: 500;
+        }
+
+        .card-description {
+            color: #a7a7a7;
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+        }
+
+        .table th {
+            font-weight: 500;
+            color: #6c7293;
+        }
+
+        ul {
+            margin: 0;
+            padding-left: 1rem;
+        }
+    </style>
+}

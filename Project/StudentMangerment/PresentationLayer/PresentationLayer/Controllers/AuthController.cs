@@ -59,7 +59,7 @@ namespace PresentationLayer.Controllers
             return role switch
             {
                 "Admin" => RedirectToAction("Index", "Admin"),
-                "Teacher" => RedirectToAction("Index", "Teacher"),
+                "Teacher" => RedirectToAction("Classes", "Teacher"),
                 "Student" => RedirectToAction("Index", "Student"),
                 _ => RedirectToAction("Login")
             };

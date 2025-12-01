@@ -149,11 +149,11 @@ namespace PresentationLayer.Controllers
                 SubjectName = cls.SubjectName ?? "[No Subject]",
                 TeacherId = cls.TeacherId,
                 TeacherName = cls.TeacherName ?? "[No Teacher]",
-                Students = cls.ClassStudents.Select(x => new StudentInClassDto
-                {
-                    StudentId = x.StudentId,
-                    FullName = x.Student.User.FullName
-                }).ToList
+                //Students = cls.ClassStudents.Select(x => new StudentInClassDto
+                //{
+                //    StudentId = x.StudentId,
+                //    FullName = x.Student.User.FullName
+                //}).ToList
             };
 
             return View(dto);
