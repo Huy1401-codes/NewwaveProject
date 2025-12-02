@@ -19,5 +19,8 @@ namespace DataAccessLayer.Repositories.Interface.RoleAdmin
 
         Task<IEnumerable<Student>> GetAllNameAsync();
 
+        Task<IEnumerable<User>> GetUsersByRoleAsync(string role);
+
+
     }
 }

@@ -1,0 +1,253 @@
+﻿@model BusinessLogicLayer.DTOs.ManagerTeacher.TeacherPagesDto
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Quản lý Giáo Viên";
+
+    int pageIndex = Model.Page;
+    int pageSize = Model.PageSize;
+    int totalRecords = Model.TotalCount;
+    int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+    string search = Model.Search ?? "";
+}
+
+@if (TempData["Success"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["Success"])", "success");
+        });
+    </script>
+}
+
+@if (TempData["Error"] != null)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            showToast("@Html.Raw(TempData["Error"])", "error");
+        });
+    </script>
+}
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+
+                <!-- Header -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="card-title mb-0">Quản lý Giáo Viên</h4>
+                        <p class="card-description">Quản lý, tìm kiếm và phân trang danh sách giáo viên</p>
+                    </div>
+                    <a asp-action="CreateTeacher" class="btn btn-primary btn-sm">
+                        <i class="mdi mdi-plus"></i> Thêm giáo viên
+                    </a>
+                </div>
+
+                <!-- Search -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title">Tìm kiếm</h6>
+                                <form method="get" class="d-flex gap-2">
+                                    <input type="text" class="form-control form-control-sm" name="search"
+                                           value="@search" placeholder="Tên, mã giáo viên..." />
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="mdi mdi-magnify"></i> Tìm kiếm
+                                    </button>
+                                    <a href="@Url.Action("ListTeacher")" class="btn btn-outline-secondary btn-sm">
+                                        <i class="mdi mdi-close"></i> Xóa
+                                    </a>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Table -->
+                @if (Model.Teachers != null && Model.Teachers.Any())
+                {
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge badge-info">
+                                @totalRecords GIáo Viên
+                                @if (!string.IsNullOrEmpty(search))
+                                {
+                                    <span> cho "@search"</span>
+                                }
+                            </span>
+                            <small class="text-muted ms-2">
+                                Hiển thị @(((pageIndex - 1) * pageSize) + 1) đến @(Math.Min(pageIndex * pageSize, totalRecords))
+                                trong tổng số @totalRecords
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Full Name</th>
+                                    <th>Teacher Code</th>
+                                    <th>Email</th>
+                                    <th>Phone</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var s in Model.Teachers)
+                                {
+                                    <tr>
+                                        <td>@s.TeacherId</td>
+                                        <td>@s.User.FullName</td>
+                                        <td>@s.TeacherCode</td>
+                                        <td>@s.User.Email</td>
+                                        <td>@s.User.Phone</td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a asp-action="DetailTeacher" asp-route-id="@s.TeacherId" class="btn btn-outline-info btn-sm btn-icon-text">
+                                                    <i class="mdi mdi-eye"></i> Chi tiết
+                                                </a>
+                                                <a asp-action="EditTeacher" asp-route-id="@s.TeacherId" class="btn btn-outline-warning btn-sm btn-icon-text">
+                                                    <i class="mdi mdi-pencil"></i> Sửa
+                                                </a>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (totalPages >= 1)
+                    {
+                        <nav aria-label="Pagination" class="mt-4">
+                            <ul class="pagination pagination-sm justify-content-center">
+                                <li class="page-item @(pageIndex == 1 ? "disabled" : "")">
+                                    <a class="page-link" href="?page=@(pageIndex - 1)&search=@search">«</a>
+                                </li>
+
+                                @{
+                                    var startPage = Math.Max(1, pageIndex - 2);
+                                    var endPage = Math.Min(totalPages, pageIndex + 2);
+                                }
+
+                                @for (int i = startPage; i <= endPage; i++)
+                                {
+                                    <li class="page-item @(i == pageIndex ? "active" : "")">
+                                        @if (i == pageIndex)
+                                        {
+                                            <span class="page-link">@i</span>
+                                        }
+                                        else
+                                        {
+                                            <a class="page-link" href="?page=@i&search=@search">@i</a>
+                                        }
+                                    </li>
+                                }
+
+                                <li class="page-item @(pageIndex == totalPages ? "disabled" : "")">
+                                    <a class="page-link" href="?page=@(pageIndex + 1)&search=@search">»</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                }
+                else
+                {
+                    <!-- No Results -->
+                    <div class="text-center py-5">
+                        <i class="mdi mdi-account-off-outline display-1 text-muted mb-4"></i>
+                        <h4 class="mb-3">Không có giáo viên</h4>
+                        @if (!string.IsNullOrEmpty(search))
+                        {
+                            <p class="text-muted mb-4">
+                                Không tìm thấy giáo viên với "<strong>@search</strong>".
+                                <br>Thử điều chỉnh tìm kiếm hoặc <a href="@Url.Action("ListTeacher")" class="text-primary">xem tất cả</a>.
+                            </p>
+                        }
+                        <a asp-action="CreateStudent" class="btn btn-primary">
+                            <i class="mdi mdi-plus"></i> Thêm giáo viên
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .card-title {
+            color: #6c7293;
+            font-weight: 500;
+        }
+
+        .card-description {
+            color: #a7a7a7;
+            font-size: 0.875rem;
+            margin-bottom: 0;
+        }
+
+        .badge-info {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-group .btn {
+            margin-right: 4px;
+        }
+
+            .btn-group .btn:last-child {
+                margin-right: 0;
+            }
+
+        .btn-icon-text {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .pagination-sm .page-link {
+            padding: 0.375rem 0.75rem;
+        }
+
+        .gap-2 {
+            gap: 0.5rem;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function showToast(message, type) {
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+
+            toastBody.innerText = message;
+
+            toastEl.classList.remove("bg-success", "bg-danger");
+            if (type === "success") toastEl.classList.add("bg-success");
+            else toastEl.classList.add("bg-danger");
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000, autohide: true });
+            toast.show();
+        }
+    </script>
+}

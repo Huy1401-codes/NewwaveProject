@@ -1,11 +1,14 @@
 ﻿using BusinessLogicLayer.DTOs.Admin.ManagerClass;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ClassController : Controller
     {
         private readonly IClassSemesterService _classService;
@@ -29,13 +32,17 @@ namespace PresentationLayer.Controllers
         }
         public async Task<IActionResult> Index()
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
             var list = await _classService.GetAllAsync();
             return View(list);
         }
 
-        // =====================
         // CREATE
-        // =====================
         public async Task<IActionResult> Create()
         {
             await LoadDropdowns();
@@ -55,9 +62,7 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
-        // =====================
-        // EDIT
-        // =====================
+        // EDIT     
         public async Task<IActionResult> Edit(int id)
         {
             var cls = await _classService.GetByIdAsync(id); // ClassDetailDto
@@ -74,8 +79,13 @@ namespace PresentationLayer.Controllers
                 TeacherId = cls.TeacherId,
                 StudentIds = cls.Students.Select(s => s.StudentId).ToList()
             };
+            Console.WriteLine(">>> Loaded for edit:");
+            Console.WriteLine($"SemesterId = {cls.SemesterId}");
+            Console.WriteLine($"SubjectId = {cls.SubjectId}");
+            Console.WriteLine($"TeacherId = {cls.TeacherId}");
+            Console.WriteLine($"Studentid = {cls.Students}");
 
-            await LoadDropdowns(dto.StudentIds);
+            await LoadDropdowns(dto.SemesterId, dto.SubjectId, dto.TeacherId, dto.StudentIds);
             return View(dto);
         }
 
@@ -85,7 +95,7 @@ namespace PresentationLayer.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await LoadDropdowns(dto.StudentIds);
+                await LoadDropdowns(dto.SemesterId, dto.SubjectId, dto.TeacherId, dto.StudentIds);
                 return View(dto);
             }
 
@@ -93,39 +103,32 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
-
-        // =====================
-        // Dropdown Loading
-        // =====================
-        private async Task LoadDropdowns(List<int>? selectedStudents = null)
+        private async Task LoadDropdowns(int? selectedSemesterId = null,
+                                   int? selectedSubjectId = null,
+                                   int? selectedTeacherId = null,
+                                   List<int>? selectedStudents = null)
         {
-            // Lấy dữ liệu, bảo vệ null
-            var semesters = await _semesterService.GetAllAsync() ?? new List<Semester>();
-            var subjects = await _subjectService.GetAllNameAsync() ?? new List<Subject>();
-            var teachers = await _teacherService.GetAllAsync() ?? new List<Teacher>();
-            var students = await _studentService.GetAllAsync() ?? new List<Student>();
-
-            // Đảm bảo selectedStudents không null
             selectedStudents ??= new List<int>();
-            var studentListForSelect = students
-    .Select(s => new
-    {
-        s.StudentId,
-        FullName = s.User?.FullName ?? "[No Name]"
-    }).ToList();
 
-            var teacherListForSelect = teachers
-    .Select(t => new
-    {
-        t.TeacherId,
-        FullName = t.User?.FullName ?? "[No Name]"
-    }).ToList();
+            var semesters = await _semesterService.GetAllAsync();
+            var subjects = await _subjectService.GetAllNameAsync();
+            var teachers = await _teacherService.GetAllAsync();
+            var students = await _studentService.GetAllAsync();
 
+            //  set selected value
+            ViewBag.Semesters = new SelectList(semesters, "SemesterId", "Name", selectedSemesterId);
+            ViewBag.Subjects = new SelectList(subjects, "SubjectId", "Name", selectedSubjectId);
 
-            ViewBag.Semesters = new SelectList(semesters, "SemesterId", "Name");
-            ViewBag.Subjects = new SelectList(subjects, "SubjectId", "Name");
-            ViewBag.Teachers = new SelectList(teacherListForSelect, "TeacherId", "FullName");
-            ViewBag.Students = new MultiSelectList(studentListForSelect, "StudentId", "FullName", selectedStudents ?? new List<int>());
+            // Teacher và Student dùng modal → trả list
+            ViewBag.Teachers = teachers.Select(t => new {
+                Value = t.TeacherId.ToString(),
+                Text = t.User?.FullName ?? "[No Name]"
+            }).ToList();
+
+            ViewBag.Students = students.Select(s => new {
+                Value = s.StudentId.ToString(),
+                Text = s.User?.FullName ?? "[No Name]"
+            }).ToList();
         }
 
 

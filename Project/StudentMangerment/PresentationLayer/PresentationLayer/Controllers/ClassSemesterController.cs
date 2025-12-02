@@ -1,9 +1,12 @@
 ﻿using BusinessLogicLayer.DTOs.Admin.ManagerClass;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize(Roles = "Admin")]
+
     public class ClassSemesterController : Controller
     {
         private readonly IClassSemesterService _classService;
@@ -22,6 +25,7 @@ namespace PresentationLayer.Controllers
         public IActionResult Create() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ClassCreateDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
@@ -37,6 +41,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ClassUpdateDto dto)
         {
             await _classService.UpdateAsync(dto);

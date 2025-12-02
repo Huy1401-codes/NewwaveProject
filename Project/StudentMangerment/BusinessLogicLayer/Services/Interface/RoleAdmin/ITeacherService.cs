@@ -1,9 +1,6 @@
-﻿using DataAccessLayer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BusinessLogicLayer.DTOs.ManagerStudent;
+using BusinessLogicLayer.DTOs.ManagerTeacher;
+using DataAccessLayer.Models;
 
 namespace BusinessLogicLayer.Services.Interface.RoleAdmin
 {
@@ -11,11 +8,13 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
     {
         Task<Teacher> GetByIdAsync(int id);
         Task<(IEnumerable<Teacher> Data, int TotalCount)> GetPagedAsync(int page, int pageSize, string search);
-        Task<bool> CreateAsync(Teacher teacher);
+        Task<(bool Success, string ErrorMessage)> CreateAsync(CreateTeacherDto dto);
         Task<bool> UpdateAsync(Teacher teacher);
         Task<bool> SoftDeleteAsync(int id);
 
         Task<IEnumerable<Teacher>> GetAllAsync();
+
+        Task<IEnumerable<UserDropdownDto>> GetAvailableTeacherUsersAsync(string search = null);
 
     }
 

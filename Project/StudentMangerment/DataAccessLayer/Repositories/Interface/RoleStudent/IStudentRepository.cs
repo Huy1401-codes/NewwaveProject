@@ -8,5 +8,8 @@ namespace DataAccessLayer.Repositories.Interface.RoleStudent
         IQueryable<StudentGrade> GetStudentGradesQuery(int studentId);
 
         IQueryable<ClassSchedule> GetStudentSchedulesQuery(int studentId);
+
+        Task<int?> GetStudentIdByUserIdAsync(int userId);
+
     }
 }

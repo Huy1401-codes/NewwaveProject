@@ -1,9 +1,11 @@
 ﻿using BusinessLogicLayer.Services.Interface.RoleStudent;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
 {
+    [Authorize(Roles = "Student")]
     public class StudentController : Controller
     {
         private readonly IStudentService _studentService;
@@ -24,11 +26,12 @@ namespace PresentationLayer.Controllers
 
             if (userIdClaim == null)
             {
-                return Unauthorized();  // hoặc redirect login
+                return Unauthorized();  
             }
 
             int studentId = int.Parse(userIdClaim.Value);
 
+            Console.WriteLine($"UserIdClaim Value: {userIdClaim.Value}");
 
 
             var classes = await _studentService.GetClassesAsync(

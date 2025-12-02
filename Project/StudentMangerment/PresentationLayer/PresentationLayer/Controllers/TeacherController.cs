@@ -1,4 +1,4 @@
-﻿using BusinessLogicLayer.DTOs.Teacher;
+﻿using BusinessLogicLayer.DTOs.ManagerTeacher;
 using BusinessLogicLayer.Services.Interface.RoleTeacher;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +16,14 @@ namespace PresentationLayer.Controllers
             _teacherService = teacherService;
         }
 
-        // 1. Danh sách lớp
+        // Danh sách lớp
         public async Task<IActionResult> Classes(int page = 1, string search = "", int? semesterId = null)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
             {
-                return Unauthorized();  // hoặc redirect login
+                return Unauthorized();
             }
 
             int teacherId = int.Parse(userIdClaim.Value);
@@ -47,6 +47,7 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> UpdateGrade(int? classId, int studentId, Dictionary<int, double> scores)
         {
             if (!classId.HasValue)

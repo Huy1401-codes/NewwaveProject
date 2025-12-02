@@ -1,11 +1,7 @@
-﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
+﻿using BusinessLogicLayer.DTOs.ManagerStudent;
+using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {
@@ -30,21 +26,35 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             return await _studentRepo.GetPagedAsync(page, pageSize, search);
         }
 
-        public async Task<bool> CreateAsync(Student student)
+        public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateStudentDto dto)
         {
-            // Kiểm tra UserId có hợp lệ hay không
-            var user = await _userRepo.GetByIdAsync(student.UserId);
-            if (user == null) return false;
+            var user = (await _studentRepo.GetUsersByRoleAsync("Student"))
+                .FirstOrDefault(u => u.UserId == dto.UserId);
 
-            // Check user đã là student hay chưa
-            var existed = await _studentRepo.GetAllAsync();
-            if (existed.Any(s => s.UserId == student.UserId))
-                return false;
+            if (user == null)
+                return (false, "User không hợp lệ hoặc chưa có role Student.");
+
+            var existedStudents = await _studentRepo.GetAllAsync();
+            if (existedStudents.Any(s => s.UserId == dto.UserId))
+                return (false, "User này đã là Student.");
+
+            if (existedStudents.Any(s => s.StudentCode.Equals(dto.StudentCode, StringComparison.OrdinalIgnoreCase)))
+                return (false, "StudentCode đã tồn tại, vui lòng chọn mã khác.");
+
+            var student = new Student
+            {
+                UserId = (int)dto.UserId,
+                StudentCode = dto.StudentCode,
+                BirthDate = (DateTime)dto.BirthDate,
+                Gender = dto.Gender
+            };
 
             await _studentRepo.AddAsync(student);
             await _studentRepo.SaveAsync();
-            return true;
+
+            return (true, string.Empty);
         }
+
 
         public async Task<bool> UpdateAsync(Student student)
         {
@@ -74,6 +84,38 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             return await _studentRepo.GetAllAsync();
         }
 
-     
+        public async Task<IEnumerable<UserDropdownDto>> GetAvailableStudentUsersAsync(string search = null)
+        {
+            var users = await _studentRepo.GetUsersByRoleAsync("Student");
+
+            var students = await _studentRepo.GetAllAsync();
+
+            var available = users
+                .Where(u => !students.Any(s => s.UserId == u.UserId));
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.Trim().ToLower();
+
+                available = available.Where(u =>
+                    (u.FullName != null && u.FullName.ToLower().Contains(search)) ||
+                    (u.Email != null && u.Email.ToLower().Contains(search)) ||
+                    (u.Phone != null && u.Phone.Contains(search))
+                );
+            }
+
+            return available
+                .Select(u => new UserDropdownDto
+                {
+                    UserId = u.UserId,
+                    FullName = u.FullName,
+                    Email = u.Email,    
+                    Phone = u.Phone
+                })
+                .ToList();
+        }
+
+
+
     }
 }

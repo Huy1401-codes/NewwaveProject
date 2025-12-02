@@ -1,4 +1,6 @@
 ﻿using BusinessLogicLayer.DTOs.Admin;
+using BusinessLogicLayer.DTOs.ManagerStudent;
+using BusinessLogicLayer.DTOs.ManagerTeacher;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -8,14 +10,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 namespace PresentationLayer.Controllers
 {
     [Authorize(Roles = "Admin")]
-
     public class AdminController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IStudentService _studentService;
+        private readonly ITeacherService _teacherService;
 
-        public AdminController(IUserService userService)
+
+        public AdminController(IUserService userService, IStudentService student, ITeacherService teacherService)
         {
             _userService = userService;
+            _studentService = student;
+            _teacherService = teacherService;
         }
 
         public IActionResult Index()
@@ -50,8 +56,7 @@ namespace PresentationLayer.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("~/Admin/Edit/{id:int}")]
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> EditTrash(int id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
@@ -61,7 +66,8 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditStatus(int id)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditTrashStatus(int id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
@@ -82,6 +88,132 @@ namespace PresentationLayer.Controllers
 
             TempData["SuccessMessage"] = "Khôi phục tài khoản thành công!";
             return RedirectToAction("ListRestore", "Admin");
+        }
+
+
+        public async Task<IActionResult> ListStudent(int page = 1, int pageSize = 10, string search = "")
+        {
+            var result = await _studentService.GetPagedAsync(page, pageSize, search);
+
+            var vm = new StudentPagedDto
+            {
+                Students = result.Data,
+                TotalCount = result.TotalCount,
+                Page = page,
+                PageSize = pageSize,
+                Search = search
+            };
+
+            return View(vm);
+        }
+
+
+        [HttpGet]
+        public IActionResult CreateStudent()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// hỗ trợ lọc và search
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> SearchUsers(string search)
+        {
+            var users = await _studentService.GetAvailableStudentUsersAsync(search);
+            Console.WriteLine("SEARCH PARAM = " + search);
+
+            var results = users.Select(u => new
+            {
+                id = u.UserId,
+                text = $"{u.FullName} - Email: ({u.Email}) - Phone: ({u.Phone})"
+            });
+
+            return Json(results);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateStudent(CreateStudentDto dto)
+        {
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            var (success, errorMessage) = await _studentService.CreateAsync(dto);
+
+            if (!success)
+            {
+                ModelState.AddModelError(string.Empty, errorMessage);
+                return View(dto);
+            }
+
+            TempData["Success"] = "Tạo Student thành công!";
+            return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> ListTeacher(int page = 1, int pageSize = 10, string search = "")
+        {
+            var result = await _teacherService.GetPagedAsync(page, pageSize, search);
+
+            var vm = new TeacherPagesDto
+            {
+                Teachers = result.Data,
+                TotalCount = result.TotalCount,
+                Page = page,
+                PageSize = pageSize,
+                Search = search
+            };
+
+            return View(vm);
+        }
+
+        [HttpGet]
+        public IActionResult CreateTeacher()
+        {
+            return View();
+        }
+
+        /// <summary>
+        /// hỗ trợ lọc và search ở phần gắn giáo viên
+        /// </summary>
+        /// <param name="search"></param>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<IActionResult> SearchTeacher(string search)
+        {
+            var users = await _teacherService.GetAvailableTeacherUsersAsync(search);
+            Console.WriteLine("SEARCH PARAM = " + search);
+
+            var results = users.Select(u => new
+            {
+                id = u.UserId,
+                text = $"{u.FullName} - Email: ({u.Email}) - Phone: ({u.Phone})"
+            });
+
+            return Json(results);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateTeacher(CreateTeacherDto dto)
+        {
+            if (!ModelState.IsValid)
+                return View(dto);
+
+            var (success, errorMessage) = await _teacherService.CreateAsync(dto);
+
+            if (!success)
+            {
+                ModelState.AddModelError(string.Empty, errorMessage);
+                return View(dto);
+            }
+
+            TempData["Success"] = "Tạo Teacher thành công!";
+            return RedirectToAction("ListTeacher");
         }
 
     }

@@ -1,12 +1,9 @@
-﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
+﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.DTOs.ManagerTeacher;
+using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {
@@ -26,7 +23,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         /// <param name="page">phân trang</param>
         /// <param name="pageSize">Số lượng hiển thị trên 1 trang</param>
         /// <returns></returns>
-        public async Task<(IEnumerable<Subject> data, int totalItems)> GetPagedSubjectsAsync(
+        public async Task<(IEnumerable<SubjectDto> data, int totalItems)> GetPagedSubjectsAsync(
             string? search, int page, int pageSize)
         {
             var query = _subjectRepo.GetAllQueryable();
@@ -40,12 +37,22 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
             int totalItems = await query.CountAsync();
 
-            // Pagination
-            var data = await query
+            // Lấy entity
+            var subjects = await query
                 .OrderBy(s => s.Name)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            // Map sang DTO
+            var data = subjects.Select(s => new SubjectDto
+            {
+                SubjectId = s.SubjectId,
+                Name = s.Name,
+                Credit = s.Credit,
+                IsStatus = s.IsStatus,
+                GradeComponents = new List<GradeComponentDto>()
+            });
 
             return (data, totalItems);
         }

@@ -1,0 +1,67 @@
+﻿@model BusinessLogicLayer.DTOs.CreateSubjectDto
+
+@{
+    ViewData["Title"] = "Tạo Môn Học";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">Tạo Môn Học</h2>
+
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label class="form-label">Tên môn học</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tín chỉ</label>
+            <input asp-for="Credit" class="form-control" type="number" min="1" max="10" />
+            <span asp-validation-for="Credit" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Trạng thái</label>
+            <select asp-for="IsStatus" class="form-select">
+                <option value="true">Hoạt động</option>
+                <option value="false">Vô hiệu hóa</option>
+            </select>
+        </div>
+
+        <hr />
+        <h5>Danh sách đầu điểm</h5>
+        <div id="gradeComponentsContainer"></div>
+        <button type="button" class="btn btn-sm btn-outline-primary mb-3" onclick="addComponent()">
+            <i class="bi bi-plus-circle"></i> Thêm đầu điểm
+        </button>
+
+        <button type="submit" class="btn btn-primary">Tạo Môn Học</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        let componentIndex = 0;
+
+        function addComponent(name = '', weight = '') {
+            const container = document.getElementById("gradeComponentsContainer");
+
+            const div = document.createElement("div");
+            div.className = "d-flex gap-2 mb-2 align-items-center";
+            div.innerHTML = `
+                <input type="text" name="GradeComponents[${componentIndex}].ComponentName"
+                       class="form-control" placeholder="Tên đầu điểm" value="${name}" required />
+                <input type="number" name="GradeComponents[${componentIndex}].Weight"
+                       class="form-control" placeholder="Trọng số (1-100%)"  min="1" max="100" value="${weight}" required />
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.remove()">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(div);
+            componentIndex++;
+        }
+
+        addComponent();
+    </script>
+}

@@ -37,6 +37,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- inject:css -->
     <link rel="stylesheet" href="~/assets/css/style.css">
@@ -236,7 +238,7 @@
                             <div class="collapse" id="manageTeacherMenu">
                                 <ul class="nav flex-column sub-menu">
                                     <li class="nav-item">
-                                        <a class="nav-link" asp-controller="Teacher" asp-action="Index">Danh sách giáo viên</a>
+                                        <a class="nav-link" asp-controller="Admin" asp-action="ListTeacher">Danh sách giáo viên</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Teacher" asp-action="Create">Thêm giáo viên</a>
@@ -258,7 +260,7 @@
                             <div class="collapse" id="manageStudentMenu">
                                 <ul class="nav flex-column sub-menu">
                                     <li class="nav-item">
-                                        <a class="nav-link" asp-controller="Student" asp-action="Index">Danh sách sinh viên</a>
+                                        <a class="nav-link" asp-controller="Admin" asp-action="ListStudent">Danh sách sinh viên</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Student" asp-action="Create">Thêm sinh viên</a>
@@ -283,7 +285,7 @@
                                         <a class="nav-link" asp-controller="Class" asp-action="Index">Danh sách lớp học</a>
                                     </li>
                                     <li class="nav-item">
-                                        <a class="nav-link" asp-controller="Subject" asp-action="Create">Thêm môn học</a>
+                                        <a class="nav-link" asp-controller="Subject" asp-action="Index">Danh sách môn học</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Curriculum" asp-action="Index">Chương trình học</a>

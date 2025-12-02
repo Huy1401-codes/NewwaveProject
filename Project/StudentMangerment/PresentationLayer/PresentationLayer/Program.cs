@@ -52,6 +52,9 @@ builder.Services.AddScoped<ISubjectService, SubjectService>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<ITeacherService, TeacherService>();
 
+builder.Services.AddScoped<IGradeComponentRepository, GradeComponentRepository>();
+builder.Services.AddScoped<IGradeComponentService, GradeComponentService>();
+
 
 /////Teacher
 

@@ -1,5 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs;
-using BusinessLogicLayer.DTOs.Teacher;
+using BusinessLogicLayer.DTOs.ManagerTeacher;
 using BusinessLogicLayer.Services.Interface.RoleTeacher;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleTeacher;

@@ -12,14 +12,12 @@
 
         <input type="hidden" asp-for="ClassId" />
 
-        <!-- CLASS NAME -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Class Name</label>
             <input asp-for="ClassName" class="form-control" />
             <span asp-validation-for="ClassName" class="text-danger"></span>
         </div>
 
-        <!-- SEMESTER -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Semester</label>
             <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
@@ -28,7 +26,6 @@
             <span asp-validation-for="SemesterId" class="text-danger"></span>
         </div>
 
-        <!-- SUBJECT -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Subject</label>
             <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
@@ -37,20 +34,27 @@
             <span asp-validation-for="SubjectId" class="text-danger"></span>
         </div>
 
-        <!-- TEACHER -->
         <div class="mb-3">
-            <label class="form-label fw-semibold">Teacher</label>
-            <select asp-for="TeacherId" class="form-control" asp-items="ViewBag.Teachers">
-                <option value="">-- Select Teacher --</option>
-            </select>
+            <label class="form-label fw-semibold">Teacher</label><br />
+
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacherModal">
+                Chọn giáo viên
+            </button>
+
+            <div id="selectedTeacherName" class="mt-2 text-primary fw-bold"></div>
+
+            <input type="hidden" asp-for="TeacherId" id="TeacherId" />
             <span asp-validation-for="TeacherId" class="text-danger"></span>
         </div>
 
-        <!-- STUDENTS MULTI SELECT -->
         <div class="mb-3">
-            <label class="form-label fw-semibold">Students</label>
-            <select asp-for="StudentIds" multiple class="form-select" asp-items="ViewBag.Students" size="10">
-            </select>
+            <label class="form-label fw-semibold">Students</label><br />
+
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal">
+                Chọn học sinh
+            </button>
+
+            <div id="selectedStudentsDisplay" class="mt-2 text-success"></div>
         </div>
 
         <button type="submit" class="btn btn-warning">
@@ -60,5 +64,138 @@
         <a href="@Url.Action("Index", "Class")" class="btn btn-secondary">Cancel</a>
 
     </form>
-
 </div>
+<style>
+    #teacherModal .form-check,
+    #studentModal .form-check {
+        display: flex !important;
+        align-items: center;
+        gap: 8px;
+        /* bỏ padding/margin mặc định gây lệch */
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    #teacherModal .form-check-input,
+    #studentModal .form-check-input {
+        margin-left: 0 !important;
+        transform: scale(1.2); /* optional: radio to rõ hơn */
+    }
+</style>
+<!-- STUDENT MODAL -->
+<div class="modal fade" id="studentModal">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header py-2">
+                <h5 class="modal-title">Chọn học sinh</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                @foreach (var s in ViewBag.Students)
+                {
+                    bool isChecked = Model.StudentIds.Contains(int.Parse(s.Value));
+                    <div class="form-check">
+                        <input class="form-check-input student-checkbox"
+                               type="checkbox"
+                               name="StudentIds"
+                               value="@s.Value"
+                               data-name="@s.Text"
+                               id="stu_@s.Value"
+                               @(isChecked ? "checked" : "") />
+
+                        <label class="form-check-label" for="stu_@s.Value">@s.Text</label>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmStudents">Xong</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- TEACHER MODAL -->
+<div class="modal fade" id="teacherModal">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+
+            <div class="modal-header py-2">
+                <h5 class="modal-title">Chọn giáo viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                @foreach (var t in ViewBag.Teachers)
+                {
+                    bool isChecked = t.Value == Model.TeacherId.ToString();
+                    <div class="form-check">
+                        <input class="form-check-input teacher-radio"
+                               type="radio"
+                               name="TeacherSelect"
+                               value="@t.Value"
+                               data-name="@t.Text"
+                               id="t_@t.Value"
+                               @(isChecked ? "checked" : "") />
+
+                        <label class="form-check-label" for="t_@t.Value">@t.Text</label>
+                    </div>
+                }
+            </div>
+
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmTeacher">Xong</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    // Confirm Students
+     document.getElementById("confirmStudents").onclick = function () {
+        var selectedIds = [];
+        var selectedNames = [];
+
+        $(".student-checkbox:checked").each(function () {
+            selectedIds.push($(this).val());      // id để gửi server
+            selectedNames.push($(this).data("name")); // tên để hiển thị
+        });
+
+        // Xóa input hidden cũ (nếu đã tạo từ lần trước)
+        $("#studentInputs").remove();
+
+        // Thêm input hidden mới vào form để gửi về server
+        if (selectedIds.length > 0) {
+            var form = $("form");
+            var container = $("<div id='studentInputs'></div>");
+            selectedIds.forEach(function (id) {
+                container.append('<input type="hidden" name="StudentIds" value="' + id + '" />');
+            });
+            form.append(container);
+        }
+
+        // Update hiển thị
+        document.getElementById("selectedStudentsDisplay").innerText =
+            selectedNames.length > 0
+                ? "Đã chọn: " + selectedNames.join(", ")
+                : "Chưa chọn học sinh";
+    };
+
+
+    // Confirm Teacher
+    document.getElementById("confirmTeacher").onclick = function () {
+        var selected = $(".teacher-radio:checked");
+
+        if (selected.length > 0) {
+            var teacherId = selected.val();
+            var teacherName = selected.data("name");
+
+            $("#TeacherId").val(teacherId);
+            $("#selectedTeacherName").text("Giáo viên: " + teacherName);
+        }
+    };
+</script>

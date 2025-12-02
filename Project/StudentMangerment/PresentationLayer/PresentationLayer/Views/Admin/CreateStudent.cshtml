@@ -1,0 +1,129 @@
+﻿@model BusinessLogicLayer.DTOs.ManagerStudent.CreateStudentDto
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<style>
+    /* Thu nhỏ chữ bên trong select2 */
+    .select2-container--default .select2-selection--single {
+        height: 42px !important;
+        padding: 6px 10px;
+        font-size: 14px;
+        border-radius: 6px;
+    }
+
+    /* Placeholder */
+    .select2-selection__placeholder {
+        color: #888 !important;
+        font-size: 14px;
+    }
+
+    /* Text trong dropdown */
+    .select2-results__option {
+        font-size: 14px;
+        padding: 8px;
+        white-space: normal !important; /* Xuống dòng khi dài */
+    }
+
+    /* Dropdown không bị tràn */
+    .select2-dropdown {
+        border-radius: 6px;
+        width: auto !important;
+        min-width: 300px;
+    }
+</style>
+
+<form asp-action="CreateStudent" method="post">
+    @if (ViewData.ModelState[string.Empty]?.Errors?.Count > 0)
+    {
+        <div class="alert alert-danger">
+            @foreach (var error in ViewData.ModelState[string.Empty].Errors)
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <div class="form-group mb-3">
+        <label class="fw-bold">Chọn User</label>
+        <select id="UserIdSelect" name="UserId" class="form-control"></select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="fw-bold">Student Code</label>
+        <input asp-for="StudentCode" class="form-control" />
+        <span asp-validation-for="StudentCode" class="text-danger"></span>
+
+    </div>
+    <div class="form-group mb-3">
+        <label class="fw-bold">Birth Date</label>
+        <input asp-for="BirthDate" type="date" class="form-control" />
+        <span asp-validation-for="BirthDate" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label class="fw-bold">Gender</label>
+        <select asp-for="Gender" class="form-control">
+            <option value="">Chọn giới tính</option>
+            <option value="Male">Nam</option>
+            <option value="Female">Nữ</option>
+            <option value="Other">Khác</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary px-4">Create</button>
+        <a asp-action="ListStudent" class="btn btn-secondary px-4">Hủy</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $("#UserIdSelect").select2({
+                placeholder: "Nhập tên / email / số điện thoại...",
+                allowClear: true,
+                width: "100%",
+                minimumInputLength: 1,       // chỉ gọi API khi nhập >= 1 ký tự
+                language: {
+                    inputTooShort: () => "Nhập ít nhất 1 ký tự để tìm kiếm..."
+                },
+
+                ajax: {
+                    url: '@Url.Action("SearchUsers", "Admin")',
+                    dataType: "json",
+                    delay: 300,
+                    data: params => ({
+                        search: params.term ?? ""
+                    }),
+                    processResults: data => ({
+                        results: data
+                    })
+                },
+
+                templateResult: formatUser,    // Format đẹp
+                templateSelection: formatSelection
+            });
+
+            // Format từng item trong dropdown
+            function formatUser(user) {
+                if (!user.id) return user.text;
+
+                return $(`
+                    <div style="padding:5px;">
+                        <div><strong>${user.text}</strong></div>
+                    </div>
+                `);
+            }
+
+            function formatSelection(user) {
+                return user.text || "Chọn User";
+            }
+
+        });
+    </script>
+}

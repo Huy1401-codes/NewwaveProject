@@ -1,5 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs;
-using BusinessLogicLayer.DTOs.Teacher;
+using BusinessLogicLayer.DTOs.ManagerTeacher;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Http;
 

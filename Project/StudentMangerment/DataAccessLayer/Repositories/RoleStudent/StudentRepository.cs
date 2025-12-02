@@ -27,15 +27,16 @@ namespace DataAccessLayer.Repositories.RoleStudent
         public IQueryable<ClassStudent> GetStudentClassesQuery(int studentId)
         {
             return _context.ClassStudents
+                .Where(cs => cs.StudentId == studentId)
                 .Include(cs => cs.Class)
                     .ThenInclude(c => c.Subject)
                 .Include(cs => cs.Class)
-                    .ThenInclude(c => c.Teacher)
-                        .ThenInclude(t => t.User)
-                .Include(cs => cs.Class)
                     .ThenInclude(c => c.Semester)
-                .Where(cs => cs.StudentId == studentId);
+                .Include(cs => cs.Class)
+                    .ThenInclude(c => c.Teacher)
+                        .ThenInclude(t => t.User);
         }
+
 
         /// <summary>
         /// Lấy tất cả StudentGrade của student
@@ -65,6 +66,14 @@ namespace DataAccessLayer.Repositories.RoleStudent
                     .ThenInclude(c => c.Teacher)
                         .ThenInclude(t => t.User)
                 .Where(cs => cs.Class.ClassStudents.Any(cs2 => cs2.StudentId == studentId));
+        }
+
+        public async Task<int?> GetStudentIdByUserIdAsync(int userId)
+        {
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            return student?.StudentId;
         }
     }
 }

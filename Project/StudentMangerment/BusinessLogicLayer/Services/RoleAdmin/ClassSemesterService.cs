@@ -23,22 +23,35 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 SubjectId = dto.SubjectId,
                 SemesterId = dto.SemesterId,
                 TeacherId = dto.TeacherId,
+                ClassStudents = new List<ClassStudent>()
             };
 
-            foreach (var studentId in dto.StudentIds)
+            if (dto.StudentIds != null)
             {
-                entity.ClassStudents.Add(new ClassStudent
+                foreach (var studentId in dto.StudentIds)
                 {
-                    StudentId = studentId
-                });
+                    entity.ClassStudents.Add(new ClassStudent
+                    {
+                        StudentId = studentId,
+                        EnrollDate = DateTime.Now    // cần thiết!
+                    });
+                }
             }
+            // Thêm quan hệ với Semester (ClassSemester)
+            entity.ClassSemesters.Add(new ClassSemester
+            {
+                SemesterId = dto.SemesterId,
+                IsStatus = true
+            });
 
             await _classRepo.AddAsync(entity);
             return true;
         }
 
+
         public async Task<bool> UpdateAsync(ClassUpdateDto dto)
         {
+            // Lấy entity đã include ClassStudents
             var entity = await _classRepo.GetByIdAsync(dto.ClassId);
             if (entity == null) return false;
 
@@ -48,16 +61,30 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             entity.SemesterId = dto.SemesterId;
             entity.TeacherId = dto.TeacherId;
 
+            // Xóa student cũ
             entity.ClassStudents.Clear();
-
-            foreach (var studentId in dto.StudentIds)
+            entity.ClassSemesters.Add(new ClassSemester
             {
-                entity.ClassStudents.Add(new ClassStudent { StudentId = studentId });
+                SemesterId = dto.SemesterId,
+                IsStatus = true
+            });
+            // Thêm student mới
+            if (dto.StudentIds != null)
+            {
+                foreach (var studentId in dto.StudentIds)
+                {
+                    entity.ClassStudents.Add(new ClassStudent
+                    {
+                        StudentId = studentId,
+                        EnrollDate = DateTime.UtcNow
+                    });
+                }
             }
 
-            await _classRepo.UpdateAsync(entity);
+            await _classRepo.UpdateAsync(entity); // repo sẽ gọi _context.Update(entity)
             return true;
         }
+
 
         public Task<bool> DeleteAsync(int id)
             => _classRepo.DeleteAsync(id).ContinueWith(_ => true);
@@ -72,6 +99,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 ClassId = entity.ClassId,
                 ClassName = entity.ClassName,
                 IsStatus = entity.IsStatus,
+                SubjectId = entity.SubjectId,
+                SemesterId = entity.SemesterId,
+                TeacherId = entity.TeacherId,
                 SubjectName = entity.Subject?.Name,
                 SemesterName = entity.Semester?.Name,
                 TeacherName = entity.Teacher?.User.FullName,

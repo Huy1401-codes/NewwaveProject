@@ -29,6 +29,12 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
+        {
+            return await _context.Users.Include(a => a.UserRoles).ThenInclude(a => a.Role)
+                .Where(u => u.UserRoles.Any(a => a.Role.RoleName == role) && u.IsStatus == true)
+                .ToListAsync();
+        }
         /// <summary>
         /// Danh sách học sinh
         /// </summary>
@@ -43,10 +49,13 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .Where(s => !s.IsDeleted);
 
             if (!string.IsNullOrEmpty(search))
-            {   
-                    query = query.Where(s =>
-                    s.User.FullName.Contains(search) ||
-                    s.User.Username.Contains(search));
+            {
+                query = query.Where(s =>
+                s.User.FullName.Contains(search) ||
+                s.User.Email.Contains(search) ||
+                s.User.Phone.Contains(search) ||
+                s.StudentCode.Contains(search)
+                );
             }
 
             int total = await query.CountAsync();

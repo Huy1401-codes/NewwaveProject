@@ -1,0 +1,131 @@
+﻿@model IEnumerable<BusinessLogicLayer.DTOs.SubjectDto>
+
+@{
+    ViewData["Title"] = "Quản lý Môn Học";
+}
+
+<!-- Toast -->
+<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+    <div id="toastNotification" class="toast align-items-center text-white border-0" role="alert">
+        <div class="d-flex">
+            <div id="toastMessage" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold">Quản lý Môn Học</h2>
+        <a href="@Url.Action("Create", "Subject")" class="btn btn-primary btn-icon-text">
+            <i class="bi bi-plus-circle"></i> Tạo Môn Học
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Tên môn</th>
+                    <th>Tín chỉ</th>
+                    <th>Trạng thái</th>
+                    <th>Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model == null || !Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="text-center text-muted">Chưa có môn học</td>
+                    </tr>
+                }
+                else
+                {
+                    int index = 1;
+                    foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@s.Name</td>
+                            <td>@s.Credit</td>
+                            <td>@(s.IsStatus == true ? "Hoạt động" : "Vô hiệu hóa")</td>
+                            <td class="d-flex gap-1 flex-wrap">
+                                <a href="@Url.Action("Edit", "Subject", new { id = s.SubjectId })"
+                                   class="btn btn-outline-primary btn-sm btn-icon-text">
+                                    <i class="bi bi-pencil"></i> Chỉnh sửa
+                                </a>
+                                <a href="@Url.Action("Delete", "Subject", new { id = s.SubjectId })"
+                                   class="btn btn-outline-danger btn-sm btn-icon-text"
+                                   onclick="return confirm('Bạn có chắc muốn xóa môn học này?');">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </a>
+                                <a href="@Url.Action("Details", "Subject", new { id = s.SubjectId })"
+                                   class="btn btn-outline-info btn-sm btn-icon-text">
+                                    <i class="bi bi-eye"></i> Chi tiết
+                                </a>
+                            </td>
+                        </tr>
+                        index++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .btn-sm {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-weight: 500;
+        }
+
+        .btn-icon-text i {
+            margin-right: 4px;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .table-light th {
+            color: #6c7293;
+        }
+
+        a.btn:hover {
+            opacity: 0.9;
+        }
+
+        .gap-1 {
+            gap: 0.25rem;
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        function showToast(message, type) {
+            if (!message) return;
+            const toastEl = document.getElementById("toastNotification");
+            const toastBody = document.getElementById("toastMessage");
+            toastBody.innerText = message;
+            toastEl.classList.remove("bg-success", "bg-danger");
+            toastEl.classList.add(type === "success" ? "bg-success" : "bg-danger");
+            new bootstrap.Toast(toastEl, { delay: 3000, autohide: true }).show();
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const success = "@TempData["SuccessMessage"]";
+            const error = "@TempData["ErrorMessage"]";
+            if (success) showToast(success, "success");
+            if (error) showToast(error, "error");
+        });
+    </script>
+}

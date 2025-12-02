@@ -183,13 +183,7 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("List");
         }
 
-
-
-
-
-
-
-        // Helper: Populate dropdown roles
+        // dropdown roles
         private async Task PopulateRolesAsync()
         {
             var rolesFromDb = await _userService.GetAllAsync();

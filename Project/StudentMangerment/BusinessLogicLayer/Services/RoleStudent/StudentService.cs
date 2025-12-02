@@ -1,7 +1,7 @@
 ﻿using BusinessLogicLayer.DTOs;
 using BusinessLogicLayer.Services.Interface.RoleStudent;
+using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleStudent;
-using DataAccessLayer.Repositories.RoleStudent;
 using Microsoft.EntityFrameworkCore;
 
 namespace BusinessLogicLayer.Services.RoleStudent
@@ -15,25 +15,19 @@ namespace BusinessLogicLayer.Services.RoleStudent
             _repo = repo;
         }
 
-        /// <summary>
-        /// Danh sách các lớp học theo thời gian của từng kì
-        /// </summary>
-        /// <param name="studentId"></param>
-        /// <param name="search"></param>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
         public async Task<List<StudentClassDto>> GetClassesAsync(
-            int studentId,
-            string? search = null,
-            DateTime? from = null,
-            DateTime? to = null,
-            int page = 1,
-            int pageSize = 10)
+    int userId,
+    string? search = null,
+    DateTime? from = null,
+    DateTime? to = null,
+    int page = 1,
+    int pageSize = 10)
         {
-            var query = _repo.GetStudentClassesQuery(studentId);
+            var studentId = await _repo.GetStudentIdByUserIdAsync(userId);
+            if (studentId == null)
+                return new List<StudentClassDto>();
+
+            var query = _repo.GetStudentClassesQuery(studentId.Value);
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -55,7 +49,6 @@ namespace BusinessLogicLayer.Services.RoleStudent
                 .Take(pageSize)
                 .ToListAsync();
 
-            // mapping sang DTO
             return list.Select(cs => new StudentClassDto
             {
                 ClassId = cs.ClassId,
@@ -68,6 +61,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
             }).ToList();
         }
 
+
         /// <summary>
         /// Điểm của học sinh
         /// </summary>
@@ -75,7 +69,9 @@ namespace BusinessLogicLayer.Services.RoleStudent
         /// <returns></returns>
         public async Task<List<StudentGradeDto>> GetGradesAsync(int studentId)
         {
-            var grades = await _repo.GetStudentGradesQuery(studentId).ToListAsync();
+            var studId = await _repo.GetStudentIdByUserIdAsync(studentId);
+
+            var grades = await _repo.GetStudentGradesQuery((int)studId).ToListAsync();
 
             var result = grades
                 .GroupBy(g => new { g.SubjectId, g.ClassId })
@@ -89,12 +85,13 @@ namespace BusinessLogicLayer.Services.RoleStudent
                         Score = x.Score,
                         Weight = x.GradeComponent.Weight
                     }).ToList(),
-                    AverageScore = g.Sum(x => (x.Score ?? 0) * x.GradeComponent.Weight)
-               / g.Sum(x => x.GradeComponent.Weight)
+                    AverageScore = g.Sum(x => (x.Score ?? 0) * x.GradeComponent.Weight)/ g.Sum(x => x.GradeComponent.Weight)
                 }).ToList();
 
             return result;
         }
+
+
 
         /// <summary>
         /// Danh sách lịch học cho học sinh

@@ -282,6 +282,15 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             await _userRepo.SaveAsync();
         }
 
+
+        /// <summary>
+        /// Danh sách tài khoản bị khóa
+        /// </summary>
+        /// <param name="search"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="roleId"></param>
+        /// <returns></returns>
         public async Task<(IEnumerable<UserListDto> Users, int Total)> GetRestoreUsersAsync(string search, int pageIndex, int pageSize, int? roleId)
         {
             var query = _userRepo.GetAllRestoreQueryable();

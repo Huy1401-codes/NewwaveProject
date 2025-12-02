@@ -5,7 +5,7 @@
         public string ComponentName { get; set; } = string.Empty;
 
         /// <summary>
-        /// Hệ số (0 - 1)
+        /// Hệ số 
         /// </summary>
         public double Weight { get; set; }
     }

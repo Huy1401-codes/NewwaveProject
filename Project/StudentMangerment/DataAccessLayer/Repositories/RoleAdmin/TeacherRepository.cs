@@ -46,7 +46,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
             {
                 query = query.Where(t =>
                     t.User.FullName.Contains(search) ||
-                    t.User.Username.Contains(search));
+                     t.User.Email.Contains(search) ||
+                t.User.Phone.Contains(search) ||
+                t.TeacherCode.Contains(search)
+                    );
             }
 
             int total = await query.CountAsync();
@@ -87,7 +90,14 @@ namespace DataAccessLayer.Repositories.RoleAdmin
 
         public async Task<IEnumerable<Teacher>> GetAllNameAsync()
         {
-            return await _context.Teachers.Include(a=>a.User).OrderBy(t => t.User.FullName).ToListAsync();
+            return await _context.Teachers.Include(a => a.User).OrderBy(t => t.User.FullName).ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
+        {
+            return await _context.Users.Include(a => a.UserRoles).ThenInclude(a => a.Role)
+                .Where(u => u.UserRoles.Any(a => a.Role.RoleName == role) && u.IsStatus == true)
+                .ToListAsync();
         }
     }
 }

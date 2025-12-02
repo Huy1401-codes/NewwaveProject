@@ -1,10 +1,11 @@
 ﻿using BusinessLogicLayer.DTOs.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace PresentationLayer.Controllers
 {
-
+    [Authorize(Roles ="Admin")]
     public class SemesterController : Controller
     {
         private readonly ISemesterService _semesterService;
