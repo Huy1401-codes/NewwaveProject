@@ -35,6 +35,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                     .ThenInclude(ur => ur.Role)
                 .AsQueryable();
         }
+
         public async Task<User> GetByIdAsync(int id)
         {
             return await _context.Users

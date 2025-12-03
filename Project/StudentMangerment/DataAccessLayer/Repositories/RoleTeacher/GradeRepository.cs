@@ -19,7 +19,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
             _context = context;
         }
 
-        // Lấy toàn bộ điểm (nhiều thành phần) của 1 học sinh trong 1 lớp
+        // Lấy toàn bộ điểm của 1 học sinh trong 1 lớp
         public async Task<List<StudentGrade>> GetStudentGradesAsync(int studentId, int classId)
         {
             return await _context.StudentGrades
@@ -85,7 +85,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
         {
             return await _context.GradeComponents
                 .Where(gc => gc.SubjectId == subjectId)
-                    .Include(c => c.StudentGrades) // <--- phải Include
+                    .Include(c => c.StudentGrades)
                 .ToListAsync();
         }
 

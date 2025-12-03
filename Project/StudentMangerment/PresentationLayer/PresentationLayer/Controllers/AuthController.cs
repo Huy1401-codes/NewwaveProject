@@ -32,17 +32,15 @@ namespace PresentationLayer.Controllers
                 return View(model);
             }
 
-            // Lấy role
             var role = user.UserRoles.FirstOrDefault()?.Role.RoleName ?? "Student";
 
-            // Tạo claims
             var claims = new List<Claim>
-        {
+            {
             new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
             new Claim(ClaimTypes.Name, user.Username),
             new Claim(ClaimTypes.Email, user.Email ?? ""),
             new Claim(ClaimTypes.Role, role)
-        };
+            };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 

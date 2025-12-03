@@ -51,7 +51,7 @@ namespace PresentationLayer.Controllers
 
             if (userIdClaim == null)
             {
-                return Unauthorized();  // hoặc redirect login
+                return Unauthorized();  
             }
 
             int studentId = int.Parse(userIdClaim.Value);
@@ -69,7 +69,7 @@ namespace PresentationLayer.Controllers
 
             if (userIdClaim == null)
             {
-                return Unauthorized();  // hoặc redirect login
+                return Unauthorized(); 
             }
 
             int studentId = int.Parse(userIdClaim.Value);

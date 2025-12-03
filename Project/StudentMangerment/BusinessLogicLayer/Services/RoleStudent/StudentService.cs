@@ -1,40 +1,46 @@
 ﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.Messages.Student;
 using BusinessLogicLayer.Services.Interface.RoleStudent;
-using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleStudent;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace BusinessLogicLayer.Services.RoleStudent
 {
     public class StudentService : IStudentService
     {
         private readonly IStudentRepository _repo;
+        private readonly ILogger<StudentService> _logger;
 
-        public StudentService(IStudentRepository repo)
+        public StudentService(IStudentRepository repo, ILogger<StudentService> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
         public async Task<List<StudentClassDto>> GetClassesAsync(
-    int userId,
-    string? search = null,
-    DateTime? from = null,
-    DateTime? to = null,
-    int page = 1,
-    int pageSize = 10)
+            int userId,
+            string? search = null,
+            DateTime? from = null,
+            DateTime? to = null,
+            int page = 1,
+            int pageSize = 10)
         {
             var studentId = await _repo.GetStudentIdByUserIdAsync(userId);
             if (studentId == null)
+            {
+                _logger.LogWarning(StudentMessages.StudentNotFound, userId);
                 return new List<StudentClassDto>();
+            }
 
             var query = _repo.GetStudentClassesQuery(studentId.Value);
 
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(cs =>
-                    cs.Class.ClassName.Contains(search) ||
-                    cs.Class.Subject.Name.Contains(search) ||
-                    cs.Class.Teacher.User.FullName.Contains(search));
+                    cs.Class.ClassName.Contains(search.ToLower()) ||
+                    cs.Class.Subject.Name.Contains(search.ToLower()) ||
+                    cs.Class.Teacher.User.FullName.Contains(search.ToLower()));
             }
 
             if (from.HasValue)
@@ -49,6 +55,8 @@ namespace BusinessLogicLayer.Services.RoleStudent
                 .Take(pageSize)
                 .ToListAsync();
 
+            _logger.LogInformation(StudentMessages.ListStudent, userId, list.Count);
+
             return list.Select(cs => new StudentClassDto
             {
                 ClassId = cs.ClassId,
@@ -61,17 +69,22 @@ namespace BusinessLogicLayer.Services.RoleStudent
             }).ToList();
         }
 
-
-        /// <summary>
-        /// Điểm của học sinh
-        /// </summary>
-        /// <param name="studentId"></param>
-        /// <returns></returns>
-        public async Task<List<StudentGradeDto>> GetGradesAsync(int studentId)
+        public async Task<List<StudentGradeDto>> GetGradesAsync(int userId)
         {
-            var studId = await _repo.GetStudentIdByUserIdAsync(studentId);
+            var studentId = await _repo.GetStudentIdByUserIdAsync(userId);
+            if (studentId == null)
+            {
+                _logger.LogWarning(StudentMessages.StudentNotFound, userId);
+                return new List<StudentGradeDto>();
+            }
 
-            var grades = await _repo.GetStudentGradesQuery((int)studId).ToListAsync();
+            var grades = await _repo.GetStudentGradesQuery(studentId.Value).ToListAsync();
+
+            if (!grades.Any())
+            {
+                _logger.LogWarning(StudentMessages.GradeNotFound, studentId);
+                return new List<StudentGradeDto>();
+            }
 
             var result = grades
                 .GroupBy(g => new { g.SubjectId, g.ClassId })
@@ -85,23 +98,15 @@ namespace BusinessLogicLayer.Services.RoleStudent
                         Score = x.Score,
                         Weight = x.GradeComponent.Weight
                     }).ToList(),
-                    AverageScore = g.Sum(x => (x.Score ?? 0) * x.GradeComponent.Weight)/ g.Sum(x => x.GradeComponent.Weight)
+                    AverageScore = g.Sum(x => (x.Score ?? 0) * x.GradeComponent.Weight)
+                                   / g.Sum(x => x.GradeComponent.Weight)
                 }).ToList();
+
+            _logger.LogWarning(StudentMessages.GradeNotFound, studentId);
 
             return result;
         }
 
-
-
-        /// <summary>
-        /// Danh sách lịch học cho học sinh
-        /// </summary>
-        /// <param name="studentId"></param>
-        /// <param name="dayOfWeek"></param>
-        /// <param name="search"></param>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
         public async Task<List<StudentScheduleDto>> GetStudentSchedulesAsync(
             int studentId,
             int? dayOfWeek = null,
@@ -111,15 +116,20 @@ namespace BusinessLogicLayer.Services.RoleStudent
         {
             var query = _repo.GetStudentSchedulesQuery(studentId);
 
+            if (!query.Any())
+            {
+                _logger.LogWarning(StudentMessages.ScheduleNotFound, studentId);
+            }
+
             if (dayOfWeek.HasValue)
                 query = query.Where(cs => cs.DayOfWeek == dayOfWeek.Value);
 
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(cs =>
-                    cs.Class.ClassName.Contains(search) ||
-                    cs.Class.Subject.Name.Contains(search) ||
-                    cs.Class.Teacher.User.FullName.Contains(search) ||
+                    cs.Class.ClassName.Contains(search.ToLower()) ||
+                    cs.Class.Subject.Name.Contains(search.ToLower()) ||
+                    cs.Class.Teacher.User.FullName.Contains(search.ToLower()) ||
                     cs.Room.Contains(search));
             }
 
@@ -129,6 +139,8 @@ namespace BusinessLogicLayer.Services.RoleStudent
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+
+            _logger.LogInformation(StudentMessages.ScheduleListInfo, studentId, list.Count);
 
             return list.Select(cs => new StudentScheduleDto
             {
@@ -142,5 +154,4 @@ namespace BusinessLogicLayer.Services.RoleStudent
             }).ToList();
         }
     }
-
 }

@@ -2,6 +2,7 @@
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,17 +14,27 @@ namespace DataAccessLayer.Repositories.RoleAdmin
     public class GradeComponentRepository : IGradeComponentRepository
     {
         private readonly SchoolContext _context;
-
-        public GradeComponentRepository(SchoolContext context)
+        private readonly  ILogger<GradeComponentRepository> _logger;
+        public GradeComponentRepository(SchoolContext context, ILogger<GradeComponentRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<GradeComponent>> GetBySubjectAsync(int subjectId)
         {
-            return await _context.GradeComponents
-                .Where(x => x.SubjectId == subjectId && !x.IsDeleted)
-                .ToListAsync();
+            try
+            {
+                return await _context.GradeComponents
+              .Where(x => x.SubjectId == subjectId && !x.IsDeleted)
+              .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Lỗi khi lấy Thành phần điểm cho Mã môn học {SubjectId}");
+                throw;
+            }
+          
         }
 
         public async Task<GradeComponent> GetByIdAsync(int id)

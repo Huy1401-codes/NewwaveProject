@@ -51,10 +51,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(s =>
-                s.User.FullName.Contains(search) ||
-                s.User.Email.Contains(search) ||
-                s.User.Phone.Contains(search) ||
-                s.StudentCode.Contains(search)
+                s.User.FullName.Contains(search.ToLower()) ||
+                s.User.Email.Contains(search.ToLower()) ||
+                s.User.Phone.Contains(search.ToLower()) ||
+                s.StudentCode.Contains(search.ToLower())
                 );
             }
 

@@ -1,6 +1,8 @@
-﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
+﻿using BusinessLogicLayer.Messages.Admin;
+using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,13 @@ namespace BusinessLogicLayer.Services.RoleAdmin
     public class AccountService : IAccountService
     {
         private readonly IAccountRepository _account;
+        private readonly ILogger<AccountService> _logger;
 
-        public AccountService(IAccountRepository account)
+
+        public AccountService(IAccountRepository account, ILogger<AccountService> logger)
         {
             _account = account;
+            _logger = logger;
         }
 
         public async Task<User> LoginAsync(string email, string password)
@@ -23,6 +28,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             var user = await _account.GetByUsernameAsync(email);
             if (user == null)
                 return null;
+
+            if (user.IsStatus == false)
+            {
+                _logger.LogWarning(LoginMessages.InActive);
+                return null;
+            }
 
             string storedPassword = user.PasswordHash;
 

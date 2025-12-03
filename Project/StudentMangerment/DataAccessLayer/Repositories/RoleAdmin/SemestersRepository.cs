@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,11 +39,16 @@ namespace DataAccessLayer.Repositories.RoleAdmin
 
         public async Task<IEnumerable<Semester>> GetAllAsync()
         {
-            return await _context.Semesters
+            return await _context.Semesters.AsNoTracking()
                                  .OrderBy(s => s.Name)
                                  .ToListAsync();
         }
 
         public async Task SaveAsync() => await _context.SaveChangesAsync();
+
+        public async Task<bool> AnyAsync(Expression<Func<Semester, bool>> predicate)
+        {
+            return await _context.Semesters.AnyAsync(predicate);
+        }
     }
 }

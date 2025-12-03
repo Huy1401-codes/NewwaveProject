@@ -6,6 +6,7 @@ using DataAccessLayer.Repositories.RoleAdmin;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using NLog.Web;
 using OfficeOpenXml;
 
 
@@ -73,7 +74,11 @@ builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IS
 
 builder.Services.AddScoped<BusinessLogicLayer.Services.Interface.RoleStudent.IStudentService, BusinessLogicLayer.Services.RoleStudent.StudentService>();
 
-
+builder.Services.AddLogging(loggingbuider =>
+{
+    loggingbuider.ClearProviders();
+    loggingbuider.AddNLogWeb();
+});
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -83,6 +88,10 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromHours(1);
     });
 
+
+
+// Thêm NLog
+builder.Host.UseNLog();
 
 // EPPlus 8+ license setup
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
@@ -99,13 +108,11 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseSession();
 
-// Middleware kiểm tra quyền
-app.UseMiddleware<AuthorizationMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(

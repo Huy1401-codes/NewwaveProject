@@ -42,7 +42,6 @@ namespace PresentationLayer.Controllers
             return View(list);
         }
 
-        // CREATE
         public async Task<IActionResult> Create()
         {
             await LoadDropdowns();
@@ -62,13 +61,12 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Index");
         }
 
-        // EDIT     
         public async Task<IActionResult> Edit(int id)
         {
-            var cls = await _classService.GetByIdAsync(id); // ClassDetailDto
+            var cls = await _classService.GetByIdAsync(id);
             if (cls == null) return NotFound();
 
-            // Map từ ClassDetailDto sang ClassUpdateDto
+            
             var dto = new ClassUpdateDto
             {
                 ClassId = cls.ClassId,
@@ -115,11 +113,8 @@ namespace PresentationLayer.Controllers
             var teachers = await _teacherService.GetAllAsync();
             var students = await _studentService.GetAllAsync();
 
-            //  set selected value
             ViewBag.Semesters = new SelectList(semesters, "SemesterId", "Name", selectedSemesterId);
             ViewBag.Subjects = new SelectList(subjects, "SubjectId", "Name", selectedSubjectId);
-
-            // Teacher và Student dùng modal → trả list
             ViewBag.Teachers = teachers.Select(t => new {
                 Value = t.TeacherId.ToString(),
                 Text = t.User?.FullName ?? "[No Name]"
@@ -134,13 +129,11 @@ namespace PresentationLayer.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            // Lấy entity Class từ database
-            var cls = await _classService.GetByIdAsync(id); // cls là entity Class
+            var cls = await _classService.GetByIdAsync(id);
 
             if (cls == null)
                 return NotFound();
 
-            // Map từ entity sang DTO
             var dto = new ClassDetailDto
             {
                 ClassId = cls.ClassId,
@@ -158,11 +151,7 @@ namespace PresentationLayer.Controllers
                 //    FullName = x.Student.User.FullName
                 //}).ToList
             };
-
             return View(dto);
         }
-
-
     }
-
 }

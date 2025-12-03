@@ -39,9 +39,9 @@ namespace DataAccessLayer.Repositories.RoleTeacher
             if (!string.IsNullOrWhiteSpace(search))
             {
                 query = query.Where(cs =>
-                    cs.Student.User.FullName.Contains(search) ||
-                    cs.Student.StudentCode.Contains(search) ||
-                    cs.Student.User.Email.Contains(search)
+                    cs.Student.User.FullName.Contains(search.ToLower()) ||
+                    cs.Student.StudentCode.Contains(search.ToLower()) ||
+                    cs.Student.User.Email.Contains(search.ToLower())
                 );
             }
 

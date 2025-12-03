@@ -1,7 +1,9 @@
 ﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,57 +15,101 @@ namespace BusinessLogicLayer.Services.RoleAdmin
     public class GradeComponentService : IGradeComponentService
     {
         private readonly IGradeComponentRepository _repo;
+        private readonly ILogger<GradeComponentService> _logger;
 
-        public GradeComponentService(IGradeComponentRepository repo)
+        public GradeComponentService(IGradeComponentRepository repo, ILogger<GradeComponentService> logger)
         {
             _repo = repo;
+            _logger = logger;
         }
 
+
         /// <summary>
-        /// danh sách điểm thành phần
+        /// List grade component of Subject
         /// </summary>
         /// <param name="subjectId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<GradeComponent>> GetComponentsOfSubject(int subjectId)
-            => _repo.GetBySubjectAsync(subjectId);
+        public async Task<IEnumerable<GradeComponent>> GetComponentsOfSubject(int subjectId)
+        {
+            try
+            {
+                return await _repo.GetBySubjectAsync(subjectId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, GradeComponentMessage.GetBySubjectError, subjectId);
+                throw;
+            }
+        }
 
         /// <summary>
-        /// Thêm điểm thành phần
+        /// Add component
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task AddComponent(CreateGradeComponentDto dto)
         {
-            var entity = new GradeComponent
+            try
             {
-                SubjectId = dto.SubjectId,
-                ComponentName = dto.ComponentName,
-                Weight = dto.Weight,
-                IsDeleted = false
-            };
+                var entity = new GradeComponent
+                {
+                    SubjectId = dto.SubjectId,
+                    ComponentName = dto.ComponentName,
+                    Weight = dto.Weight,
+                    IsDeleted = false
+                };
 
-            await _repo.AddAsync(entity);
+                await _repo.AddAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, GradeComponentMessage.CreateError, dto.SubjectId);
+                throw;
+            }
         }
 
         /// <summary>
-        /// chỉnh sửa thành phần
+        /// Update compenent grade
         /// </summary>
         /// <param name="id"></param>
         /// <param name="dto"></param>
         /// <returns></returns>
         public async Task UpdateComponent(int id, UpdateGradeComponentDto dto)
         {
-            var entity = await _repo.GetByIdAsync(id);
-            if (entity == null) return;
+            try
+            {
+                var entity = await _repo.GetByIdAsync(id);
 
-            entity.ComponentName = dto.ComponentName;
-            entity.Weight = dto.Weight;
+                if (entity == null)
+                {
+                    _logger.LogWarning(GradeComponentMessage.NotFound, id);
+                    return;
+                }
 
-            await _repo.UpdateAsync(entity);
+                entity.ComponentName = dto.ComponentName;
+                entity.Weight = dto.Weight;
+
+                await _repo.UpdateAsync(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, GradeComponentMessage.UpdateError, id);
+                throw;
+            }
         }
 
-        public Task DeleteComponent(int id)
-            => _repo.SoftDeleteAsync(id);
+        public async Task DeleteComponent(int id)
+        {
+            try
+            {
+                await _repo.SoftDeleteAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, GradeComponentMessage.DeleteError, id);
+                throw;
+            }
+        }
     }
 
 }

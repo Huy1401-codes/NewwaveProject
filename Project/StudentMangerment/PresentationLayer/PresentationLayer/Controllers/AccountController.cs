@@ -16,7 +16,6 @@ namespace PresentationLayer.Controllers
             _userService = userService;
         }
 
-        // GET: /Admin/Account/List
         public async Task<IActionResult> List(string search, int pageIndex = 1, int pageSize = 10, int? roleId = null, bool? status = null)
         {
             var (users, total) = await _userService.GetPagedUsersAsync(search, pageIndex, pageSize, roleId, status);
@@ -38,16 +37,12 @@ namespace PresentationLayer.Controllers
             return View("/Views/Admin/Account/List.cshtml", users);
         }
 
-
-
-        // GET: /Admin/Account/Create
         public async Task<IActionResult> Create()
         {
             await PopulateRolesAsync();
             return View("/Views/Admin/Account/Create.cshtml", new UserCreateDto());
         }
 
-        // POST: /Admin/Account/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserCreateDto user)
@@ -72,11 +67,10 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("List");
         }
 
-        // GET: /Admin/Account/Edit/5
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var userDetail = await _userService.GetByIdAsync(id); // UserDetailDto
+            var userDetail = await _userService.GetByIdAsync(id); 
             if (userDetail == null)
                 return NotFound();
 
@@ -95,7 +89,6 @@ namespace PresentationLayer.Controllers
             return View("/Views/Admin/Account/Edit.cshtml", userUpdate);
         }
 
-        // POST: /Admin/Account/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, UserUpdateDto user)
@@ -114,7 +107,6 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("List");
         }
 
-        // POST: /Admin/Account/ResetPassword
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(int UserId, string NewPassword, string ConfirmPassword)
@@ -137,7 +129,6 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Edit", new { id = UserId });
         }
 
-        // GET: /Admin/Account/Details/5
         public async Task<IActionResult> Detail(int id)
         {
             var user = await _userService.GetByIdAsync(id);
@@ -147,7 +138,6 @@ namespace PresentationLayer.Controllers
             return View("/Views/Admin/Account/Detail.cshtml", user);
         }
 
-        // GET: /Admin/Account/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
             var user = await _userService.GetByIdAsync(id);
@@ -165,7 +155,6 @@ namespace PresentationLayer.Controllers
             if (user == null)
                 return NotFound();
 
-            // Map UserDetailDto -> UserUpdateDto
             var updateDto = new UserUpdateDto
             {
                 UserId = user.UserId,
@@ -173,7 +162,7 @@ namespace PresentationLayer.Controllers
                 FullName = user.FullName,
                 Email = user.Email,
                 Phone = user.Phone,
-                IsStatus = false,      // Vô hiệu hóa
+                IsStatus = false,    
                 RoleId = user.RoleIds
             };
 
@@ -183,7 +172,6 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("List");
         }
 
-        // dropdown roles
         private async Task PopulateRolesAsync()
         {
             var rolesFromDb = await _userService.GetAllAsync();

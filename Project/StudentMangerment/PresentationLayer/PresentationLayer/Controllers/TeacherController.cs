@@ -16,7 +16,6 @@ namespace PresentationLayer.Controllers
             _teacherService = teacherService;
         }
 
-        // Danh sách lớp
         public async Task<IActionResult> Classes(int page = 1, string search = "", int? semesterId = null)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -34,7 +33,6 @@ namespace PresentationLayer.Controllers
             return View(classes);
         }
 
-        // 2. Danh sách học sinh trong lớp
         public async Task<IActionResult> Students(int? classId, int page = 1, string search = "")
         {
             if (!classId.HasValue)
@@ -90,9 +88,6 @@ namespace PresentationLayer.Controllers
             return PartialView("_EnterGradeModal", model);
         }
 
-
-
-        // 4. Import Excel
         [HttpPost]
         public async Task<IActionResult> ImportExcel(int classId, IFormFile file)
         {
@@ -115,7 +110,6 @@ namespace PresentationLayer.Controllers
             return RedirectToAction("Students", new { classId });
         }
 
-        // 5. Export Excel
         public async Task<IActionResult> ExportExcel(int classId)
         {
             var data = await _teacherService.ExportGradesAsync(classId);
@@ -124,7 +118,6 @@ namespace PresentationLayer.Controllers
                 $"Grades_Class_{classId}.xlsx");
         }
 
-        // 6. Thống kê
         public async Task<IActionResult> Statistics(int classId)
         {
             var result = await _teacherService.GetClassStatisticsAsync(classId);

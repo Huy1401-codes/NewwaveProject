@@ -25,10 +25,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .Include(x => x.Semester)
                 .Include(x => x.Subject)
                 .Include(x => x.Teacher)
-                    .ThenInclude(t => t.User) // load thông tin User của Teacher
+                    .ThenInclude(t => t.User) 
                 .Include(x => x.ClassStudents)
                     .ThenInclude(cs => cs.Student)
-                        .ThenInclude(s => s.User) // load thông tin User của Student
+                        .ThenInclude(s => s.User)
                 .FirstOrDefaultAsync(x => x.ClassId == id);
         }
 
@@ -39,10 +39,10 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .Include(x => x.Semester)
                 .Include(x => x.Subject)
                 .Include(x => x.Teacher)
-                    .ThenInclude(t => t.User) // <- bắt buộc để load User của Teacher
+                    .ThenInclude(t => t.User) 
                 .Include(x => x.ClassStudents)
                     .ThenInclude(cs => cs.Student)
-                        .ThenInclude(s => s.User) // <- để lấy tên học sinh
+                        .ThenInclude(s => s.User) 
                 .ToListAsync();
         }
 

@@ -15,7 +15,6 @@ namespace PresentationLayer.Controllers
             _semesterService = semesterService;
         }
 
-        // GET: /Admin/Semester
         public async Task<IActionResult> Index(string search, int pageIndex = 1, int pageSize = 10)
         {
             var (semesters, total) = await _semesterService.GetPagedSemestersAsync(search, pageIndex, pageSize);
@@ -27,13 +26,11 @@ namespace PresentationLayer.Controllers
             return View(semesters);
         }
 
-        // GET: /Admin/Semester/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: /Admin/Semester/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SemesterCreateDto dto)
@@ -47,14 +44,13 @@ namespace PresentationLayer.Controllers
                 TempData["Success"] = "Tạo kì học thành công!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (ArgumentException ex) // validate ngày
+            catch (ArgumentException ex) 
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(dto);
             }
         }
 
-        // GET: /Admin/Semester/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
             var semester = await _semesterService.GetByIdAsync(id);
@@ -71,7 +67,6 @@ namespace PresentationLayer.Controllers
             return View(dto);
         }
 
-        // POST: /Admin/Semester/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(SemesterDto dto)
@@ -85,14 +80,13 @@ namespace PresentationLayer.Controllers
                 TempData["Success"] = "Cập nhật kì học thành công!";
                 return RedirectToAction(nameof(Index));
             }
-            catch (ArgumentException ex) // validate ngày
+            catch (ArgumentException ex) 
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
                 return View(dto);
             }
         }
 
-        // GET: /Admin/Semester/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var semester = await _semesterService.GetByIdAsync(id);

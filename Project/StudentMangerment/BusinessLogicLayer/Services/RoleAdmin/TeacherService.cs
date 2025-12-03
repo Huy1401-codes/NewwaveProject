@@ -1,8 +1,10 @@
 ﻿using BusinessLogicLayer.DTOs.ManagerStudent;
 using BusinessLogicLayer.DTOs.ManagerTeacher;
+using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,16 +18,26 @@ namespace BusinessLogicLayer.Services.RoleAdmin
     {
         private readonly ITeacherRepository _teacherRepo;
         private readonly IUserRepository _userRepo;
+        private readonly ILogger<TeacherService> _logger;
 
-        public TeacherService(ITeacherRepository teacherRepo, IUserRepository userRepo)
+        public TeacherService(
+            ITeacherRepository teacherRepo,
+            IUserRepository userRepo,
+            ILogger<TeacherService> logger)
         {
             _teacherRepo = teacherRepo;
             _userRepo = userRepo;
+            _logger = logger;
         }
 
         public async Task<Teacher> GetByIdAsync(int id)
         {
-            return await _teacherRepo.GetByIdAsync(id);
+            var teacher = await _teacherRepo.GetByIdAsync(id);
+
+            if (teacher == null)
+                _logger.LogWarning(TeacherMessages.NotFound, id);
+
+            return teacher;
         }
 
         public async Task<(IEnumerable<Teacher> Data, int TotalCount)> GetPagedAsync(int page, int pageSize, string search)
@@ -35,98 +47,142 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
         public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateTeacherDto dto)
         {
-            // 1. Kiểm tra User hợp lệ
-            var user = (await _teacherRepo.GetUsersByRoleAsync("Teacher"))
-                .FirstOrDefault(u => u.UserId == dto.UserId);
-            if (user == null)
-                return (false, "User không hợp lệ hoặc chưa có role Teacher.");
-
-            // 2. Kiểm tra User đã là Student chưa
-            var existedStudents = await _teacherRepo.GetAllAsync();
-            if (existedStudents.Any(s => s.UserId == dto.UserId))
-                return (false, "User này đã là Teacher.");
-
-            // 3. Kiểm tra StudentCode trùng
-            if (existedStudents.Any(s => s.TeacherCode.Equals(dto.TeacherCode, StringComparison.OrdinalIgnoreCase)))
-                return (false, "TeacherCode đã tồn tại, vui lòng chọn mã khác.");
-
-            // 4. Tạo Student
-            var teach = new Teacher
+            try
             {
-                UserId = (int)dto.UserId,
-                TeacherCode = dto.TeacherCode,            
-                Degree = dto.Degree,
-            };
+                var teacherUsers = await _teacherRepo.GetUsersByRoleAsync("Teacher");
+                var user = teacherUsers.FirstOrDefault(u => u.UserId == dto.UserId);
 
-            await _teacherRepo.AddAsync(teach);
-            await _teacherRepo.SaveAsync();
+                if (user == null)
+                {
+                    _logger.LogWarning(TeacherMessages.InvalidUser, dto.UserId);
+                    return (false, TeacherMessages.InvalidUser);
+                }
 
-            return (true, string.Empty);
+                var existedTeachers = await _teacherRepo.GetAllAsync();
+                if (existedTeachers.Any(t => t.UserId == dto.UserId))
+                {
+                    _logger.LogWarning(TeacherMessages.DuplicateUser, dto.UserId);
+                    return (false, TeacherMessages.DuplicateUser);
+                }
+
+                if (existedTeachers.Any(t =>
+                        t.TeacherCode.Equals(dto.TeacherCode, StringComparison.OrdinalIgnoreCase)))
+                {
+                    _logger.LogWarning(TeacherMessages.DuplicateCode, dto.TeacherCode);
+                    return (false, TeacherMessages.DuplicateCode);
+                }
+
+                var teacher = new Teacher
+                {
+                    UserId = dto.UserId.Value,
+                    TeacherCode = dto.TeacherCode,
+                    Degree = dto.Degree,
+                };
+
+                await _teacherRepo.AddAsync(teacher);
+                await _teacherRepo.SaveAsync();
+
+                _logger.LogInformation(TeacherMessages.CreateSuccess, dto.TeacherCode);
+                return (true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, TeacherMessages.CreateFail);
+                return (false, TeacherMessages.CreateFail);
+            }
         }
 
         public async Task<bool> UpdateAsync(Teacher teacher)
         {
-            var existing = await _teacherRepo.GetByIdAsync(teacher.TeacherId);
-            if (existing == null) return false;
+            try
+            {
+                var existing = await _teacherRepo.GetByIdAsync(teacher.TeacherId);
+                if (existing == null)
+                {
+                    _logger.LogWarning(TeacherMessages.NotFound , teacher.TeacherId);
+                    return false;
+                }
 
-            existing.Degree = teacher.Degree;
+                existing.Degree = teacher.Degree;
 
-            await _teacherRepo.UpdateAsync(existing);
-            await _teacherRepo.SaveAsync();
-            return true;
+                await _teacherRepo.UpdateAsync(existing);
+                await _teacherRepo.SaveAsync();
+
+                _logger.LogInformation(TeacherMessages.UpdateSuccess, teacher.TeacherId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, TeacherMessages.UpdateFail, teacher.TeacherId);
+                return false;
+            }
         }
 
         public async Task<bool> SoftDeleteAsync(int id)
         {
-            var teacher = await _teacherRepo.GetByIdAsync(id);
-            if (teacher == null) return false;
+            try
+            {
+                var teacher = await _teacherRepo.GetByIdAsync(id);
+                if (teacher == null)
+                {
+                    _logger.LogWarning(TeacherMessages.NotFound, id);
+                    return false;
+                }
 
-            await _teacherRepo.SoftDeleteAsync(id);
-            await _teacherRepo.SaveAsync();
-            return true;
+                await _teacherRepo.SoftDeleteAsync(id);
+                await _teacherRepo.SaveAsync();
+
+                _logger.LogInformation(TeacherMessages.DeleteSuccess, id);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, TeacherMessages.DeleteFail, id);
+                return false;
+            }
         }
 
         public async Task<IEnumerable<Teacher>> GetAllAsync()
         {
-            return await _teacherRepo.GetAllNameAsync();
+            try
+            {
+                return await _teacherRepo.GetAllNameAsync();
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, TeacherMessages.Fail);
+                throw;
+            }
         }
 
         public async Task<IEnumerable<UserDropdownDto>> GetAvailableTeacherUsersAsync(string search = null)
         {
-            // Lấy danh sách User có role Teacher
             var users = await _teacherRepo.GetUsersByRoleAsync("Teacher");
-
-            // Lấy các Teacher đã tạo
             var teachers = await _teacherRepo.GetAllAsync();
 
-            // Chỉ lấy User chưa có trong bảng Teacher
             var available = users
-                .Where(u => !teachers.Any(s => s.UserId == u.UserId));
+                .Where(u => !teachers.Any(t => t.UserId == u.UserId));
 
-            // Nếu có search thì lọc
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.Trim().ToLower();
 
                 available = available.Where(u =>
-                    (!string.IsNullOrWhiteSpace(u.FullName) && u.FullName.Trim().ToLower().Contains(search)) ||
-                    (!string.IsNullOrWhiteSpace(u.Email) && u.Email.Trim().ToLower().Contains(search)) ||
-                    (!string.IsNullOrWhiteSpace(u.Phone) && u.Phone.Trim().Contains(search))
+                    (!string.IsNullOrWhiteSpace(u.FullName) && u.FullName.ToLower().Contains(search)) ||
+                    (!string.IsNullOrWhiteSpace(u.Email) && u.Email.ToLower().Contains(search)) ||
+                    (!string.IsNullOrWhiteSpace(u.Phone) && u.Phone.ToLower().Contains(search))
                 );
             }
 
-
-            return available
-                .Select(u => new UserDropdownDto
-                {
-                    UserId = u.UserId,
-                    FullName = u.FullName,
-                    Email = u.Email,
-                    Phone = u.Phone
-                })
-                .ToList();
+            return available.Select(u => new UserDropdownDto
+            {
+                UserId = u.UserId,
+                FullName = u.FullName,
+                Email = u.Email,
+                Phone = u.Phone
+            })
+            .ToList();
         }
-
     }
-
 }

@@ -82,34 +82,30 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
             int subjectId = classInfo.SubjectId;
 
-            // Lấy ClassSemester hiện tại 
             var classSemester = await _classSemesterRepo.GetClassSemesterAsync(classId);
             if (classSemester == null)
                 throw new Exception("ClassSemester not found");
 
             foreach (var (componentId, score) in scores)
             {
-                // Kiểm tra grade hiện có
                 var existingGrade = await _gradeRepo.GetSingleGradeAsync(
                     studentId,
-                    classSemester.Id, // dùng ClassSemesterId
+                    classSemester.Id, 
                     componentId
                 );
 
                 if (existingGrade != null)
                 {
-                    // Nếu đã có điểm → cập nhật
                     existingGrade.Score = score;
                     existingGrade.UpdatedAt = DateTime.Now;
                 }
                 else
                 {
-                    // Nếu chưa có → tạo mới
                     var newGrade = new StudentGrade
                     {
                         StudentId = studentId,
-                        ClassId = classId,               // cần gán để thoả FK
-                        ClassSemesterId = classSemester.Id, // bắt buộc phải có
+                        ClassId = classId,               
+                        ClassSemesterId = classSemester.Id, 
                         SubjectId = subjectId,
                         GradeComponentId = componentId,
                         Score = score,
@@ -120,7 +116,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 }
             }
 
-            // Lưu tất cả thay đổi 1 lần
             await _gradeRepo.SaveAsync();
             return true;
         }
@@ -134,52 +129,48 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <returns></returns>
         public async Task<bool> ImportGradesAsync(int classId, IFormFile file)
         {
-            // 1. Lấy thông tin lớp
             var classInfo = await _classRepo.GetByIdAsync(classId);
             if (classInfo == null)
                 throw new Exception("Class not found");
 
             int subjectId = classInfo.SubjectId;
 
-            // 2. Lấy ClassSemester hiện tại
             var classSemester = await _classSemesterRepo.GetClassSemesterAsync(classId);
             if (classSemester == null)
                 throw new Exception("ClassSemester not found");
 
-            // 3. Lấy danh sách GradeComponent của lớp
             var components = await _gradeRepo.GetGradeComponentsAsync(subjectId);
 
-            // 4. Đọc file Excel
             using var package = new ExcelPackage(file.OpenReadStream());
             var ws = package.Workbook.Worksheets[0];
 
-            for (int row = 2; row <= ws.Dimension.End.Row; row++) // bỏ qua header
+            for (int row = 2; row <= ws.Dimension.End.Row; row++)
             {
                 if (!int.TryParse(ws.Cells[row, 1].Value?.ToString(), out int studentId))
-                    continue; // bỏ qua nếu studentId không hợp lệ
+                    continue; 
 
-                int col = 2; // cột điểm bắt đầu từ 2
+                int col = 2; 
                 foreach (var comp in components)
                 {
                     var cellValue = ws.Cells[row, col].Value?.ToString();
                     if (!string.IsNullOrWhiteSpace(cellValue) && double.TryParse(cellValue, out double score))
                     {
-                        // Kiểm tra grade hiện có
+                       
                         var existingGrade = await _gradeRepo.GetSingleGradeAsync(studentId, classSemester.Id, comp.GradeComponentId);
 
                         if (existingGrade != null)
                         {
-                            // Nếu đã có điểm → cập nhật
+                           
                             existingGrade.Score = score;
                             existingGrade.UpdatedAt = DateTime.Now;
                         }
                         else
                         {
-                            // Nếu chưa có → tạo mới
+                       
                             var newGrade = new StudentGrade
                             {
                                 StudentId = studentId,
-                                ClassId = classId,               // cần để thoả FK
+                                ClassId = classId,             
                                 ClassSemesterId = classSemester.Id,
                                 SubjectId = subjectId,
                                 GradeComponentId = comp.GradeComponentId,
@@ -195,14 +186,9 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 }
             }
 
-            // 5. Lưu tất cả thay đổi 1 lần
             await _gradeRepo.SaveAsync();
             return true;
         }
-
-
-
-
 
         /// <summary>
         /// Xuất điểm ra file excel
@@ -211,19 +197,15 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <returns></returns>
         public async Task<byte[]> ExportGradesAsync(int classId)
         {
-            // Lấy thông tin lớp, các thành phần điểm và danh sách học sinh
             var classInfo = await _classRepo.GetByIdAsync(classId);
             var components = await _gradeRepo.GetGradeComponentsAsync(classInfo.SubjectId);
             var students = await _classStudentRepo.GetStudentsWithUserByClassAsync(classId);
 
-            // Lấy tất cả điểm của lớp một lần
             var allGrades = await _gradeRepo.GetGradesByClassAsync(classId);
-            // allGrades là List<Grade> có StudentId, GradeComponentId, Score
 
             using var package = new ExcelPackage();
             var ws = package.Workbook.Worksheets.Add("Grades");
 
-            // Tạo header
             ws.Cells[1, 1].Value = "Student ID";
             ws.Cells[1, 2].Value = "Full Name";
 
@@ -234,7 +216,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 col++;
             }
 
-            // Điền dữ liệu từng học sinh
             int row = 2;
             foreach (var s in students)
             {
@@ -253,7 +234,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 row++;
             }
 
-            // Tự động căn chỉnh cột
             ws.Cells.AutoFitColumns();
 
             return package.GetAsByteArray();
@@ -273,7 +253,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
             var components = await _gradeRepo.GetGradeComponentsAsync(classInfo.SubjectId);
             var grades = await _gradeRepo.GetGradesByClassAsync(classId);
 
-            // chia theo học sinh
             var grouped = grades.GroupBy(g => g.StudentId);
 
             var avgScores = new List<double>();

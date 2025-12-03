@@ -123,7 +123,6 @@ namespace PresentationLayer.Controllers
         public async Task<IActionResult> SearchUsers(string search)
         {
             var users = await _studentService.GetAvailableStudentUsersAsync(search);
-            Console.WriteLine("SEARCH PARAM = " + search);
 
             var results = users.Select(u => new
             {
@@ -185,7 +184,6 @@ namespace PresentationLayer.Controllers
         public async Task<IActionResult> SearchTeacher(string search)
         {
             var users = await _teacherService.GetAvailableTeacherUsersAsync(search);
-            Console.WriteLine("SEARCH PARAM = " + search);
 
             var results = users.Select(u => new
             {
