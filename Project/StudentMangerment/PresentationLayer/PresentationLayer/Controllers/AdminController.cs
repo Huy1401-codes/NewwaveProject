@@ -55,7 +55,7 @@ namespace PresentationLayer.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet]
+        [HttpGet("EditTrash/{id}")]
         public async Task<IActionResult> EditTrash(int id)
         {
             var user = await _userService.GetByIdAsync(id);

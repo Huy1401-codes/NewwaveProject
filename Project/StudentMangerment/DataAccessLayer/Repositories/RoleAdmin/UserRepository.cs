@@ -20,7 +20,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         {
             return _context.Users
                 .Where(u => u.IsStatus == true)
-                .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName != "Admin")) 
+                .Where(u => u.UserRoles.Any(ur => ur.Role.RoleName != "Admin"))
                 .Include(u => u.UserRoles)
                     .ThenInclude(ur => ur.Role)
                 .AsQueryable();
@@ -40,14 +40,14 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         {
             return await _context.Users
                 .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.UserId == id && u.IsStatus==true);
+                .FirstOrDefaultAsync(u => u.UserId == id );
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await _context.Users
                 .Include(u => u.UserRoles).ThenInclude(ur => ur.Role)
-                .FirstOrDefaultAsync(u => u.Username == username && u.IsStatus==true);
+                .FirstOrDefaultAsync(u => u.Username == username && u.IsStatus == true);
         }
 
         public async Task AddAsync(User user) => await _context.Users.AddAsync(user);

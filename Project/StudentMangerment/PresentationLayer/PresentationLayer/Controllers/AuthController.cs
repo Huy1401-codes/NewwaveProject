@@ -23,24 +23,33 @@ namespace PresentationLayer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
 
-            var user = await _service.LoginAsync(model.Email, model.Password);
-            if (user == null)
+            // Nhận LoginResult, không phải User
+            var result = await _service.LoginAsync(model.Email, model.Password);
+
+            // Nếu đăng nhập thất bại
+            if (result.User == null)
             {
-                ModelState.AddModelError("", "Tên người dùng hoặc mật khẩu không hợp lệ.");
+                ModelState.AddModelError("", result.ErrorMessage);
                 return View(model);
             }
 
+            // Lấy user thật
+            var user = result.User;
+
+            // Lấy role
             var role = user.UserRoles.FirstOrDefault()?.Role.RoleName ?? "Student";
 
+            // Claims
             var claims = new List<Claim>
-            {
-            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email ?? ""),
-            new Claim(ClaimTypes.Role, role)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+        new Claim(ClaimTypes.Name, user.Username),
+        new Claim(ClaimTypes.Email, user.Email ?? ""),
+        new Claim(ClaimTypes.Role, role)
+    };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -63,6 +72,7 @@ namespace PresentationLayer.Controllers
                 _ => RedirectToAction("Login")
             };
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Logout()

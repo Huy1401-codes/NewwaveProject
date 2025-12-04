@@ -1,4 +1,6 @@
-﻿using BusinessLogicLayer.Messages.Admin;
+﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.DTOs.Results;
+using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
@@ -23,36 +25,53 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             _logger = logger;
         }
 
-        public async Task<User> LoginAsync(string email, string password)
+        public async Task<LoginResult> LoginAsync(string email, string password)
         {
+            var result = new LoginResult();
+
             var user = await _account.GetByUsernameAsync(email);
+
             if (user == null)
-                return null;
+            {
+                result.ErrorMessage = LoginMessages.EmailFail;
+                _logger.LogWarning(LoginMessages.EmailFail);
+                return result;
+            }
 
             if (user.IsStatus == false)
             {
+                result.ErrorMessage = LoginMessages.InActive;
                 _logger.LogWarning(LoginMessages.InActive);
-                return null;
+                return result;
             }
 
             string storedPassword = user.PasswordHash;
 
-            //1. Nếu mật khẩu đã mã hoá
+            // BCrypt password
             if (!string.IsNullOrEmpty(storedPassword) && storedPassword.StartsWith("$2"))
             {
                 bool isMatch = BCrypt.Net.BCrypt.Verify(password, storedPassword);
-                return isMatch ? user : null;
+
+                if (!isMatch)
+                {
+                    result.ErrorMessage = LoginMessages.PasswordFail;
+                    return result;
+                }
+
+                result.User = user;
+                return result;
             }
 
-            //2. Nếu mật khẩu chưa mã hoá  so sánh trực tiếp
+            // Plain text fallback (không khuyến nghị)
             if (storedPassword == password)
             {
-                return user;
+                result.User = user;
+                return result;
             }
 
-            return null;
+            result.ErrorMessage = LoginMessages.PasswordFail;
+            return result;
         }
-
 
     }
 }

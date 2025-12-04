@@ -18,11 +18,10 @@
             <li><strong>Họ tên:</strong> @Model.FullName</li>
         </ul>
 
-        <form method="post" asp-action="EditStatus" asp-route-id="@Model.UserId">
-            @* Thêm Anti-Forgery Token cho bảo mật *@
+            <form method="post" asp-action="EditTrashStatus" asp-route-id="@Model.UserId">
             @Html.AntiForgeryToken()
             <button type="submit" class="btn btn-success">Khôi phục</button>
-            <a asp-action="ListRestore" asp-controller="Admin" class="btn btn-secondary">Hủy</a> @* Sửa controller thành Admin *@
+            <a asp-action="ListRestore" asp-controller="Admin" class="btn btn-secondary">Hủy</a> 
         </form>
     </div>
     </div>
@@ -30,7 +29,6 @@
 else
 {
     {
-        // Hiển thị thông báo hoặc chuyển hướng nếu Model bị null
         <div class="alert alert-danger">Không tìm thấy thông tin tài khoản để hiển thị.</div>
         <a asp-action="ListRestore" asp-controller="Admin" class="btn btn-secondary">Quay lại danh sách</a>
     }

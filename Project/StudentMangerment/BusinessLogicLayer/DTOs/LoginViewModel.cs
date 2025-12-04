@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccessLayer.Models;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace BusinessLogicLayer.DTOs
         [Required(ErrorMessage = "Password không được để trống")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+
     }
 
 }

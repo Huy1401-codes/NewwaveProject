@@ -11,6 +11,8 @@ namespace BusinessLogicLayer.DTOs
         public string SubjectName { get; set; }
         public string ClassName { get; set; }
         public List<GradeDetail> Grades { get; set; }
-        public double? AverageScore { get; set; } // tính tổng điểm dựa trên Weight
+        public double? AverageScore { get; set; } 
+
+        public DateTime UpdateAt { get; set; }
     }
 }

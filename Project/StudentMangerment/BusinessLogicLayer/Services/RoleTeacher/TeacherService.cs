@@ -59,7 +59,8 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 StudentId = s.StudentId,
                 StudentCode = s.StudentCode,
                 FullName = s.User?.FullName,
-                Email = s.User?.Email
+                Email = s.User?.Email,
+              
             });
 
             return (dtos, total);
@@ -75,7 +76,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
         /// <returns></returns>
         public async Task<bool> UpdateGradeAsync(int classId, int studentId, Dictionary<int, double> scores)
         {
-            // Lấy thông tin lớp
             var classInfo = await _classRepo.GetByIdAsync(classId);
             if (classInfo == null)
                 throw new Exception("Class not found");
@@ -154,13 +154,11 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 {
                     var cellValue = ws.Cells[row, col].Value?.ToString();
                     if (!string.IsNullOrWhiteSpace(cellValue) && double.TryParse(cellValue, out double score))
-                    {
-                       
+                    {                      
                         var existingGrade = await _gradeRepo.GetSingleGradeAsync(studentId, classSemester.Id, comp.GradeComponentId);
 
                         if (existingGrade != null)
                         {
-                           
                             existingGrade.Score = score;
                             existingGrade.UpdatedAt = DateTime.Now;
                         }
@@ -181,7 +179,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                             await _gradeRepo.AddOrUpdateGradeAsync(newGrade);
                         }
                     }
-
                     col++;
                 }
             }
@@ -208,8 +205,9 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
             ws.Cells[1, 1].Value = "Student ID";
             ws.Cells[1, 2].Value = "Full Name";
+            ws.Cells[1, 3].Value = "Student Code";
 
-            int col = 3;
+            int col = 4;
             foreach (var comp in components)
             {
                 ws.Cells[1, col].Value = comp.ComponentName;
@@ -221,8 +219,9 @@ namespace BusinessLogicLayer.Services.RoleTeacher
             {
                 ws.Cells[row, 1].Value = s.StudentId;
                 ws.Cells[row, 2].Value = s.User.FullName;
+                ws.Cells[row, 3].Value = s.StudentCode;
 
-                col = 3;
+                col = 4;
                 foreach (var comp in components)
                 {
                     var grade = allGrades
