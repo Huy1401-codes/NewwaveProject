@@ -1,15 +1,8 @@
-﻿using BusinessLogicLayer.DTOs;
-using BusinessLogicLayer.DTOs.Results;
+﻿using BusinessLogicLayer.DTOs.Results;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
-using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {

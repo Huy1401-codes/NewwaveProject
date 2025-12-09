@@ -11,21 +11,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ParkingDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ParkingDb")));
-// Nếu dùng Program.cs (.NET 6+)
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddHttpContextAccessor();
 
 
-// JWT Authentication
 var jwtKey = builder.Configuration["Jwt:Key"];
 var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 var jwtAudience = builder.Configuration["Jwt:Audience"];
@@ -50,14 +46,12 @@ builder.Services.AddAuthentication(options =>
 });
 
 
-// Swagger Configuration
 builder.Services.AddSwaggerGen(c =>
 {
-    // Định nghĩa phiên bản OpenAPI là v1
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "Parking API",
-        Version = "v1",  // Đặt tên cho phiên bản là v1
+        Version = "v1",  
         Description = "API for managing parking lot operations",
         Contact = new OpenApiContact
         {
@@ -66,7 +60,6 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // Thêm cấu hình Bearer Token (JWT Authentication)
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "Please enter your JWT token",
@@ -90,23 +83,34 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        // Đảm bảo trỏ đúng endpoint Swagger v1
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Parking API v1");
     });
 }
 
-app.UseSwagger(); // You can keep this if you want to expose the swagger.json for the API
+app.UseSwagger(); 
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 

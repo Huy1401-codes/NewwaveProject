@@ -26,23 +26,17 @@ namespace PresentationLayer.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
-            // Nhận LoginResult, không phải User
             var result = await _service.LoginAsync(model.Email, model.Password);
 
-            // Nếu đăng nhập thất bại
             if (result.User == null)
             {
                 ModelState.AddModelError("", result.ErrorMessage);
                 return View(model);
             }
-
-            // Lấy user thật
             var user = result.User;
 
-            // Lấy role
             var role = user.UserRoles.FirstOrDefault()?.Role.RoleName ?? "Student";
 
-            // Claims
             var claims = new List<Claim>
     {
         new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
@@ -55,7 +49,7 @@ namespace PresentationLayer.Controllers
 
             var authProperties = new AuthenticationProperties
             {
-                IsPersistent = false
+                IsPersistent = false,
             };
 
             await HttpContext.SignInAsync(
@@ -80,7 +74,6 @@ namespace PresentationLayer.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
-
         public IActionResult AccessDenied() => View();
     }
 

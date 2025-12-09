@@ -15,6 +15,6 @@ namespace BusinessLogicLayer.Messages.Admin
         public const string InvalidDate = "StartDate must be earlier than EndDate.";
         public const string GetAll = "Error when getting all semesters.";
         public const string NotFound = "Semester Id {Id} not found.";
-        public const string DuplicateNameInTimeRange = "The semester name has existed for this period of time.";
+        public const string DuplicateInTimeRange = "The semester has existed for this period of time.";
     }
 }

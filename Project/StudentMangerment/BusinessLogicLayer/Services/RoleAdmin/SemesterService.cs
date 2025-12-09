@@ -110,14 +110,13 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 var lowerName = dto.Name.ToLower();
 
                 var isExist = await _semesterRepo.AnyAsync(s =>
-                                 s.Name.ToLower() == lowerName &&
-                                 s.StartDate < dto.EndDate &&
-                                 s.EndDate > dto.StartDate);
+                                 s.StartDate <= dto.EndDate &&
+                                 s.EndDate >= dto.StartDate);
 
                 if (isExist)
                 {
-                    _logger.LogWarning(SemesterMessages.DuplicateNameInTimeRange);
-                    throw new ArgumentException(SemesterMessages.DuplicateNameInTimeRange);
+                    _logger.LogWarning(SemesterMessages.DuplicateInTimeRange);
+                    throw new ArgumentException(SemesterMessages.DuplicateInTimeRange);
                 }
 
                 var semester = new Semester
@@ -163,14 +162,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 var lowerName = dto.Name.ToLower();
 
                 var isExist = await _semesterRepo.AnyAsync(s =>
-                                 s.Name.ToLower() == lowerName &&
-                                 s.StartDate < dto.EndDate &&
-                                 s.EndDate > dto.StartDate);
+                                       s.SemesterId != dto.SemesterId &&
+                                       s.StartDate <= dto.EndDate &&
+                                       s.EndDate >= dto.StartDate);
 
                 if (isExist)
                 {
-                    _logger.LogWarning(SemesterMessages.DuplicateNameInTimeRange);
-                    throw new ArgumentException(SemesterMessages.DuplicateNameInTimeRange);
+                    _logger.LogWarning(SemesterMessages.DuplicateInTimeRange);
+                    throw new ArgumentException(SemesterMessages.DuplicateInTimeRange);
                 }
 
                 semester.Name = dto.Name;
@@ -199,7 +198,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,SemesterMessages.GetAll);
+                _logger.LogError(ex, SemesterMessages.GetAll);
                 throw;
             }
         }

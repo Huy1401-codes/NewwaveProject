@@ -69,8 +69,6 @@ namespace DataAccessLayer.Repositories
         /// <returns></returns>
         public Task SaveAsync() => _context.SaveChangesAsync();
 
-
-
         /// <summary>
         /// tìm kiếm Refresh Token tron db
         /// </summary>
@@ -78,18 +76,16 @@ namespace DataAccessLayer.Repositories
         /// <returns></returns>
         public async Task<RefreshToken> GetRefreshTokenAsync(string refreshToken)
         {
-            // Lấy RefreshToken từ database, sử dụng FirstOrDefaultAsync() để thực hiện truy vấn bất đồng bộ
             var refreshTokenEntity = await _context.RefreshTokens
                                                     .Where(t => t.TokenHash == refreshToken)
-                                                    .FirstOrDefaultAsync();  // Không cần await nữa, vì là một đối tượng RefreshToken
+                                                    .FirstOrDefaultAsync(); 
 
-            // Kiểm tra trạng thái của RefreshToken
             if (refreshTokenEntity != null && refreshTokenEntity.IsActive)
             {
-                return refreshTokenEntity;  // Trả về RefreshToken nếu nó hợp lệ
+                return refreshTokenEntity;  
             }
 
-            return null;  // Nếu token không hợp lệ hoặc không tồn tại
+            return null; 
         }
 
 

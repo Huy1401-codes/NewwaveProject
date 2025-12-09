@@ -238,9 +238,6 @@ namespace BusinessLogicLayer.Services.RoleTeacher
             return package.GetAsByteArray();
         }
 
-
-
-
         /// <summary>
         /// Thống kê kết quả điểm
         /// </summary>

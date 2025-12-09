@@ -15,7 +15,6 @@ namespace BussinessLayer.DTOs
         public string RefreshToken { get; set; }
         public DateTime ExpiredAt { get; set; }
 
-        // Dùng để tự đong login sau khi register dựa theo token
         public UserResponseDto User { get; set; }
 
     }

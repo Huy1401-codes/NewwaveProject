@@ -70,7 +70,7 @@ namespace DataAccessLayer.Context
                .HasOne(rt => rt.User)
                .WithMany(u => u.RefreshTokens)
                .HasForeignKey(rt => rt.UserId)
-               .OnDelete(DeleteBehavior.Cascade); // hoặc Restrict tùy nhu cầu
+               .OnDelete(DeleteBehavior.Cascade); 
 
             // Seed roles
             model.Entity<Role>().HasData(
