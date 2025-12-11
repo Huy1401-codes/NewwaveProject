@@ -40,7 +40,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
             string storedPassword = user.PasswordHash;
 
-            // BCrypt password
             if (!string.IsNullOrEmpty(storedPassword) && storedPassword.StartsWith("$2"))
             {
                 bool isMatch = BCrypt.Net.BCrypt.Verify(password, storedPassword);
@@ -55,7 +54,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 return result;
             }
 
-            // Plain text fallback (không khuyến nghị)
             if (storedPassword == password)
             {
                 result.User = user;

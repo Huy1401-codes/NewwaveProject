@@ -18,7 +18,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         {
             return await _context.Teachers
                 .Include(t => t.User)
-                .FirstOrDefaultAsync(t => t.TeacherId == id && !t.IsDeleted);
+                .FirstOrDefaultAsync(t => t.Id == id && !t.IsDeleted);
         }
 
         public async Task<IEnumerable<Teacher>> GetAllAsync()
@@ -55,7 +55,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
             int total = await query.CountAsync();
 
             var data = await query
-                .OrderBy(t => t.TeacherId)
+                .OrderBy(t => t.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -75,7 +75,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
 
         public async Task SoftDeleteAsync(int id)
         {
-            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.TeacherId == id);
+            var teacher = await _context.Teachers.FirstOrDefaultAsync(t => t.Id == id);
             if (teacher != null)
             {
                 teacher.IsDeleted = true;
@@ -96,8 +96,17 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         public async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
         {
             return await _context.Users.Include(a => a.UserRoles).ThenInclude(a => a.Role)
-                .Where(u => u.UserRoles.Any(a => a.Role.RoleName == role) && u.IsStatus == true)
+                .Where(u => u.UserRoles.Any(a => a.Role.Name == role) && u.IsStatus == true)
                 .ToListAsync();
         }
+
+        public async Task<int?> GetTeacherIdByUserIdAsync(int userId)
+        {
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(t => t.UserId == userId);
+
+            return teacher?.Id;
+        }
+
     }
 }

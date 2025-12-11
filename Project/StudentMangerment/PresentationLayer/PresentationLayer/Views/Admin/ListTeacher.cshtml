@@ -111,17 +111,17 @@
                                 @foreach (var s in Model.Teachers)
                                 {
                                     <tr>
-                                        <td>@s.TeacherId</td>
+                                        <td>@s.Id</td>
                                         <td>@s.User.FullName</td>
                                         <td>@s.TeacherCode</td>
                                         <td>@s.User.Email</td>
                                         <td>@s.User.Phone</td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <a asp-action="DetailTeacher" asp-route-id="@s.TeacherId" class="btn btn-outline-info btn-sm btn-icon-text">
+                                                <a asp-action="DetailTeacher" asp-route-id="@s.Id" class="btn btn-outline-info btn-sm btn-icon-text">
                                                     <i class="mdi mdi-eye"></i> Chi tiết
                                                 </a>
-                                                <a asp-action="EditTeacher" asp-route-id="@s.TeacherId" class="btn btn-outline-warning btn-sm btn-icon-text">
+                                                <a asp-action="EditTeacher" asp-route-id="@s.Id" class="btn btn-outline-warning btn-sm btn-icon-text">
                                                     <i class="mdi mdi-pencil"></i> Sửa
                                                 </a>
 

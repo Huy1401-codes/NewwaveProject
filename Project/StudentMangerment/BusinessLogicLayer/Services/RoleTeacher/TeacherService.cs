@@ -56,7 +56,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
             var dtos = students.Select(s => new StudentDto
             {
-                StudentId = s.StudentId,
+                StudentId = s.Id,
                 StudentCode = s.StudentCode,
                 FullName = s.User?.FullName,
                 Email = s.User?.Email,
@@ -155,7 +155,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                     var cellValue = ws.Cells[row, col].Value?.ToString();
                     if (!string.IsNullOrWhiteSpace(cellValue) && double.TryParse(cellValue, out double score))
                     {                      
-                        var existingGrade = await _gradeRepo.GetSingleGradeAsync(studentId, classSemester.Id, comp.GradeComponentId);
+                        var existingGrade = await _gradeRepo.GetSingleGradeAsync(studentId, classSemester.Id, comp.Id);
 
                         if (existingGrade != null)
                         {
@@ -171,7 +171,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                                 ClassId = classId,             
                                 ClassSemesterId = classSemester.Id,
                                 SubjectId = subjectId,
-                                GradeComponentId = comp.GradeComponentId,
+                                GradeComponentId = comp.Id,
                                 Score = score,
                                 UpdatedAt = DateTime.Now
                             };
@@ -217,7 +217,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
             int row = 2;
             foreach (var s in students)
             {
-                ws.Cells[row, 1].Value = s.StudentId;
+                ws.Cells[row, 1].Value = s.Id;
                 ws.Cells[row, 2].Value = s.User.FullName;
                 ws.Cells[row, 3].Value = s.StudentCode;
 
@@ -225,7 +225,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
                 foreach (var comp in components)
                 {
                     var grade = allGrades
-                        .FirstOrDefault(g => g.StudentId == s.StudentId && g.GradeComponentId == comp.GradeComponentId);
+                        .FirstOrDefault(g => g.StudentId == s.Id && g.GradeComponentId == comp.Id);
                     ws.Cells[row, col].Value = grade?.Score ?? 0;
                     col++;
                 }
@@ -259,7 +259,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
                 foreach (var g in group)
                 {
-                    var comp = components.First(c => c.GradeComponentId == g.GradeComponentId);
+                    var comp = components.First(c => c.Id == g.GradeComponentId);
                     avg += (g.Score ?? 0) * (comp.Weight / 100.0);
                 }
 
@@ -295,7 +295,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
             return new StudentDto
             {
-                StudentId = s.StudentId,
+                StudentId = s.Id,
                 StudentCode = s.StudentCode,
                 FullName = s.User.FullName,
                 Email = s.User.Email
@@ -312,7 +312,7 @@ namespace BusinessLogicLayer.Services.RoleTeacher
 
             return components.Select(c => new GradeComponentDto
             {
-                GradeComponentId = c.GradeComponentId,
+                GradeComponentId = c.Id,
                 ComponentName = c.ComponentName,
                 Weight = c.Weight,
                 Score = c.StudentGrades?.FirstOrDefault(g => g.StudentId == studentId)?.Score

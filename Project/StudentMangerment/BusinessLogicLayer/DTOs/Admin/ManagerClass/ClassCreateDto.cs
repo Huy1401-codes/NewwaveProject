@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BusinessLogicLayer.Enums.Admin;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
     {
         [Required(ErrorMessage ="Không bỏ trống")]
         public string ClassName { get; set; }
-        public bool IsStatus { get; set; } = true;
+        public ClassStatus IsStatus { get; set; } 
 
         [Required(ErrorMessage = "Không bỏ trống")]
         public int SubjectId { get; set; }

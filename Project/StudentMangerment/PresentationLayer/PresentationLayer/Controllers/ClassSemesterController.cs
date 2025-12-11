@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.DTOs.Admin.ManagerClass;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
+using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +23,12 @@ namespace PresentationLayer.Controllers
             return View(list);
         }
 
-        public IActionResult Create() => View();
+        public async Task<IActionResult> Create()
+        {
+           
+            return View();
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

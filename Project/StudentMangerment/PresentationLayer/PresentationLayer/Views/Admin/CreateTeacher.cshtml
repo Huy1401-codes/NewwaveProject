@@ -3,7 +3,6 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
 <style>
-    /* Thu nhỏ chữ bên trong select2 */
     .select2-container--default .select2-selection--single {
         height: 42px !important;
         padding: 6px 10px;
@@ -11,20 +10,17 @@
         border-radius: 6px;
     }
 
-    /* Placeholder */
     .select2-selection__placeholder {
         color: #888 !important;
         font-size: 14px;
     }
 
-    /* Text trong dropdown */
     .select2-results__option {
         font-size: 14px;
         padding: 8px;
-        white-space: normal !important; /* Xuống dòng khi dài */
+        white-space: normal !important;
     }
 
-    /* Dropdown không bị tràn */
     .select2-dropdown {
         border-radius: 6px;
         width: auto !important;
@@ -81,7 +77,7 @@
                 placeholder: "Nhập tên / email / số điện thoại...",
                 allowClear: true,
                 width: "100%",
-                minimumInputLength: 1,       // chỉ gọi API khi nhập >= 1 ký tự
+                minimumInputLength: 1,       
                 language: {
                     inputTooShort: () => "Nhập ít nhất 1 ký tự để tìm kiếm..."
                 },
@@ -98,11 +94,10 @@
                     })
                 },
 
-                templateResult: formatUser,    // Format đẹp
+                templateResult: formatUser,   
                 templateSelection: formatSelection
             });
 
-            // Format từng item trong dropdown
             function formatUser(user) {
                 if (!user.id) return user.text;
 

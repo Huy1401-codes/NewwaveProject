@@ -12,5 +12,6 @@
         public const string InvalidUser = "User is invalid or does not have Student role.";
         public const string UserAlreadyStudent = "This user is already a Student.";
         public const string StudentCodeExists = "StudentCode already exists, please choose another code.";
+        public const string StudentNotFound = "Student {Id} not found.";
     }
 }

@@ -1,22 +1,19 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using DataAccessLayer.Models.Base;
+using System.ComponentModel.DataAnnotations;
 
 namespace DataAccessLayer.Models
 {
-    public class Semester
+    public class Semester : BaseNameEntity
     {
-        [Key]
-        public int SemesterId { get; set; }
-
-        [Required, StringLength(50)]
-        public string Name { get; set; }
-
+        [Required]
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
 
+        [Required]
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
-        public ICollection<ClassSemester> ClassSemesters { get; set; } = new List<ClassSemester>();
 
+        public ICollection<ClassSemester> ClassSemesters { get; set; } = new List<ClassSemester>();
     }
 
 }

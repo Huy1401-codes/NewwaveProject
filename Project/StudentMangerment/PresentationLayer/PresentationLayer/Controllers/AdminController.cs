@@ -36,8 +36,8 @@ namespace PresentationLayer.Controllers
             var roles = await _userService.GetAllAsync();
             ViewBag.Roles = roles.Select(r => new SelectListItem
             {
-                Value = r.RoleId.ToString(),
-                Text = r.RoleName
+                Value = r.Id.ToString(),
+                Text = r.Name
             }).ToList();
 
             ViewBag.Total = total;
@@ -51,7 +51,7 @@ namespace PresentationLayer.Controllers
 
 
         /// <summary>
-        ///            Vẫn lỗi chưa nhận URL
+        ///   Restore account         
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -115,7 +115,7 @@ namespace PresentationLayer.Controllers
         }
 
         /// <summary>
-        /// hỗ trợ lọc và search
+        /// Support filter and search
         /// </summary>
         /// <param name="search"></param>
         /// <returns></returns>
@@ -149,7 +149,7 @@ namespace PresentationLayer.Controllers
             }
 
             TempData["Success"] = "Tạo Student thành công!";
-            return RedirectToAction("Index");
+            return RedirectToAction("ListStudent");
         }
 
 

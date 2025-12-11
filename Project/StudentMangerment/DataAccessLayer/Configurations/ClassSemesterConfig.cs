@@ -1,11 +1,6 @@
 ﻿using DataAccessLayer.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccessLayer.Configurations
 {
@@ -13,21 +8,17 @@ namespace DataAccessLayer.Configurations
     {
         public void Configure(EntityTypeBuilder<ClassSemester> builder)
         {
-            builder.HasOne(cs => cs.Class)
-                   .WithMany(c => c.ClassSemesters)
-                   .HasForeignKey(cs => cs.ClassId)
-                   .OnDelete(DeleteBehavior.Restrict);
-
-            builder.HasOne(cs => cs.Semester)
-                   .WithMany(s => s.ClassSemesters)
-                   .HasForeignKey(cs => cs.SemesterId)
-                   .OnDelete(DeleteBehavior.Restrict);
+            builder.HasKey(cs => cs.Id);
 
             builder.HasMany(cs => cs.ClassSchedules)
-                   .WithOne(sch => sch.ClassSemester)
-                   .HasForeignKey(sch => sch.ClassSemesterId)
+                   .WithOne(s => s.ClassSemester)
+                   .HasForeignKey(s => s.ClassSemesterId)
+                   .OnDelete(DeleteBehavior.Restrict); 
+
+            builder.HasMany(cs => cs.StudentGrades)
+                   .WithOne(sg => sg.ClassSemester)
+                   .HasForeignKey(sg => sg.ClassSemesterId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
-
 }

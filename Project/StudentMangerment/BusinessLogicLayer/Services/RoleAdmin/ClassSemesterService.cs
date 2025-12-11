@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs.Admin.ManagerClass;
+using BusinessLogicLayer.Enums.Admin;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
@@ -18,18 +19,23 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             _logger = logger;
         }
 
+        /// <summary>
+        /// Create Sesmester
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public async Task<bool> CreateAsync(ClassCreateDto dto)
         {
             try
             {
                 var entity = new Class
                 {
-                    ClassName = dto.ClassName,
-                    IsStatus = dto.IsStatus,
+                    Name = dto.ClassName,
+                    IsStatus = dto.IsStatus == ClassStatus.Active,
                     SubjectId = dto.SubjectId,
                     SemesterId = dto.SemesterId,
                     TeacherId = dto.TeacherId,
-                    ClassStudents = new List<ClassStudent>()
+                    ClassStudents = new List<ClassStudent>(),
                 };
 
                 if (dto.StudentIds != null)
@@ -46,7 +52,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 entity.ClassSemesters.Add(new ClassSemester
                 {
                     SemesterId = dto.SemesterId,
-                    IsStatus = true
+                    IsStatus = ClassStatus.Active == ClassStatus.Active
                 });
 
                 await _classRepo.AddAsync(entity);
@@ -59,7 +65,11 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
         }
 
-
+        /// <summary>
+        /// Update sesmester
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateAsync(ClassUpdateDto dto)
         {
             try
@@ -67,8 +77,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 var entity = await _classRepo.GetByIdAsync(dto.ClassId);
                 if (entity == null) return false;
 
-                entity.ClassName = dto.ClassName;
-                entity.IsStatus = dto.IsStatus;
+                entity.Name = dto.ClassName;
+                entity.IsStatus = dto.IsStatus == ClassStatus.Active;
                 entity.SubjectId = dto.SubjectId;
                 entity.SemesterId = dto.SemesterId;
                 entity.TeacherId = dto.TeacherId;
@@ -131,8 +141,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 return new ClassDetailDto
                 {
-                    ClassId = entity.ClassId,
-                    ClassName = entity.ClassName,
+                    ClassId = entity.Id,
+                    ClassName = entity.Name,
                     IsStatus = entity.IsStatus,
                     SubjectId = entity.SubjectId,
                     SemesterId = entity.SemesterId,
@@ -162,8 +172,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 return list.Select(entity => new ClassDetailDto
                 {
-                    ClassId = entity.ClassId,
-                    ClassName = entity.ClassName,
+                    ClassId = entity.Id,
+                    ClassName = entity.Name,
                     IsStatus = entity.IsStatus,
                     SubjectId = entity.SubjectId,
                     SubjectName = entity.Subject?.Name ?? "[No Subject]",

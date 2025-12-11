@@ -24,7 +24,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
 
         public async Task<Semester> GetByIdAsync(int id)
         {
-            return await _context.Semesters.FirstOrDefaultAsync(s => s.SemesterId == id);
+            return await _context.Semesters.FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task AddAsync(Semester semester)

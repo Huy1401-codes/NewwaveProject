@@ -1,10 +1,12 @@
-﻿namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
+﻿using BusinessLogicLayer.Enums.Admin;
+
+namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
 {
     public class ClassUpdateDto
     {
         public int ClassId { get; set; }
         public string ClassName { get; set; }
-        public bool IsStatus { get; set; } = true;
+        public ClassStatus IsStatus { get; set; }
 
         public int SubjectId { get; set; }
         public int SemesterId { get; set; }

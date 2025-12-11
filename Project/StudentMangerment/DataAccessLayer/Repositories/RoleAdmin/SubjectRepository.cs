@@ -18,7 +18,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
         public IQueryable<Subject> GetAllQueryable() => _context.Subjects.Where(s => s.IsStatus==true);
 
         public async Task<Subject> GetByIdAsync(int id) =>
-            await _context.Subjects.FirstOrDefaultAsync(s => s.SubjectId == id && s.IsStatus==true);
+            await _context.Subjects.FirstOrDefaultAsync(s => s.Id == id && s.IsStatus==true);
 
         public async Task AddAsync(Subject sub) => await _context.Subjects.AddAsync(sub);
 

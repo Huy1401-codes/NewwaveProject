@@ -113,15 +113,15 @@ namespace PresentationLayer.Controllers
             var teachers = await _teacherService.GetAllAsync();
             var students = await _studentService.GetAllAsync();
 
-            ViewBag.Semesters = new SelectList(semesters, "SemesterId", "Name", selectedSemesterId);
-            ViewBag.Subjects = new SelectList(subjects, "SubjectId", "Name", selectedSubjectId);
+            ViewBag.Semesters = new SelectList(semesters, "Id", "Name", selectedSemesterId);
+            ViewBag.Subjects = new SelectList(subjects, "Id", "Name", selectedSubjectId);
             ViewBag.Teachers = teachers.Select(t => new {
-                Value = t.TeacherId.ToString(),
+                Value = t.Id.ToString(),
                 Text = t.User?.FullName ?? "[No Name]"
             }).ToList();
 
             ViewBag.Students = students.Select(s => new {
-                Value = s.StudentId.ToString(),
+                Value = s.Id.ToString(),
                 Text = s.User?.FullName ?? "[No Name]"
             }).ToList();
         }
@@ -145,11 +145,6 @@ namespace PresentationLayer.Controllers
                 SubjectName = cls.SubjectName ?? "[No Subject]",
                 TeacherId = cls.TeacherId,
                 TeacherName = cls.TeacherName ?? "[No Teacher]",
-                //Students = cls.ClassStudents.Select(x => new StudentInClassDto
-                //{
-                //    StudentId = x.StudentId,
-                //    FullName = x.Student.User.FullName
-                //}).ToList
             };
             return View(dto);
         }

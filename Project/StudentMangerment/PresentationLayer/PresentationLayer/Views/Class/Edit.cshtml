@@ -161,14 +161,12 @@
         var selectedNames = [];
 
         $(".student-checkbox:checked").each(function () {
-            selectedIds.push($(this).val());      // id để gửi server
-            selectedNames.push($(this).data("name")); // tên để hiển thị
+            selectedIds.push($(this).val());      
+            selectedNames.push($(this).data("name")); 
         });
 
-        // Xóa input hidden cũ (nếu đã tạo từ lần trước)
         $("#studentInputs").remove();
 
-        // Thêm input hidden mới vào form để gửi về server
         if (selectedIds.length > 0) {
             var form = $("form");
             var container = $("<div id='studentInputs'></div>");
@@ -178,7 +176,6 @@
             form.append(container);
         }
 
-        // Update hiển thị
         document.getElementById("selectedStudentsDisplay").innerText =
             selectedNames.length > 0
                 ? "Đã chọn: " + selectedNames.join(", ")
@@ -186,7 +183,6 @@
     };
 
 
-    // Confirm Teacher
     document.getElementById("confirmTeacher").onclick = function () {
         var selected = $(".teacher-radio:checked");
 

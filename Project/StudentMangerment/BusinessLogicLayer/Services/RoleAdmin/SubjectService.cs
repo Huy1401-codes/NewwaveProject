@@ -50,7 +50,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 var data = subjects.Select(s => new SubjectDto
                 {
-                    SubjectId = s.SubjectId,
+                    Id = s.Id,
                     Name = s.Name,
                     Credit = s.Credit,
                     IsStatus = s.IsStatus,
@@ -118,17 +118,17 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var exist = await _subjectRepo.GetByIdAsync(subject.SubjectId);
+                var exist = await _subjectRepo.GetByIdAsync(subject.Id);
                 if (exist == null)
                 {
-                    _logger.LogWarning(SubjectMessages.NotFound , subject.SubjectId);
+                    _logger.LogWarning(SubjectMessages.NotFound , subject.Id);
                     return false;
                 }
 
                 bool duplicate = await _subjectRepo
                     .GetAllQueryable()
                     .AnyAsync(s =>
-                        s.SubjectId != subject.SubjectId &&
+                        s.Id != subject.Id &&
                         s.Name.ToLower() == subject.Name.ToLower()
                     );
 
@@ -145,12 +145,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 await _subjectRepo.UpdateAsync(exist);
                 await _subjectRepo.SaveAsync();
 
-                _logger.LogInformation(SubjectMessages.UpdateSuccess, subject.SubjectId);
+                _logger.LogInformation(SubjectMessages.UpdateSuccess, subject.Id);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, SubjectMessages.UpdateFail, subject.SubjectId);
+                _logger.LogError(ex, SubjectMessages.UpdateFail, subject.Id);
                 return false;
             }
         }

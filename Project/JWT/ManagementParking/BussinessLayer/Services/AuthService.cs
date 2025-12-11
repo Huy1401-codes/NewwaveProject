@@ -25,7 +25,6 @@ namespace BussinessLayer.Services
         }
 
 
-        // Lấy IP client
         private string GetClientIp()
         {
             var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();

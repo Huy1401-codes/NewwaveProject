@@ -10,14 +10,12 @@
 
     <form asp-action="Create" method="post">
 
-        <!-- CLASS NAME -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Class Name</label>
             <input asp-for="ClassName" class="form-control" placeholder="Enter class name" />
             <span asp-validation-for="ClassName" class="text-danger"></span>
         </div>
 
-        <!-- SEMESTER -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Semester</label>
             <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
@@ -26,7 +24,6 @@
             <span asp-validation-for="SemesterId" class="text-danger"></span>
         </div>
 
-        <!-- SUBJECT -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Subject</label>
             <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
@@ -35,7 +32,6 @@
             <span asp-validation-for="SubjectId" class="text-danger"></span>
         </div>
 
-        <!-- TEACHER SELECTION USING MODAL -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Teacher</label><br />
 
@@ -43,15 +39,12 @@
                 Chọn giáo viên
             </button>
 
-            <!-- Hiển thị giáo viên đã chọn -->
             <div id="selectedTeacherName" class="mt-2 text-primary fw-bold"></div>
 
-            <!-- Input hidden để gửi TeacherId -->
             <input type="hidden" asp-for="TeacherId" id="TeacherId" />
             <span asp-validation-for="TeacherId" class="text-danger"></span>
         </div>
 
-        <!-- STUDENTS MULTI-SELECT USING MODAL -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Students</label><br />
 
@@ -143,7 +136,6 @@
         display: flex !important;
         align-items: center;
         gap: 8px;
-        /* bỏ padding/margin mặc định gây lệch */
         padding-left: 0 !important;
         margin-left: 0 !important;
     }
@@ -151,25 +143,22 @@
     #teacherModal .form-check-input,
     #studentModal .form-check-input {
         margin-left: 0 !important;
-        transform: scale(1.2); /* optional: radio to rõ hơn */
+        transform: scale(1.2);
     }
 </style>
 
 <script>
-    // Xác nhận chọn học sinh
        document.getElementById("confirmStudents").onclick = function () {
         var selectedIds = [];
         var selectedNames = [];
 
         $(".student-checkbox:checked").each(function () {
-            selectedIds.push($(this).val());      // id để gửi server
-            selectedNames.push($(this).data("name")); // tên để hiển thị
+            selectedIds.push($(this).val());     
+            selectedNames.push($(this).data("name"));
         });
 
-        // Xóa input hidden cũ (nếu có)
         $("#studentInputs").remove();
 
-        // Tạo input hidden mới để gửi về server
         if (selectedIds.length > 0) {
             var form = $("form");
             var container = $("<div id='studentInputs'></div>");
@@ -179,7 +168,6 @@
             form.append(container);
         }
 
-        // Update hiển thị
         document.getElementById("selectedStudentsDisplay").innerText =
             selectedNames.length > 0
                 ? "Đã chọn: " + selectedNames.join(", ")
@@ -187,7 +175,6 @@
     };
 
 
-    // Xác nhận chọn giáo viên
     document.getElementById("confirmTeacher").onclick = function () {
 
         var selected = $(".teacher-radio:checked");

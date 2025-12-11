@@ -13,6 +13,8 @@ namespace BusinessLogicLayer.DTOs
         public List<GradeDetail> Grades { get; set; }
         public double? AverageScore { get; set; } 
 
-        public DateTime UpdateAt { get; set; }
+        public DateTime CreateAt { get; set; }
+
+        public string SubjectOfSemester { get; set; }
     }
 }

@@ -8,11 +8,13 @@ namespace DataAccessLayer.Configurations
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {
+            builder.HasKey(r => r.Id);
             builder.HasMany(r => r.UserRoles)
                    .WithOne(ur => ur.Role)
                    .HasForeignKey(ur => ur.RoleId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
+
 
 }

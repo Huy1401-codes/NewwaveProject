@@ -46,7 +46,6 @@ namespace PresentationLayer.Controllers
 
             await _subjectService.CreateAsync(subject);
 
-            // Lưu các đầu điểm do user nhập
             if (dto.GradeComponents != null)
             {
                 foreach (var c in dto.GradeComponents)
@@ -55,7 +54,7 @@ namespace PresentationLayer.Controllers
                     {
                         await _gradeService.AddComponent(new CreateGradeComponentDto
                         {
-                            SubjectId = subject.SubjectId,
+                            SubjectId = subject.Id,
                             ComponentName = c.ComponentName,
                             Weight = c.Weight,
                             IsDelete = true
@@ -79,7 +78,7 @@ namespace PresentationLayer.Controllers
                 Name = subject.Name,
                 Credit = subject.Credit,
                 IsStatus = subject.IsStatus,
-                GradeComponents = (await _gradeService.GetComponentsOfSubject(subject.SubjectId))
+                GradeComponents = (await _gradeService.GetComponentsOfSubject(subject.Id))
                                   .Select(c => new CreateGradeComponentDto
                                   {
                                       ComponentName = c.ComponentName,

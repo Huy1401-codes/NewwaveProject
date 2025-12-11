@@ -48,7 +48,7 @@ namespace DataAccessLayer.Repositories.RoleStudent
             return _context.StudentGrades
                 .Include(g => g.Class)
                 .Include(g => g.Subject)
-                .Include(g => g.GradeComponent)
+                .Include(g => g.GradeComponent).Include(a=>a.ClassSemester).ThenInclude(a=>a.Semester)
                 .Where(g => g.StudentId == studentId);
         }
 
@@ -73,7 +73,7 @@ namespace DataAccessLayer.Repositories.RoleStudent
             var student = await _context.Students
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
-            return student?.StudentId;
+            return student?.Id;
         }
     }
 }

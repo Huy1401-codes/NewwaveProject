@@ -76,7 +76,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
         {
             return await _context.Students
                 .Include(s => s.User)
-                .FirstOrDefaultAsync(s => s.StudentId == studentId);
+                .FirstOrDefaultAsync(s => s.Id == studentId);
         }
 
     }

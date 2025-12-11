@@ -68,13 +68,13 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     .Take(pageSize)
                     .Select(u => new UserListDto
                     {
-                        UserId = u.UserId,
+                        UserId = u.Id,
                         Username = u.Username,
                         FullName = u.FullName,
                         Email = u.Email,
                         Phone = u.Phone,
                         IsStatus = u.IsStatus,
-                        Roles = u.UserRoles.Select(ur => ur.Role.RoleName).ToList()
+                        Roles = u.UserRoles.Select(ur => ur.Role.Name).ToList()
                     })
                     .ToListAsync();
 
@@ -99,14 +99,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
             return new UserDetailDto
             {
-                UserId = user.UserId,
+                UserId = user.Id,
                 Username = user.Username,
                 FullName = user.FullName,
                 Email = user.Email,
                 Phone = user.Phone,
                 IsStatus = user.IsStatus,
                 RoleIds = user.UserRoles.FirstOrDefault()?.RoleId ?? 0,
-                RoleNames = user.UserRoles.Select(ur => ur.Role.RoleName).ToList()
+                RoleNames = user.UserRoles.Select(ur => ur.Role.Name).ToList()
             };
         }
 
@@ -150,7 +150,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 user.UserRoles = new List<UserRole>
                 {
-                    new UserRole { UserId = user.UserId, RoleId = dto.RoleId }
+                    new UserRole { UserId = user.Id, RoleId = dto.RoleId }
                 };
 
                 await _userRepo.SaveAsync();
@@ -207,7 +207,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 var user = await _userRepo.GetByIdAsync(dto.UserId);
-
                 if (user == null)
                 {
                     errors.Add(UserMessages.UserNotFound);
@@ -215,11 +214,10 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 }
 
                 ValidateUserUpdate(dto, errors);
-
                 if (errors.Any())
                     return (false, errors);
 
-                if (await _userRepo.FirstOrDefaultAsync(x => x.Phone == dto.Phone && x.UserId != dto.UserId) != null)
+                if (await _userRepo.FirstOrDefaultAsync(x => x.Phone == dto.Phone && x.Id != dto.UserId) != null)
                     errors.Add(UserMessages.PhoneExists);
 
                 if (!string.IsNullOrEmpty(dto.Username) && dto.Username != user.Username)
@@ -236,15 +234,19 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 user.IsStatus = dto.IsStatus.Value;
                 if (!string.IsNullOrEmpty(dto.Username))
                     user.Username = dto.Username;
+                var currentRole = user.UserRoles.FirstOrDefault();
+                if (currentRole != null)
+                {
+                    currentRole.RoleId = dto.RoleId;
+                }
+                else
+                {
+                    user.UserRoles.Add(new UserRole { UserId = user.Id, RoleId = dto.RoleId });
+                }
 
-                user.UserRoles.Clear();
-                user.UserRoles.Add(new UserRole { UserId = user.UserId, RoleId = dto.RoleId });
-
-                await _userRepo.UpdateAsync(user);
                 await _userRepo.SaveAsync();
 
                 _logger.LogInformation(UserMessages.UpdateSuccess);
-
                 return (true, null);
             }
             catch (Exception ex)
@@ -253,6 +255,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+
 
 
         private void ValidateUserUpdate(UserUpdateDto dto, List<string> errors)
@@ -356,13 +359,13 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     .Take(pageSize)
                     .Select(u => new UserListDto
                     {
-                        UserId = u.UserId,
+                        UserId = u.Id,
                         Username = u.Username,
                         FullName = u.FullName,
                         Email = u.Email,
                         Phone = u.Phone,
                         IsStatus = u.IsStatus,
-                        Roles = u.UserRoles.Select(ur => ur.Role.RoleName).ToList()
+                        Roles = u.UserRoles.Select(ur => ur.Role.Name).ToList()
                     })
                     .ToListAsync();
 

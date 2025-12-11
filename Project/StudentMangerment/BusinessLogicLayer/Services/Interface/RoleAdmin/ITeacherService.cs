@@ -16,6 +16,8 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
 
         Task<IEnumerable<UserDropdownDto>> GetAvailableTeacherUsersAsync(string search = null);
 
+        Task<int?> GetTeacherIdByUserIdAsync(int userId);
+
     }
 
 }

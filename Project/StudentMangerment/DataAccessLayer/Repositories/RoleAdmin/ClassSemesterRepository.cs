@@ -29,7 +29,7 @@ namespace DataAccessLayer.Repositories.RoleAdmin
                 .Include(x => x.ClassStudents)
                     .ThenInclude(cs => cs.Student)
                         .ThenInclude(s => s.User)
-                .FirstOrDefaultAsync(x => x.ClassId == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
 

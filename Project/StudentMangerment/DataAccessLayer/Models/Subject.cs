@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccessLayer.Models.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,18 +8,11 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Models
 {
-    public class Subject
+    public class Subject : BaseNameEntity
     {
-        [Key]
-        public int SubjectId { get; set; }
-
-        [Required, StringLength(100)]
-        public string Name { get; set; }
-
-        [Range(1, 10)]
         public int Credit { get; set; }
-
-        public bool? IsStatus { get; set; }
+        public ICollection<StudentGrade> StudentGrades { get; set; } = new List<StudentGrade>();
+        public ICollection<GradeComponent> GradeComponents { get; set; } = new List<GradeComponent>();
 
     }
 }

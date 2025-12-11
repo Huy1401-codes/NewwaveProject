@@ -38,7 +38,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(cs =>
-                    cs.Class.ClassName.Contains(search.ToLower()) ||
+                    cs.Class.Name.Contains(search.ToLower()) ||
                     cs.Class.Subject.Name.Contains(search.ToLower()) ||
                     cs.Class.Teacher.User.FullName.Contains(search.ToLower()));
             }
@@ -60,7 +60,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
             return list.Select(cs => new StudentClassDto
             {
                 ClassId = cs.ClassId,
-                ClassName = cs.Class.ClassName,
+                ClassName = cs.Class.Name,
                 SubjectName = cs.Class.Subject.Name,
                 TeacherName = cs.Class.Teacher.User.FullName,
                 StartDate = cs.Class.Semester.StartDate,
@@ -90,8 +90,10 @@ namespace BusinessLogicLayer.Services.RoleStudent
                 .GroupBy(g => new { g.SubjectId, g.ClassId })
                 .Select(g => new StudentGradeDto
                 {
-                    ClassName = g.First().Class.ClassName,
+                    ClassName = g.First().Class.Name,
                     SubjectName = g.First().Subject.Name,
+                    CreateAt = g.First().CreatedAt,
+                    SubjectOfSemester = g.First().ClassSemester.Semester.Name,
                     Grades = g.Select(x => new GradeDetail
                     {
                         ComponentName = x.GradeComponent.ComponentName,
@@ -127,7 +129,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(cs =>
-                    cs.Class.ClassName.Contains(search.ToLower()) ||
+                    cs.Class.Name.Contains(search.ToLower()) ||
                     cs.Class.Subject.Name.Contains(search.ToLower()) ||
                     cs.Class.Teacher.User.FullName.Contains(search.ToLower()) ||
                     cs.Room.Contains(search));
@@ -144,7 +146,7 @@ namespace BusinessLogicLayer.Services.RoleStudent
 
             return list.Select(cs => new StudentScheduleDto
             {
-                ClassName = cs.Class.ClassName,
+                ClassName = cs.Class.Name,
                 SubjectName = cs.Class.Subject.Name,
                 TeacherName = cs.Class.Teacher.User.FullName,
                 DayOfWeek = cs.DayOfWeek,

@@ -9,18 +9,14 @@ using System.Threading.Tasks;
 
 namespace DataAccessLayer.Configurations
 {
-    public class GradeComponentConfig : IEntityTypeConfiguration<GradeComponent>
+    public class SemesterConfig : IEntityTypeConfiguration<Semester>
     {
-        public void Configure(EntityTypeBuilder<GradeComponent> builder)
+        public void Configure(EntityTypeBuilder<Semester> builder)
         {
-            builder.HasKey(g => g.Id);
-
-            builder.HasMany(g => g.StudentGrades)
-                   .WithOne(sg => sg.GradeComponent)
-                   .HasForeignKey(sg => sg.GradeComponentId)
+            builder.HasMany(s => s.ClassSemesters)
+                   .WithOne(cs => cs.Semester)
+                   .HasForeignKey(cs => cs.SemesterId)
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
-
-
 }

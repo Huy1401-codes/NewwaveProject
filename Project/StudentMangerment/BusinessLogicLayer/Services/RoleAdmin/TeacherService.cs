@@ -50,7 +50,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 var teacherUsers = await _teacherRepo.GetUsersByRoleAsync("Teacher");
-                var user = teacherUsers.FirstOrDefault(u => u.UserId == dto.UserId);
+                var user = teacherUsers.FirstOrDefault(u => u.Id == dto.UserId);
 
                 if (user == null)
                 {
@@ -96,10 +96,10 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var existing = await _teacherRepo.GetByIdAsync(teacher.TeacherId);
+                var existing = await _teacherRepo.GetByIdAsync(teacher.Id);
                 if (existing == null)
                 {
-                    _logger.LogWarning(TeacherMessages.NotFound , teacher.TeacherId);
+                    _logger.LogWarning(TeacherMessages.NotFound , teacher.Id);
                     return false;
                 }
 
@@ -108,12 +108,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 await _teacherRepo.UpdateAsync(existing);
                 await _teacherRepo.SaveAsync();
 
-                _logger.LogInformation(TeacherMessages.UpdateSuccess, teacher.TeacherId);
+                _logger.LogInformation(TeacherMessages.UpdateSuccess, teacher.Id);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, TeacherMessages.UpdateFail, teacher.TeacherId);
+                _logger.LogError(ex, TeacherMessages.UpdateFail, teacher.Id);
                 return false;
             }
         }
@@ -162,7 +162,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             var teachers = await _teacherRepo.GetAllAsync();
 
             var available = users
-                .Where(u => !teachers.Any(t => t.UserId == u.UserId));
+                .Where(u => !teachers.Any(t => t.UserId == u.Id));
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -177,12 +177,18 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
             return available.Select(u => new UserDropdownDto
             {
-                UserId = u.UserId,
+                UserId = u.Id,
                 FullName = u.FullName,
                 Email = u.Email,
                 Phone = u.Phone
             })
             .ToList();
         }
+
+        public async Task<int?> GetTeacherIdByUserIdAsync(int userId)
+        {
+            return await _teacherRepo.GetTeacherIdByUserIdAsync(userId);
+        }
+
     }
 }

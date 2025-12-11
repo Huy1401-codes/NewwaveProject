@@ -50,7 +50,7 @@
                             <td>@s.Name</td>
                             <td>@s.Credit</td>
                             <td>@(s.IsStatus == true ? "Hoạt động" : "Vô hiệu hóa")</td>
-                            <td class="d-flex gap-1 flex-wrap">
+                            @* <td class="d-flex gap-1 flex-wrap">
                                 <a href="@Url.Action("Edit", "Subject", new { id = s.SubjectId })"
                                    class="btn btn-outline-primary btn-sm btn-icon-text">
                                     <i class="bi bi-pencil"></i> Chỉnh sửa
@@ -64,7 +64,7 @@
                                    class="btn btn-outline-info btn-sm btn-icon-text">
                                     <i class="bi bi-eye"></i> Chi tiết
                                 </a>
-                            </td>
+                            </td> *@
                         </tr>
                         index++;
                     }

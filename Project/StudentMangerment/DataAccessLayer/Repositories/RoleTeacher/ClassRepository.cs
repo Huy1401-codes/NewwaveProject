@@ -30,24 +30,34 @@ namespace DataAccessLayer.Repositories.RoleTeacher
         /// <param name="semesterId"></param>
         /// <returns></returns>
         public async Task<(IEnumerable<Class>, int)> GetTeacherClassesAsync(
-            int teacherId, int page, int pageSize, string search, int? semesterId)
+     int teacherId, int page, int pageSize, string search, int? semesterId)
         {
             var query = _context.Classes
                 .Include(c => c.Subject)
                 .Include(c => c.Semester)
-                .Where(c => c.TeacherId == teacherId && c.IsStatus==true);
+                .Where(c => c.TeacherId == teacherId && c.IsStatus == true);
 
-            if (!string.IsNullOrEmpty(search))
-                query = query.Where(c => c.ClassName.Contains(search)
-                                      || c.Subject.Name.Contains(search));
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var loweredSearch = search.ToLower();
+
+                query = query.Where(c =>
+                    (c.Name != null && c.Name.ToLower().Contains(loweredSearch)) ||
+                    (c.Subject != null && c.Subject.Name != null && c.Subject.Name.ToLower().Contains(loweredSearch))
+                );
+            }
 
             if (semesterId.HasValue)
                 query = query.Where(c => c.SemesterId == semesterId);
 
             var total = await query.CountAsync();
+            Console.WriteLine(semesterId);
+            Console.WriteLine(query);
+            Console.WriteLine(total);
+            Console.WriteLine($"TeacherId: {teacherId}, Total classes: {total}");
 
             var data = await query
-                .OrderByDescending(c => c.ClassId)
+                .OrderByDescending(c => c.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
@@ -55,12 +65,13 @@ namespace DataAccessLayer.Repositories.RoleTeacher
             return (data, total);
         }
 
+
         public async Task<Class> GetByIdAsync(int classId)
         {
             return await _context.Classes
                 .Include(c => c.Subject)
                 .Include(c => c.Semester)
-                .FirstOrDefaultAsync(c => c.ClassId == classId);
+                .FirstOrDefaultAsync(c => c.Id == classId);
         }
 
         /// <summary>
@@ -83,7 +94,7 @@ namespace DataAccessLayer.Repositories.RoleTeacher
                     .ThenInclude(cs => cs.Student)
                         .ThenInclude(s => s.User)
                 .Include(c => c.Subject)
-                .FirstOrDefaultAsync(c => c.ClassId == classId);
+                .FirstOrDefaultAsync(c => c.Id == classId);
         }
     }
 

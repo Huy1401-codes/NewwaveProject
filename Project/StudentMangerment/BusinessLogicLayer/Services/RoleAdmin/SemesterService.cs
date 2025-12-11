@@ -45,7 +45,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     .Take(pageSize)
                     .Select(s => new SemesterDto
                     {
-                        SemesterId = s.SemesterId,
+                        SemesterId = s.Id,
                         Name = s.Name,
                         StartDate = s.StartDate,
                         EndDate = s.EndDate
@@ -79,7 +79,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 return new SemesterDto
                 {
-                    SemesterId = s.SemesterId,
+                    SemesterId = s.Id,
                     Name = s.Name,
                     StartDate = s.StartDate,
                     EndDate = s.EndDate
@@ -162,7 +162,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 var lowerName = dto.Name.ToLower();
 
                 var isExist = await _semesterRepo.AnyAsync(s =>
-                                       s.SemesterId != dto.SemesterId &&
+                                       s.Id != dto.SemesterId &&
                                        s.StartDate <= dto.EndDate &&
                                        s.EndDate >= dto.StartDate);
 

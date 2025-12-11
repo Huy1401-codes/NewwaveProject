@@ -48,20 +48,20 @@
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td>@item.ClassName</td>
+                            <td>@item.Name</td>
                             <td>@item.Subject?.Name</td>
                             <td>@item.Semester?.Name</td>
                             <td>
                                 <a class="btn btn-info btn-sm btn-icon-text mb-1"
-                                   href="/Teacher/Students?classId=@item.ClassId">
+                                   href="/Teacher/Students?classId=@item.Id">
                                     <i class="mdi mdi-account-multiple"></i> Xem học sinh
                                 </a>
                                 <a class="btn btn-success btn-sm btn-icon-text mb-1"
-                                   href="/Teacher/Statistics?classId=@item.ClassId">
+                                   href="/Teacher/Statistics?classId=@item.Id">
                                     <i class="mdi mdi-chart-bar"></i> Thống kê
                                 </a>
                                 <a class="btn btn-primary btn-sm btn-icon-text mb-1"
-                                   href="/Teacher/ExportExcel?classId=@item.ClassId">
+                                   href="/Teacher/ExportExcel?classId=@item.Id">
                                     <i class="mdi mdi-file-excel"></i> Xuất Excel
                                 </a>
                             </td>

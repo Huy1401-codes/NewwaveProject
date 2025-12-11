@@ -8,10 +8,13 @@ namespace DataAccessLayer.Configurations
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.HasKey(u => u.Id);
+            builder.HasIndex(u => u.Username).IsUnique();
+
             builder.HasMany(u => u.UserRoles)
                    .WithOne(ur => ur.User)
                    .HasForeignKey(ur => ur.UserId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                   .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(u => u.Student)
                    .WithOne(s => s.User)
@@ -24,5 +27,6 @@ namespace DataAccessLayer.Configurations
                    .OnDelete(DeleteBehavior.Restrict);
         }
     }
+
 
 }

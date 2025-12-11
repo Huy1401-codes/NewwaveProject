@@ -35,11 +35,11 @@ namespace PresentationLayer.Controllers
             }
             var user = result.User;
 
-            var role = user.UserRoles.FirstOrDefault()?.Role.RoleName ?? "Student";
+            var role = user.UserRoles.FirstOrDefault()?.Role.Name ?? "Student";
 
             var claims = new List<Claim>
     {
-        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new Claim(ClaimTypes.Name, user.Username),
         new Claim(ClaimTypes.Email, user.Email ?? ""),
         new Claim(ClaimTypes.Role, role)

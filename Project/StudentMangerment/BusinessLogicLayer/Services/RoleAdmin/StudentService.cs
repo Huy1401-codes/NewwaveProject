@@ -73,7 +73,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 var user = (await _studentRepo.GetUsersByRoleAsync("Student"))
-                    .FirstOrDefault(u => u.UserId == dto.UserId);
+                    .FirstOrDefault(u => u.Id == dto.UserId);
 
                 if (user == null)
                     return (false, StudentMessages.InvalidUser);
@@ -107,16 +107,15 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
         }
 
-        // ===============================================================
 
         public async Task<bool> UpdateAsync(Student student)
         {
             try
             {
-                var existing = await _studentRepo.GetByIdAsync(student.StudentId);
+                var existing = await _studentRepo.GetByIdAsync(student.Id);
                 if (existing == null)
                 {
-                    _logger.LogWarning("Student Id {Id} not found.", student.StudentId);
+                    _logger.LogWarning(StudentMessages.StudentNotFound, student.Id);
                     return false;
                 }
 
@@ -129,12 +128,11 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, StudentMessages.UpdateError, student.StudentId);
+                _logger.LogError(ex, StudentMessages.UpdateError, student.Id);
                 throw;
             }
         }
 
-        // ===============================================================
 
         public async Task<bool> SoftDeleteAsync(int id)
         {
@@ -143,7 +141,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 var student = await _studentRepo.GetByIdAsync(id);
                 if (student == null)
                 {
-                    _logger.LogWarning("Student Id {Id} not found.", id);
+                    _logger.LogWarning(StudentMessages.StudentNotFound, id);
                     return false;
                 }
 
@@ -158,7 +156,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
         }
 
-        // ===============================================================
 
         public async Task<IEnumerable<Student>> GetAllAsync()
         {
@@ -173,7 +170,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
         }
 
-        // ===============================================================
 
         public async Task<IEnumerable<UserDropdownDto>> GetAvailableStudentUsersAsync(string search = null)
         {
@@ -183,7 +179,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 var students = await _studentRepo.GetAllAsync();
 
-                var available = users.Where(u => !students.Any(s => s.UserId == u.UserId));
+                var available = users.Where(u => !students.Any(s => s.UserId == u.Id));
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
@@ -199,7 +195,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 return available
                     .Select(u => new UserDropdownDto
                     {
-                        UserId = u.UserId,
+                        UserId = u.Id,
                         FullName = u.FullName,
                         Email = u.Email,
                         Phone = u.Phone

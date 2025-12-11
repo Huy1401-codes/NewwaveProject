@@ -19,6 +19,8 @@
                                 <tr>
                                     <th>Lớp</th>
                                     <th>Môn</th>
+                                    <th>Thời gian có điểm</th>
+                                    <th>Kì học</th>
                                     <th>Điểm thành phần</th>
                                     <th>Trung bình</th>
                                 </tr>
@@ -29,6 +31,8 @@
                                     <tr>
                                         <td>@item.ClassName</td>
                                         <td>@item.SubjectName</td>
+                                        <td>@item.CreateAt.ToString("dd/MM/yyyy")</td>
+                                        <td>@item.SubjectOfSemester</td>
                                         <td>
                                             <ul class="mb-0 ps-3">
                                                 @foreach (var g in item.Grades)
@@ -37,7 +41,13 @@
                                                 }
                                             </ul>
                                         </td>
-                                        <td><b>@String.Format("{0:0.##}", item.AverageScore)</b></td>
+                                        <td>
+                                            <b>@String.Format("{0:0.##}", item.AverageScore)</b>
+                                            <span style="color:@(item.AverageScore > 5 ? "green" : "red")">
+                                             -   @(item.AverageScore > 5 ? "Đã qua môn" : "Không qua môn")
+                                            </span>
+                                        </td>
+
                                     </tr>
                                 }
                             </tbody>

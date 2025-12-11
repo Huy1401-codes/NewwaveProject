@@ -12,13 +12,13 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
         public string ClassName { get; set; }
         public bool? IsStatus { get; set; }
 
-        public int SubjectId { get; set; }     // thêm
+        public int SubjectId { get; set; }    
         public string SubjectName { get; set; }
 
-        public int SemesterId { get; set; }    // thêm
+        public int SemesterId { get; set; }  
         public string SemesterName { get; set; }
 
-        public int TeacherId { get; set; }     // thêm
+        public int TeacherId { get; set; }  
         public string TeacherName { get; set; }
 
 

@@ -23,8 +23,8 @@ namespace PresentationLayer.Controllers
             var roles = await _userService.GetAllAsync();
             ViewBag.Roles = roles.Select(r => new SelectListItem
             {
-                Value = r.RoleId.ToString(),
-                Text = r.RoleName
+                Value = r.Id.ToString(),
+                Text = r.Name
             }).ToList();
 
             ViewBag.Total = total;
@@ -176,11 +176,11 @@ namespace PresentationLayer.Controllers
         {
             var rolesFromDb = await _userService.GetAllAsync();
             ViewBag.Roles = rolesFromDb
-                .Where(r => r.RoleName != "Admin")
+                .Where(r => r.Name != "Admin")
                 .Select(r => new SelectListItem
                 {
-                    Value = r.RoleId.ToString(),
-                    Text = r.RoleName
+                    Value = r.Id.ToString(),
+                    Text = r.Name,
                 })
                 .ToList();
         }
