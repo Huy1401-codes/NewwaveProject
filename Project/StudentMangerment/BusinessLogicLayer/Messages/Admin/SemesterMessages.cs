@@ -8,6 +8,10 @@ namespace BusinessLogicLayer.Messages.Admin
 {
     public static class SemesterMessages
     {
+        public const string GetPagedSuccess = " GetPaged Success!";
+        public const string CreateSuccess = " Create Semester Success!";
+        public const string UpdateSuccess = " Update Semester Success!";
+
         public const string GetPagedError = "Error while getting paged Semesters.";
         public const string GetByIdError = "Error while getting Semester Id {Id}.";
         public const string AddError = "Error while adding Semester {Name}.";

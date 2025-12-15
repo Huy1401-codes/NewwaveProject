@@ -52,6 +52,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     })
                     .ToListAsync();
 
+                _logger.LogInformation(SemesterMessages.GetPagedSuccess);
                 return (data, total);
             }
             catch (Exception ex)
@@ -107,7 +108,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     _logger.LogWarning(SemesterMessages.InvalidDate);
                     throw new ArgumentException(SemesterMessages.InvalidDate);
                 }
-                var lowerName = dto.Name.ToLower();
 
                 var isExist = await _semesterRepo.AnyAsync(s =>
                                  s.StartDate <= dto.EndDate &&
@@ -128,6 +128,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 await _semesterRepo.AddAsync(semester);
                 await _semesterRepo.SaveAsync();
+                _logger.LogInformation(SemesterMessages.CreateSuccess);
             }
             catch (Exception ex)
             {
@@ -159,8 +160,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     return;
                 }
 
-                var lowerName = dto.Name.ToLower();
-
                 var isExist = await _semesterRepo.AnyAsync(s =>
                                        s.Id != dto.SemesterId &&
                                        s.StartDate <= dto.EndDate &&
@@ -178,6 +177,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
                 await _semesterRepo.UpdateAsync(semester);
                 await _semesterRepo.SaveAsync();
+                _logger.LogInformation(SemesterMessages.UpdateSuccess);
             }
             catch (Exception ex)
             {

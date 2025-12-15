@@ -58,7 +58,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     Weight = dto.Weight,
                     IsDeleted = false
                 };
-
+                _logger.LogInformation(GradeComponentMessage.CreateSuccess);
                 await _repo.AddAsync(entity);
             }
             catch (Exception ex)
@@ -90,6 +90,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 entity.Weight = dto.Weight;
 
                 await _repo.UpdateAsync(entity);
+                _logger.LogInformation(GradeComponentMessage.UpdateSuccess);
+
             }
             catch (Exception ex)
             {
@@ -103,6 +105,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 await _repo.SoftDeleteAsync(id);
+                _logger.LogInformation(GradeComponentMessage.DeleteSuccess);
+
             }
             catch (Exception ex)
             {

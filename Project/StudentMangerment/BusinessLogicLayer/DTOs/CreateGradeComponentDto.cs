@@ -19,7 +19,8 @@ namespace BusinessLogicLayer.DTOs
         /// Hệ số (0 - 1)
         /// </summary>
         /// 
-       [Required(ErrorMessage = "Khong bo trong")]
+        [Range(1, 100, ErrorMessage = "Trọng số phải từ 1 đến 100")]
+        [Required(ErrorMessage = "Khong bo trong")]
         public double Weight { get; set; }
 
         public bool IsDelete { get; set; } = true;

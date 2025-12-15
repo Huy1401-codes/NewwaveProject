@@ -91,7 +91,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 bool exists = await _subjectRepo
-                    .GetAllQueryable()
                     .AnyAsync(s => s.Name.ToLower() == subject.Name.ToLower());
 
                 if (exists)
@@ -126,7 +125,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 }
 
                 bool duplicate = await _subjectRepo
-                    .GetAllQueryable()
                     .AnyAsync(s =>
                         s.Id != subject.Id &&
                         s.Name.ToLower() == subject.Name.ToLower()

@@ -22,7 +22,7 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
         public string TeacherName { get; set; }
 
 
-        public List<StudentInClassDto> Students { get; set; } = new List<StudentInClassDto>(); // chắc chắn khởi tạo
+        public List<StudentInClassDto> Students { get; set; } = new List<StudentInClassDto>(); 
     }
 
 }

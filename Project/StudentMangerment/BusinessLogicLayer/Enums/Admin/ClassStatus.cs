@@ -8,7 +8,7 @@ namespace BusinessLogicLayer.Enums.Admin
 {
     public enum ClassStatus
     {
-        active = 0,
-        inActive =1,
+        Inactive = 0, 
+        Active = 1   
     }
 }

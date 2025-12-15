@@ -111,7 +111,11 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         }
 
 
-
+        /// <summary>
+        /// Create account
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public async Task<(bool Success, List<string> Errors)> AddAsync(UserCreateDto dto)
         {
             var errors = new List<string>();
@@ -167,7 +171,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         }
 
 
-
         private void ValidateUserCreate(UserCreateDto dto, List<string> errors)
         {
             if (string.IsNullOrWhiteSpace(dto.Username))
@@ -198,8 +201,11 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 errors.Add(UserMessages.RoleRequired);
         }
 
-
-
+        /// <summary>
+        /// Update account
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public async Task<(bool Success, List<string> Errors)> UpdateAsync(UserUpdateDto dto)
         {
             var errors = new List<string>();
@@ -279,8 +285,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             if (dto.RoleId <= 0)
                 errors.Add(UserMessages.RoleRequired);
         }
-
-
 
         public async Task<bool> ResetPasswordAsync(int userId, string newPassword)
         {

@@ -54,7 +54,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     SemesterId = dto.SemesterId,
                     IsStatus = ClassStatus.Active == ClassStatus.Active
                 });
-
+                _logger.LogInformation(ClassMessages.CreateSuccess);
                 await _classRepo.AddAsync(entity);
                 return true;
             }
@@ -101,6 +101,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                         });
                     }
                 }
+                _logger.LogInformation(ClassMessages.UpdateSuccess);
 
                 await _classRepo.UpdateAsync(entity);
                 return true;
@@ -119,6 +120,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 await _classRepo.DeleteAsync(id);
+                _logger.LogInformation(ClassMessages.DeleteSuccess);
                 return true;
             }
             catch (Exception ex)
@@ -138,6 +140,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     _logger.LogWarning(ClassMessages.ClassNotFound, id);
                     return null;
                 }
+                _logger.LogInformation(ClassMessages.GetByIdSuccess);
 
                 return new ClassDetailDto
                 {
@@ -156,6 +159,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                         FullName = x.Student.User.FullName
                     }).ToList()
                 };
+
             }
             catch (Exception ex)
             {
@@ -169,6 +173,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             try
             {
                 var list = await _classRepo.GetAllAsync();
+                _logger.LogInformation(ClassMessages.GetAllSuccess);
 
                 return list.Select(entity => new ClassDetailDto
                 {
@@ -187,6 +192,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                         FullName = cs.Student?.User?.FullName ?? "[No Name]"
                     }).ToList() ?? new List<StudentInClassDto>()
                 }).ToList();
+
             }
             catch (Exception ex)
             {

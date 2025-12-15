@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.DTOs.Admin.ManagerClass;
+using BusinessLogicLayer.Enums.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -71,7 +72,9 @@ namespace PresentationLayer.Controllers
             {
                 ClassId = cls.ClassId,
                 ClassName = cls.ClassName,
-                IsStatus = cls.IsStatus ?? true,
+                IsStatus = cls.IsStatus == true
+                          ? ClassStatus.Active
+                          : ClassStatus.Inactive,
                 SubjectId = cls.SubjectId,
                 SemesterId = cls.SemesterId,
                 TeacherId = cls.TeacherId,
