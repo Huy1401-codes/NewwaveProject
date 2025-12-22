@@ -12,14 +12,11 @@ namespace DataAccessLayer.Models
     {
         public string Username { get; set; }
         public string PasswordHash { get; set; }
-
         public Student Student { get; set; }
         public Teacher Teacher { get; set; }
 
-        public ICollection<UserRole> UserRoles { get; set; }
-       = new List<UserRole>(); 
+        public ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 
     }
-
-
 }

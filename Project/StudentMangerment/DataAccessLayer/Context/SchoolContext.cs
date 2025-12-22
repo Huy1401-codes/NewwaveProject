@@ -1,5 +1,6 @@
 ﻿using DataAccessLayer.Configurations;
 using DataAccessLayer.Models;
+using DataAccessLayer.Models.Base;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -24,6 +25,8 @@ namespace DataAccessLayer.Context
         public DbSet<ClassStudent> ClassStudents { get; set; }
         public DbSet<Semester> Semesters { get; set; }
 
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -43,6 +46,22 @@ namespace DataAccessLayer.Context
             modelBuilder.ApplyConfiguration(new SemesterConfig());
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(SchoolContext).Assembly);
+        }
+        public override Task<int> SaveChangesAsync( CancellationToken cancellationToken = default)
+        {
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>())
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Entity.CreatedAt = DateTime.UtcNow;
+                }
+                else if (entry.State == EntityState.Modified)
+                {
+                    entry.Entity.UpdatedAt = DateTime.UtcNow;
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
         }
 
     }

@@ -39,7 +39,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task CreateAsync_UserNotInTeacherRole_ReturnInvalidUser()
         {
-            // Trường hợp: User không thuộc role Teacher
 
             // Arrange
             var dto = new CreateTeacherDto
@@ -64,7 +63,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task CreateAsync_DuplicateUser_ReturnDuplicateUser()
         {
-            // Trường hợp: User đã được gán làm Teacher trước đó
 
             // Arrange
             var dto = new CreateTeacherDto
@@ -99,7 +97,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task CreateAsync_DuplicateTeacherCode_ReturnDuplicateCode()
         {
-            // Trường hợp: TeacherCode bị trùng
 
             // Arrange
             var dto = new CreateTeacherDto
@@ -134,7 +131,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task CreateAsync_ValidData_ReturnSuccess()
         {
-            // Trường hợp: Tạo Teacher hợp lệ
 
             // Arrange
             var dto = new CreateTeacherDto
@@ -179,7 +175,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_TeacherNotFound_ReturnFalse()
         {
-            // Trường hợp: Không tìm thấy Teacher để cập nhật
 
             // Arrange
             var teacher = new Teacher
@@ -202,7 +197,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_ValidTeacher_ReturnTrue()
         {
-            // Trường hợp: Cập nhật Teacher hợp lệ
 
             // Arrange
             var teacher = new Teacher
@@ -244,7 +238,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task SoftDeleteAsync_TeacherNotFound_ReturnFalse()
         {
-            // Trường hợp: Xóa Teacher nhưng không tồn tại
 
             // Arrange
             _teacherRepoMock
@@ -261,8 +254,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task SoftDeleteAsync_ValidTeacher_ReturnTrue()
         {
-            // Trường hợp: Xóa Teacher hợp lệ
-
             // Arrange
             _teacherRepoMock
                 .Setup(r => r.GetByIdAsync(1))

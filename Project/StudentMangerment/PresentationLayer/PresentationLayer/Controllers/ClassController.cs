@@ -80,11 +80,7 @@ namespace PresentationLayer.Controllers
                 TeacherId = cls.TeacherId,
                 StudentIds = cls.Students.Select(s => s.StudentId).ToList()
             };
-            Console.WriteLine(">>> Loaded for edit:");
-            Console.WriteLine($"SemesterId = {cls.SemesterId}");
-            Console.WriteLine($"SubjectId = {cls.SubjectId}");
-            Console.WriteLine($"TeacherId = {cls.TeacherId}");
-            Console.WriteLine($"Studentid = {cls.Students}");
+
 
             await LoadDropdowns(dto.SemesterId, dto.SubjectId, dto.TeacherId, dto.StudentIds);
             return View(dto);

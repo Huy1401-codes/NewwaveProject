@@ -21,6 +21,7 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
         public int TeacherId { get; set; }  
         public string TeacherName { get; set; }
 
+        public List<int> StudentIds { get; set; } = new();
 
         public List<StudentInClassDto> Students { get; set; } = new List<StudentInClassDto>(); 
     }

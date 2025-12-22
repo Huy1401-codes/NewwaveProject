@@ -38,7 +38,7 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task AddAsync_MissingRequiredFields_ReturnValidationErrors()
         {
-            // Trường hợp: Thiếu dữ liệu bắt buộc
+
 
             // Arrange
             var dto = new UserCreateDto();
@@ -54,7 +54,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task AddAsync_EmailAlreadyExists_ReturnEmailExists()
         {
-            // Trường hợp: Email bị trùng
 
             // Arrange
             var dto = ValidCreateDto();
@@ -76,7 +75,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task AddAsync_PhoneAlreadyExists_ReturnPhoneExists()
         {
-            // Trường hợp: Phone bị trùng
 
             // Arrange
             var dto = ValidCreateDto();
@@ -98,7 +96,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task AddAsync_ValidData_ReturnSuccess()
         {
-            // Trường hợp: Tạo user hợp lệ
 
             // Arrange
             var dto = ValidCreateDto();
@@ -131,8 +128,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_UserNotFound_ReturnError()
         {
-            // Trường hợp: User không tồn tại
-
             // Arrange
             var dto = ValidUpdateDto();
 
@@ -151,8 +146,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_InvalidData_ReturnValidationErrors()
         {
-            // Trường hợp: Validate update fail
-
             // Arrange
             var dto = new UserUpdateDto { UserId = 1 };
 
@@ -171,8 +164,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_ValidData_ReturnSuccess()
         {
-            // Trường hợp: Update user hợp lệ
-
             // Arrange
             var dto = ValidUpdateDto();
 
@@ -214,8 +205,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task ResetPasswordAsync_UserNotFound_ReturnFalse()
         {
-            // Trường hợp: Reset password cho user không tồn tại
-
             _userRepoMock
                 .Setup(r => r.GetByIdAsync(1))
                 .ReturnsAsync((User)null);
@@ -228,8 +217,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task ResetPasswordAsync_ValidUser_ReturnTrue()
         {
-            // Trường hợp: Reset password hợp lệ
-
             var user = new User { Id = 1 };
 
             _userRepoMock
@@ -257,7 +244,6 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task DeleteAsync_ValidId_NotThrow()
         {
-            // Trường hợp: Xóa user không phát sinh lỗi
 
             _userRepoMock
                 .Setup(r => r.SoftDeleteAsync(1))
