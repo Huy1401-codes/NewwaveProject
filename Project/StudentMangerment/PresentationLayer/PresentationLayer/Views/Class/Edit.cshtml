@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
 
-    <h2 class="fw-bold mb-3">Edit Class</h2>
+    <h2 class="fw-bold mb-3">Thay đổi thông tin</h2>
 
     <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="ClassId" />
@@ -91,7 +91,6 @@
         display: flex !important;
         align-items: center;
         gap: 8px;
-        /* bỏ padding/margin mặc định gây lệch */
         padding-left: 0 !important;
         margin-left: 0 !important;
     }
@@ -99,7 +98,7 @@
     #teacherModal .form-check-input,
     #studentModal .form-check-input {
         margin-left: 0 !important;
-        transform: scale(1.2); /* optional: radio to rõ hơn */
+        transform: scale(1.2);
     }
 </style>
 <!-- STUDENT MODAL -->
