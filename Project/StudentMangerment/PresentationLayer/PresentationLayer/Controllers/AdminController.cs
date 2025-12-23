@@ -2,11 +2,10 @@
 using BusinessLogicLayer.DTOs.ManagerStudent;
 using BusinessLogicLayer.DTOs.ManagerTeacher;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
-using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-
+using OfficeOpenXml;
 namespace PresentationLayer.Controllers
 {
     [Authorize(Roles = "Admin")]
@@ -151,6 +150,47 @@ namespace PresentationLayer.Controllers
             TempData["Success"] = "Tạo Student thành công!";
             return RedirectToAction("ListStudent");
         }
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportStudentsExcel()
+        {
+            var students = await _studentService.GetAllAsync();
+
+            using var package = new ExcelPackage();
+            var worksheet = package.Workbook.Worksheets.Add("Students");
+
+            // Header
+            worksheet.Cells[1, 1].Value = "StudentId";
+            worksheet.Cells[1, 2].Value = "StudentCode";
+            worksheet.Cells[1, 3].Value = "FullName";
+            worksheet.Cells[1, 4].Value = "Email";
+            worksheet.Cells[1, 5].Value = "Phone";
+
+            int row = 2;
+            foreach (var s in students)
+            {
+                worksheet.Cells[row, 1].Value = s.Id;
+                worksheet.Cells[row, 2].Value = s.StudentCode;
+                worksheet.Cells[row, 3].Value = s.User?.FullName ?? "";
+                worksheet.Cells[row, 4].Value = s.User?.Email ?? "";
+                worksheet.Cells[row, 5].Value = s.User?.Phone ?? "";
+                row++;
+            }
+
+            var stream = new MemoryStream();
+            package.SaveAs(stream);
+            stream.Position = 0;
+
+            string fileName = "Students.xlsx";
+            string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+            return File(stream, contentType, fileName);
+        }
+
+
 
 
         public async Task<IActionResult> ListTeacher(int page = 1, int pageSize = 10, string search = "")

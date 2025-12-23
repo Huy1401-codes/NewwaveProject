@@ -3,7 +3,7 @@ using BusinessLogicLayer.Messages;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -11,28 +11,22 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class SemesterService : ISemesterService
     {
-        private readonly ISemesterRepository _semesterRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<SemesterService> _logger;
 
-        public SemesterService(ISemesterRepository semesterRepo, ILogger<SemesterService> logger)
+        public SemesterService(IUnitOfWork unitOfWork, ILogger<SemesterService> logger)
         {
-            _semesterRepo = semesterRepo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
-        /// <summary>
-        /// List Semester
-        /// </summary>
-        /// <param name="search"></param>
-        /// <param name="pageIndex"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
+        #region Get Paged Semesters
         public async Task<(IEnumerable<SemesterDto> Semesters, int Total)> GetPagedSemestersAsync(
             string search, int pageIndex, int pageSize)
         {
             try
             {
-                var query = _semesterRepo.GetAllQueryable();
+                var query = _unitOfWork.Semesters.Query();
 
                 if (!string.IsNullOrWhiteSpace(search))
                     query = query.Where(s => s.Name.Contains(search));
@@ -61,17 +55,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Get semester by ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<SemesterDto> GetByIdAsync(int id)
+        #region Get By Id
+        public async Task<SemesterDto?> GetByIdAsync(int id)
         {
             try
             {
-                var s = await _semesterRepo.GetByIdAsync(id);
+                var s = await _unitOfWork.Semesters.GetByIdAsync(id);
                 if (s == null)
                 {
                     _logger.LogWarning(SemesterMessages.NotFound, id);
@@ -92,13 +83,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Add Sesmester
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        #region Add Semester
         public async Task AddAsync(SemesterCreateDto dto)
         {
             try
@@ -109,9 +96,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     throw new ArgumentException(SemesterMessages.InvalidDate);
                 }
 
-                var isExist = await _semesterRepo.AnyAsync(s =>
-                                 s.StartDate <= dto.EndDate &&
-                                 s.EndDate >= dto.StartDate);
+                bool isExist = await _unitOfWork.Semesters.AnyAsync(s =>
+                    s.StartDate <= dto.EndDate &&
+                    s.EndDate >= dto.StartDate);
 
                 if (isExist)
                 {
@@ -126,8 +113,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     EndDate = dto.EndDate
                 };
 
-                await _semesterRepo.AddAsync(semester);
-                await _semesterRepo.SaveAsync();
+                await _unitOfWork.Semesters.AddAsync(semester);
+                await _unitOfWork.SaveAsync();
+
                 _logger.LogInformation(SemesterMessages.CreateSuccess);
             }
             catch (Exception ex)
@@ -136,13 +124,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Update semester
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentException"></exception>
+        #region Update Semester
         public async Task UpdateAsync(SemesterDto dto)
         {
             try
@@ -153,17 +137,17 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     throw new ArgumentException(SemesterMessages.InvalidDate);
                 }
 
-                var semester = await _semesterRepo.GetByIdAsync(dto.SemesterId);
+                var semester = await _unitOfWork.Semesters.GetByIdAsync(dto.SemesterId);
                 if (semester == null)
                 {
                     _logger.LogWarning(SemesterMessages.NotFound, dto.SemesterId);
                     return;
                 }
 
-                var isExist = await _semesterRepo.AnyAsync(s =>
-                                       s.Id != dto.SemesterId &&
-                                       s.StartDate <= dto.EndDate &&
-                                       s.EndDate >= dto.StartDate);
+                bool isExist = await _unitOfWork.Semesters.AnyAsync(s =>
+                    s.Id != dto.SemesterId &&
+                    s.StartDate <= dto.EndDate &&
+                    s.EndDate >= dto.StartDate);
 
                 if (isExist)
                 {
@@ -175,8 +159,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 semester.StartDate = dto.StartDate;
                 semester.EndDate = dto.EndDate;
 
-                await _semesterRepo.UpdateAsync(semester);
-                await _semesterRepo.SaveAsync();
+                await _unitOfWork.Semesters.UpdateAsync(semester);
+                await _unitOfWork.SaveAsync();
+
                 _logger.LogInformation(SemesterMessages.UpdateSuccess);
             }
             catch (Exception ex)
@@ -185,16 +170,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Get All Semeter
-        /// </summary>
-        /// <returns></returns>
+        #region Get All
         public async Task<IEnumerable<Semester>> GetAllAsync()
         {
             try
             {
-                return await _semesterRepo.GetAllAsync();
+                return await _unitOfWork.Semesters.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -202,5 +185,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
     }
 }

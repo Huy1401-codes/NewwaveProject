@@ -8,14 +8,17 @@
 
     <h2 class="fw-bold mb-3">Create New Class</h2>
 
-    <form asp-action="Create" method="post">
+    <form asp-action="Create" method="post" enctype="multipart/form-data">
+        @Html.AntiForgeryToken()
 
+        <!-- Class Name -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Class Name</label>
             <input asp-for="ClassName" class="form-control" placeholder="Enter class name" />
             <span asp-validation-for="ClassName" class="text-danger"></span>
         </div>
 
+        <!-- Semester -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Semester</label>
             <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
@@ -24,6 +27,7 @@
             <span asp-validation-for="SemesterId" class="text-danger"></span>
         </div>
 
+        <!-- Subject -->
         <div class="mb-3">
             <label class="form-label fw-semibold">Subject</label>
             <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
@@ -32,159 +36,30 @@
             <span asp-validation-for="SubjectId" class="text-danger"></span>
         </div>
 
+        <!-- Teacher -->
         <div class="mb-3">
-            <label class="form-label fw-semibold">Teacher</label><br />
-
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacherModal">
-                Chọn giáo viên
-            </button>
-
-            <div id="selectedTeacherName" class="mt-2 text-primary fw-bold"></div>
-
-            <input type="hidden" asp-for="TeacherId" id="TeacherId" />
+            <label class="form-label fw-semibold">Teacher</label>
+            <select asp-for="TeacherId" class="form-control" asp-items="ViewBag.Teachers">
+                <option value="">-- Select Teacher --</option>
+            </select>
             <span asp-validation-for="TeacherId" class="text-danger"></span>
         </div>
 
+        <!-- Import Students Excel -->
         <div class="mb-3">
-            <label class="form-label fw-semibold">Students</label><br />
-
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal">
-                Chọn học sinh
-            </button>
-
-            <div id="selectedStudentsDisplay" class="mt-2 text-success"></div>
+            <label class="form-label fw-semibold">Import Students (Excel)</label>
+            <input asp-for="StudentExcelFile" type="file" class="form-control" accept=".xlsx" />
+            <span asp-validation-for="StudentExcelFile" class="text-danger"></span>
         </div>
 
+        <!-- Action Buttons -->
         <button type="submit" class="btn btn-success">
             <i class="bi bi-check-circle"></i> Create
         </button>
-
         <a href="@Url.Action("Index", "Class")" class="btn btn-secondary">Cancel</a>
-
     </form>
 </div>
 
-<div class="modal fade" id="studentModal">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-
-            <div class="modal-header py-2">
-                <h5 class="modal-title">Chọn học sinh</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body" style="max-height: calc(100vh - 180px); overflow-y: auto;">
-                @foreach (var s in ViewBag.Students)
-                {
-                    <div class="form-check">
-                        <input class="form-check-input student-checkbox"
-                               type="checkbox"
-                               name="StudentIds"
-                               value="@s.Value"
-                               data-name="@s.Text"
-                               id="stu_@s.Value" />
-
-                        <label class="form-check-label" for="stu_@s.Value">@s.Text</label>
-                    </div>
-                }
-            </div>
-
-            <div class="modal-footer py-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmStudents">Xong</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="teacherModal">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-
-            <div class="modal-header py-2">
-                <h5 class="modal-title">Chọn giáo viên</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body" style="max-height: calc(100vh - 180px); overflow-y:auto;">
-                @foreach (var t in ViewBag.Teachers)
-                {
-                    <div class="form-check">
-                        <input class="form-check-input teacher-radio"
-                               type="radio"
-                               name="TeacherSelect"
-                               value="@t.Value"
-                               data-name="@t.Text"
-                               id="t_@t.Value" />
-
-                        <label class="form-check-label" for="t_@t.Value">@t.Text</label>
-                    </div>
-                }
-            </div>
-
-            <div class="modal-footer py-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmTeacher">Xong</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<style>
-    #teacherModal .form-check,
-    #studentModal .form-check {
-        display: flex !important;
-        align-items: center;
-        gap: 8px;
-        padding-left: 0 !important;
-        margin-left: 0 !important;
-    }
-
-    #teacherModal .form-check-input,
-    #studentModal .form-check-input {
-        margin-left: 0 !important;
-        transform: scale(1.2);
-    }
-</style>
-
-<script>
-       document.getElementById("confirmStudents").onclick = function () {
-        var selectedIds = [];
-        var selectedNames = [];
-
-        $(".student-checkbox:checked").each(function () {
-            selectedIds.push($(this).val());     
-            selectedNames.push($(this).data("name"));
-        });
-
-        $("#studentInputs").remove();
-
-        if (selectedIds.length > 0) {
-            var form = $("form");
-            var container = $("<div id='studentInputs'></div>");
-            selectedIds.forEach(function (id) {
-                container.append('<input type="hidden" name="StudentIds" value="' + id + '" />');
-            });
-            form.append(container);
-        }
-
-        document.getElementById("selectedStudentsDisplay").innerText =
-            selectedNames.length > 0
-                ? "Đã chọn: " + selectedNames.join(", ")
-                : "Chưa chọn học sinh";
-    };
-
-
-    document.getElementById("confirmTeacher").onclick = function () {
-
-        var selected = $(".teacher-radio:checked");
-
-        if (selected.length > 0) {
-            var teacherId = selected.val();
-            var teacherName = selected.data("name");
-
-            $("#TeacherId").val(teacherId);
-            $("#selectedTeacherName").text("Giáo viên: " + teacherName);
-        }
-    };
-</script>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

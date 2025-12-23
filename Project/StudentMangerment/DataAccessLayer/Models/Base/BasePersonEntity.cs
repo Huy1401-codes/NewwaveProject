@@ -17,5 +17,9 @@ namespace DataAccessLayer.Models.Base
 
         [Phone, StringLength(20)]
         public string Phone { get; set; }
+
+       [StringLength(200)]
+        public string? ImageUrl { get; set; }
     }
+
 }

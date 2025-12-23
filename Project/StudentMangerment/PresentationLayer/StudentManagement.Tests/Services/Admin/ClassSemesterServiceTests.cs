@@ -3,6 +3,7 @@ using BusinessLogicLayer.Enums.Admin;
 using BusinessLogicLayer.Services.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,23 +13,31 @@ namespace StudentManagement.Tests.Services.Admin
 {
     public class ClassSemesterServiceTests
     {
-        private readonly Mock<IClassSemesterRepository> _repoMock;
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+        private readonly Mock<IClassSemesterRepository> _classSemesterRepoMock;
         private readonly Mock<ILogger<ClassSemesterService>> _loggerMock;
         private readonly ClassSemesterService _service;
 
         public ClassSemesterServiceTests()
         {
-            _repoMock = new Mock<IClassSemesterRepository>();
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
+            _classSemesterRepoMock = new Mock<IClassSemesterRepository>();
             _loggerMock = new Mock<ILogger<ClassSemesterService>>();
-            _service = new ClassSemesterService(_repoMock.Object, _loggerMock.Object);
+
+            _unitOfWorkMock
+                .Setup(u => u.ClassSemesters)
+                .Returns(_classSemesterRepoMock.Object);
+
+            _service = new ClassSemesterService(
+                _unitOfWorkMock.Object,
+                _loggerMock.Object
+            );
         }
 
         #region Create
         [Fact]
         public async Task CreateAsync_ValidDto_ReturnTrue()
-        {          
-
-            // Arrange
+        {
             var dto = new ClassCreateDto
             {
                 ClassName = "10A1",
@@ -39,14 +48,12 @@ namespace StudentManagement.Tests.Services.Admin
                 StudentIds = new List<int> { 1, 2 }
             };
 
-            _repoMock
+            _classSemesterRepoMock
                 .Setup(r => r.AddAsync(It.IsAny<Class>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _service.CreateAsync(dto);
 
-            // Assert
             result.Should().BeTrue();
         }
         #endregion
@@ -55,28 +62,23 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task UpdateAsync_ClassNotFound_ReturnFalse()
         {
-            // Arrange
             var dto = new ClassUpdateDto
             {
                 ClassId = 1
             };
 
-            _repoMock
+            _classSemesterRepoMock
                 .Setup(r => r.GetByIdAsync(1))
                 .ReturnsAsync((Class)null);
 
-            // Act
             var result = await _service.UpdateAsync(dto);
 
-            // Assert
             result.Should().BeFalse();
         }
 
         [Fact]
         public async Task UpdateAsync_ValidClass_ReturnTrue()
         {
-
-            // Arrange
             var entity = new Class
             {
                 Id = 1,
@@ -95,18 +97,16 @@ namespace StudentManagement.Tests.Services.Admin
                 StudentIds = new List<int> { 1 }
             };
 
-            _repoMock
+            _classSemesterRepoMock
                 .Setup(r => r.GetByIdAsync(1))
                 .ReturnsAsync(entity);
 
-            _repoMock
+            _classSemesterRepoMock
                 .Setup(r => r.UpdateAsync(entity))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _service.UpdateAsync(dto);
 
-            // Assert
             result.Should().BeTrue();
         }
         #endregion
@@ -115,15 +115,12 @@ namespace StudentManagement.Tests.Services.Admin
         [Fact]
         public async Task DeleteAsync_ValidId_ReturnTrue()
         {
-            // Arrange
-            _repoMock
+            _classSemesterRepoMock
                 .Setup(r => r.DeleteAsync(1))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _service.DeleteAsync(1);
 
-            // Assert
             result.Should().BeTrue();
         }
         #endregion

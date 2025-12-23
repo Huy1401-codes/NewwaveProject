@@ -8,62 +8,82 @@
 
     <h2 class="fw-bold mb-3">Edit Class</h2>
 
-    <form asp-action="Edit" method="post">
-
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
         <input type="hidden" asp-for="ClassId" />
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Class Name</label>
-            <input asp-for="ClassName" class="form-control" />
-            <span asp-validation-for="ClassName" class="text-danger"></span>
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <!-- Class Name -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Class Name</label>
+                    <input asp-for="ClassName" class="form-control" />
+                    <span asp-validation-for="ClassName" class="text-danger"></span>
+                </div>
+
+                <!-- Semester -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Semester</label>
+                    <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
+                        <option value="">-- Select Semester --</option>
+                    </select>
+                    <span asp-validation-for="SemesterId" class="text-danger"></span>
+                </div>
+
+                <!-- Subject -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Subject</label>
+                    <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
+                        <option value="">-- Select Subject --</option>
+                    </select>
+                    <span asp-validation-for="SubjectId" class="text-danger"></span>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- Teacher -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Teacher</label>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacherModal">
+                            Chọn giáo viên
+                        </button>
+                        <div id="selectedTeacherName" class="text-primary fw-bold"></div>
+                    </div>
+                    <input type="hidden" asp-for="TeacherId" id="TeacherId" />
+                    <span asp-validation-for="TeacherId" class="text-danger"></span>
+                </div>
+
+                <!-- Students -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Students</label>
+                    <div class="d-flex gap-2 mb-2">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal">
+                            Xem danh sách học sinh
+                        </button>
+                        <div id="selectedStudentsDisplay" class="text-success fw-bold"></div>
+                    </div>
+
+                    <!-- Import Excel -->
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Import Students from Excel</label>
+                        <input asp-for="StudentExcelFile" type="file" class="form-control" />
+                        <span asp-validation-for="StudentExcelFile" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Semester</label>
-            <select asp-for="SemesterId" class="form-control" asp-items="ViewBag.Semesters">
-                <option value="">-- Select Semester --</option>
-            </select>
-            <span asp-validation-for="SemesterId" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Subject</label>
-            <select asp-for="SubjectId" class="form-control" asp-items="ViewBag.Subjects">
-                <option value="">-- Select Subject --</option>
-            </select>
-            <span asp-validation-for="SubjectId" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Teacher</label><br />
-
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#teacherModal">
-                Chọn giáo viên
+        <!-- Action Buttons -->
+        <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-warning">
+                <i class="bi bi-save"></i> Save Changes
             </button>
-
-            <div id="selectedTeacherName" class="mt-2 text-primary fw-bold"></div>
-
-            <input type="hidden" asp-for="TeacherId" id="TeacherId" />
-            <span asp-validation-for="TeacherId" class="text-danger"></span>
+            <a href="@Url.Action("Index", "Class")" class="btn btn-secondary">Cancel</a>
         </div>
-
-        <div class="mb-3">
-            <label class="form-label fw-semibold">Students</label><br />
-
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#studentModal">
-                Chọn học sinh
-            </button>
-
-            <div id="selectedStudentsDisplay" class="mt-2 text-success"></div>
-        </div>
-
-        <button type="submit" class="btn btn-warning">
-            <i class="bi bi-save"></i> Save Changes
-        </button>
-
-        <a href="@Url.Action("Index", "Class")" class="btn btn-secondary">Cancel</a>
-
     </form>
+
 </div>
 <style>
     #teacherModal .form-check,
@@ -88,32 +108,20 @@
         <div class="modal-content">
 
             <div class="modal-header py-2">
-                <h5 class="modal-title">Chọn học sinh</h5>
+                <h5 class="modal-title">Danh sách học sinh hiện tại</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
                 @foreach (var s in ViewBag.Students)
                 {
-                    bool isChecked = Model.StudentIds.Contains(int.Parse(s.Value));
                     <div class="form-check">
-                        <input class="form-check-input student-checkbox"
-                               type="checkbox"
-                               name="StudentIds"
-                               value="@s.Value"
-                               data-name="@s.Text"
-                               id="stu_@s.Value"
-                               @(isChecked ? "checked" : "") />
-
-                        <label class="form-check-label" for="stu_@s.Value">@s.Text</label>
+                        <label class="form-check-label">@s.Text</label>
                     </div>
                 }
             </div>
 
-            <div class="modal-footer py-2">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="confirmStudents">Xong</button>
-            </div>
-
+          
         </div>
     </div>
 </div>

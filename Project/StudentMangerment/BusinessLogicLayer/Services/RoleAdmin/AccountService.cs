@@ -1,10 +1,11 @@
 ﻿using BusinessLogicLayer.DTOs;
+using BusinessLogicLayer.DTOs.Admin;
 using BusinessLogicLayer.DTOs.Admin.Jwt;
 using BusinessLogicLayer.DTOs.Results;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -17,16 +18,18 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class AccountService : IAccountService
     {
-        private readonly IAccountRepository _account;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<AccountService> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _config;
 
-
-        public AccountService(IAccountRepository account, ILogger<AccountService> logger, 
-                    IHttpContextAccessor httpContextAccessor, IConfiguration configuration )
+        public AccountService(
+            IUnitOfWork unitOfWork,
+            ILogger<AccountService> logger,
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration configuration)
         {
-            _account = account;
+            _unitOfWork = unitOfWork;
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _config = configuration;
@@ -35,8 +38,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         public async Task<LoginResult> LoginAsync(string email, string password)
         {
             var result = new LoginResult();
-
-            var user = await _account.GetByUsernameAsync(email);
+            var user = await _unitOfWork.Accounts.GetByUsernameAsync(email);
 
             if (user == null)
             {
@@ -45,7 +47,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 return result;
             }
 
-            if (user.IsStatus == false)
+            if (!user.IsStatus == true)
             {
                 result.ErrorMessage = LoginMessages.InActive;
                 _logger.LogWarning(LoginMessages.InActive);
@@ -54,53 +56,92 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
             string storedPassword = user.PasswordHash;
 
-            if (!string.IsNullOrEmpty(storedPassword) && storedPassword.StartsWith("$2"))
+            bool isMatch = !string.IsNullOrEmpty(storedPassword) && storedPassword.StartsWith("$2")
+                ? BCrypt.Net.BCrypt.Verify(password, storedPassword)
+                : storedPassword == password;
+
+            if (!isMatch)
             {
-                bool isMatch = BCrypt.Net.BCrypt.Verify(password, storedPassword);
-
-                if (!isMatch)
-                {
-                    result.ErrorMessage = LoginMessages.PasswordFail;
-                    return result;
-                }
-
-                result.User = user;
+                result.ErrorMessage = LoginMessages.PasswordFail;
                 return result;
             }
 
-            if (storedPassword == password)
-            {
-                result.User = user;
-                return result;
-            }
-
-            result.ErrorMessage = LoginMessages.PasswordFail;
+            result.User = user;
             return result;
         }
+
+        public async Task<UserProfileDto?> GetMyProfileAsync(int userId)
+        {
+            var user = await _unitOfWork.Accounts.GetByIdAsync(userId);
+
+            if (user == null || user.IsDeleted)
+                return null;
+
+            var student = (await _unitOfWork.Students.GetAllAsync())
+                          .FirstOrDefault(s => s.UserId == userId);
+
+            var teacher = (await _unitOfWork.Teachers.GetAllAsync())
+                          .FirstOrDefault(t => t.UserId == userId);
+
+            return new UserProfileDto
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                ImageUrl = user.ImageUrl,
+                TeacherCode = teacher?.TeacherCode,
+                StudentCode = student?.StudentCode,
+                Role = user.UserRoles.FirstOrDefault()?.Role?.Name
+            };
+        }
+
+        public async Task<(bool Success, string ErrorMessage)> UpdateProfileAsync(UserProfileUpdateDto dto)
+        {
+            try
+            {
+                var user = await _unitOfWork.Accounts.GetByIdAsync(dto.UserId);
+                if (user == null || user.IsDeleted)
+                    return (false, "User not found");
+
+                user.FullName = dto.FullName;
+                user.Email = dto.Email;
+                user.Phone = dto.Phone;
+
+                if (!string.IsNullOrEmpty(dto.ImageUrl))
+                    user.ImageUrl = dto.ImageUrl;
+
+                _unitOfWork.Accounts.UpdateAsync(user);
+                await _unitOfWork.SaveAsync();
+
+                return (true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating profile for user {UserId}", dto.UserId);
+                return (false, "Error updating profile");
+            }
+        }
+
+
 
 
         private string GetClientIp()
         {
-            var ip = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
-            return ip ?? "Unknown";
+            return _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
         }
+
         private string GenerateJwtToken(User user)
         {
-            var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"])
-            );
-
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var role = user.UserRoles != null && user.UserRoles.Any()
-              ? user.UserRoles.FirstOrDefault()?.Role?.Name ?? "Guest"
-              : "Guest";
+            var role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "Guest";
 
             var claims = new[]
             {
-           new Claim("id", user.Id.ToString()),
-           new Claim("role", role)
-           };
+                new Claim("id", user.Id.ToString()),
+                new Claim("role", role)
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
@@ -113,20 +154,15 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-
         public async Task<AuthResponse> RefreshTokenAsync(string refreshToken)
         {
-            var tokenInDb = await _account.GetRefreshTokenAsync(refreshToken);
+            var tokenInDb = await _unitOfWork.Accounts.GetRefreshTokenAsync(refreshToken);
             if (tokenInDb == null || tokenInDb.ExpiresAt < DateTime.UtcNow || tokenInDb.RevokedAt != null)
-            {
                 throw new UnauthorizedAccessException("Invalid or expired refresh token.");
-            }
 
-            var user = await _account.GetByIdAsync(tokenInDb.UserId);
+            var user = await _unitOfWork.Accounts.GetByIdAsync(tokenInDb.UserId);
             if (user == null)
-            {
                 throw new UnauthorizedAccessException("User not found.");
-            }
 
             var newAccessToken = GenerateJwtToken(user);
 
@@ -139,46 +175,40 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 CreatedByIp = GetClientIp()
             };
 
-
-            await _account.AddRefreshTokenAsync(newRefreshToken);
-
-            await _account.RemoveOldRefreshTokensAsync(user.Id);
+            await _unitOfWork.Accounts.AddRefreshTokenAsync(newRefreshToken);
+            await _unitOfWork.Accounts.RemoveOldRefreshTokensAsync(user.Id);
+            await _unitOfWork.SaveAsync();
 
             return new AuthResponse
             {
                 AccessToken = newAccessToken,
                 RefreshToken = newRefreshToken.TokenHash,
                 ExpiredAt = newRefreshToken.ExpiresAt,
-                User = new UserResponseDto
+                User = new DTOs.UserResponseDto
                 {
                     UserId = user.Id,
                     FullName = user.FullName,
                     Email = user.Email,
-                    Role = "Guest"
+                    Role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "Guest"
                 }
             };
         }
 
         public async Task<JwtLoginResponseDto> LoginJwtAsync(string email, string password)
         {
-            var user = await _account.GetByUsernameAsync(email);
-            if (user == null || user.IsStatus == false)
+            var user = await _unitOfWork.Accounts.GetByUsernameAsync(email);
+            if (user == null || user.IsStatus == true)
                 throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng");
 
-            bool isPasswordValid = false;
-
-            if (!string.IsNullOrEmpty(user.PasswordHash) && user.PasswordHash.StartsWith("$2"))
-                isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
-            else
-                isPasswordValid = user.PasswordHash == password;
+            bool isPasswordValid = !string.IsNullOrEmpty(user.PasswordHash) && user.PasswordHash.StartsWith("$2")
+                ? BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)
+                : user.PasswordHash == password;
 
             if (!isPasswordValid)
                 throw new UnauthorizedAccessException("Email hoặc mật khẩu không đúng");
 
-            // tạo JWT access token
             var accessToken = GenerateJwtToken(user);
 
-            // tạo refresh token
             var refreshToken = new RefreshToken
             {
                 TokenHash = Guid.NewGuid().ToString(),
@@ -187,8 +217,10 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 UserId = user.Id,
                 CreatedByIp = GetClientIp()
             };
-            await _account.AddRefreshTokenAsync(refreshToken);
-            await _account.RemoveOldRefreshTokensAsync(user.Id);
+
+            await _unitOfWork.Accounts.AddRefreshTokenAsync(refreshToken);
+            await _unitOfWork.Accounts.RemoveOldRefreshTokensAsync(user.Id);
+            await _unitOfWork.SaveAsync();
 
             return new JwtLoginResponseDto
             {
@@ -200,13 +232,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     UserId = user.Id,
                     FullName = user.FullName,
                     Email = user.Email,
-                    Role = user.UserRoles.FirstOrDefault()?.Role?.Name ?? "Guest"
+                    Role = user.UserRoles?.FirstOrDefault()?.Role?.Name ?? "Guest"
                 }
             };
         }
-
-
-
-
     }
 }

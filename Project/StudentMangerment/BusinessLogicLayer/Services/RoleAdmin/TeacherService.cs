@@ -1,76 +1,62 @@
-﻿using BusinessLogicLayer.DTOs.ManagerStudent;
-using BusinessLogicLayer.DTOs.ManagerTeacher;
+﻿using BusinessLogicLayer.DTOs.ManagerTeacher;
+using BusinessLogicLayer.DTOs.ManagerStudent;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class TeacherService : ITeacherService
     {
-        private readonly ITeacherRepository _teacherRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<TeacherService> _logger;
 
-        public TeacherService(
-            ITeacherRepository teacherRepo,
-            IUserRepository userRepo,
-            ILogger<TeacherService> logger)
+        public TeacherService(IUnitOfWork unitOfWork, ILogger<TeacherService> logger)
         {
-            _teacherRepo = teacherRepo;
-            _userRepo = userRepo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
         public async Task<Teacher> GetByIdAsync(int id)
         {
-            var teacher = await _teacherRepo.GetByIdAsync(id);
+            try
+            {
+                var teacher = await _unitOfWork.Teachers.GetByIdAsync(id);
+                if (teacher == null)
+                    _logger.LogWarning(TeacherMessages.NotFound, id);
 
-            if (teacher == null)
-                _logger.LogWarning(TeacherMessages.NotFound, id);
-
-            return teacher;
+                return teacher;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, TeacherMessages.Fail);
+                throw;
+            }
         }
 
         public async Task<(IEnumerable<Teacher> Data, int TotalCount)> GetPagedAsync(int page, int pageSize, string search)
         {
-            return await _teacherRepo.GetPagedAsync(page, pageSize, search);
+            return await _unitOfWork.Teachers.GetPagedAsync(page, pageSize, search);
         }
 
         public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateTeacherDto dto)
         {
             try
             {
-                var teacherUsers = await _teacherRepo.GetUsersByRoleAsync("Teacher");
+                var teacherUsers = await _unitOfWork.Teachers.GetUsersByRoleAsync("Teacher");
                 var user = teacherUsers.FirstOrDefault(u => u.Id == dto.UserId);
 
                 if (user == null)
-                {
-                    _logger.LogWarning(TeacherMessages.InvalidUser, dto.UserId);
                     return (false, TeacherMessages.InvalidUser);
-                }
 
-                var existedTeachers = await _teacherRepo.GetAllAsync();
+                var existedTeachers = await _unitOfWork.Teachers.GetAllAsync();
                 if (existedTeachers.Any(t => t.UserId == dto.UserId))
-                {
-                    _logger.LogWarning(TeacherMessages.DuplicateUser, dto.UserId);
                     return (false, TeacherMessages.DuplicateUser);
-                }
 
-                if (existedTeachers.Any(t =>
-                        t.TeacherCode.Equals(dto.TeacherCode, StringComparison.OrdinalIgnoreCase)))
-                {
-                    _logger.LogWarning(TeacherMessages.DuplicateCode, dto.TeacherCode);
+                if (existedTeachers.Any(t => t.TeacherCode.Equals(dto.TeacherCode, StringComparison.OrdinalIgnoreCase)))
                     return (false, TeacherMessages.DuplicateCode);
-                }
 
                 var teacher = new Teacher
                 {
@@ -79,8 +65,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     Degree = dto.Degree,
                 };
 
-                await _teacherRepo.AddAsync(teacher);
-                await _teacherRepo.SaveAsync();
+                await _unitOfWork.Teachers.AddAsync(teacher);
+                await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(TeacherMessages.CreateSuccess, dto.TeacherCode);
                 return (true, string.Empty);
@@ -96,17 +82,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var existing = await _teacherRepo.GetByIdAsync(teacher.Id);
+                var existing = await _unitOfWork.Teachers.GetByIdAsync(teacher.Id);
                 if (existing == null)
-                {
-                    _logger.LogWarning(TeacherMessages.NotFound , teacher.Id);
                     return false;
-                }
 
                 existing.Degree = teacher.Degree;
 
-                await _teacherRepo.UpdateAsync(existing);
-                await _teacherRepo.SaveAsync();
+                await _unitOfWork.Teachers.UpdateAsync(existing);
+                await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(TeacherMessages.UpdateSuccess, teacher.Id);
                 return true;
@@ -122,15 +105,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var teacher = await _teacherRepo.GetByIdAsync(id);
+                var teacher = await _unitOfWork.Teachers.GetByIdAsync(id);
                 if (teacher == null)
-                {
-                    _logger.LogWarning(TeacherMessages.NotFound, id);
                     return false;
-                }
 
-                await _teacherRepo.SoftDeleteAsync(id);
-                await _teacherRepo.SaveAsync();
+                await _unitOfWork.Teachers.SoftDeleteAsync(id);
+                await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(TeacherMessages.DeleteSuccess, id);
                 return true;
@@ -146,8 +126,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                return await _teacherRepo.GetAllNameAsync();
-                
+                return await _unitOfWork.Teachers.GetAllNameAsync();
             }
             catch (Exception ex)
             {
@@ -158,8 +137,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 
         public async Task<IEnumerable<UserDropdownDto>> GetAvailableTeacherUsersAsync(string search = null)
         {
-            var users = await _teacherRepo.GetUsersByRoleAsync("Teacher");
-            var teachers = await _teacherRepo.GetAllAsync();
+            var users = await _unitOfWork.Teachers.GetUsersByRoleAsync("Teacher");
+            var teachers = await _unitOfWork.Teachers.GetAllAsync();
 
             var available = users
                 .Where(u => !teachers.Any(t => t.UserId == u.Id));
@@ -167,7 +146,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             if (!string.IsNullOrWhiteSpace(search))
             {
                 search = search.Trim().ToLower();
-
                 available = available.Where(u =>
                     (!string.IsNullOrWhiteSpace(u.FullName) && u.FullName.ToLower().Contains(search)) ||
                     (!string.IsNullOrWhiteSpace(u.Email) && u.Email.ToLower().Contains(search)) ||
@@ -181,14 +159,12 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 FullName = u.FullName,
                 Email = u.Email,
                 Phone = u.Phone
-            })
-            .ToList();
+            }).ToList();
         }
 
         public async Task<int?> GetTeacherIdByUserIdAsync(int userId)
         {
-            return await _teacherRepo.GetTeacherIdByUserIdAsync(userId);
+            return await _unitOfWork.Teachers.GetTeacherIdByUserIdAsync(userId);
         }
-
     }
 }

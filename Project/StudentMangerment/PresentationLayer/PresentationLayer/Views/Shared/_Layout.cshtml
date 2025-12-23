@@ -1,10 +1,7 @@
 ﻿@using System.Security.Claims
 @{
-   
-
     var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     var username = User.FindFirst(System.Security.Claims.ClaimTypes.Name)?.Value;
-
 
 }
 
@@ -39,6 +36,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <!-- inject:css -->
     <link rel="stylesheet" href="~/assets/css/style.css">
@@ -93,7 +91,7 @@
                 <ul class="navbar-nav">
                     <li class="nav-item fw-semibold d-none d-lg-block ms-0">
                         <h1 class="welcome-text">
-                            Good Morning, <span class="text-black fw-bold">@username</span>
+                            Xin chào, <span class="text-black fw-bold">@username</span>
                         </h1>
 
                         <h3 class="welcome-sub-text">Your performance summary this week</h3>
@@ -103,7 +101,7 @@
                 <ul class="navbar-nav ms-auto">
                     <!-- Category Dropdown -->
                    
-
+@* 
                     <!-- Date Picker -->
                     <li class="nav-item d-none d-lg-block">
                         <div id="datepicker-popup" class="input-group date  ">
@@ -112,18 +110,12 @@
                             </span>
                             <input type="text" class="form-control" value="@DateTime.Now.ToString("ddd, dd/MM/yyyy HH:mm")">
                         </div>
-                    </li>
+                    </li> *@
 
 
-                    <!-- Search -->
-                    <li class="nav-item">
-                        <form class="search-form" action="#">
-                            <i class="icon-search"></i>
-                            <input type="search" class="form-control" placeholder="Search Here" title="Search here">
-                        </form>
-                    </li>
+                  
 
-                    <!-- Notifications -->
+                  @*   <!-- Notifications -->
                     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator" id="notificationDropdown" href="#" data-bs-toggle="dropdown">
                             <i class="icon-bell"></i>
@@ -144,10 +136,10 @@
                                 </div>
                             </a>
                         </div>
-                    </li>
+                    </li> *@
 
                     <!-- Messages -->
-                    <li class="nav-item dropdown">
+                @*     <li class="nav-item dropdown">
                         <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="icon-mail icon-lg"></i>
                         </a>
@@ -157,30 +149,39 @@
                                 <span class="badge badge-pill badge-primary float-end">View all</span>
                             </a>
                         </div>
-                    </li>
+                    </li> *@
 
                     <!-- User Profile -->
                     <li class="nav-item dropdown d-none d-lg-block user-dropdown">
                         <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img class="img-xs rounded-circle" src="~/assets/images/faces/face8.jpg" alt="Profile image">
+                            <!-- Hiển thị chữ viết tắt của username thay cho ảnh -->
+                            <span class="badge rounded-circle bg-primary text-white" style="width:32px; height:32px; display:flex; align-items:center; justify-content:center;">
+                                @(!string.IsNullOrEmpty(username) ? username.Substring(0, 1).ToUpper() : "U")
+                            </span>
                         </a>
+
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                             <div class="dropdown-header text-center">
-                                <img class="img-md rounded-circle" src="~/assets/images/faces/face8.jpg" alt="Profile image">
+                                <!-- Không dùng ảnh nữa, hiển thị chữ viết tắt lớn hơn -->
+                                <div class="badge rounded-circle bg-primary text-white mb-2" style="width:64px; height:64px; display:flex; align-items:center; justify-content:center; font-size:24px;">
+                                    @(!string.IsNullOrEmpty(username) ? username.Substring(0, 1).ToUpper() : "U")
+                                </div>
                                 <p class="mb-1 mt-3 fw-semibold">@username</p>
                                 <p class="fw-light text-muted mb-0">Role: @role</p>
                             </div>
-                            <a class="dropdown-item" href="#"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>My Profile</a>
+
+                            <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                <i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i>My Profile
+                            </a>
 
                             <form method="post" asp-controller="Auth" asp-action="Logout">
                                 <button class="dropdown-item" type="submit" style="background:none;border:none;">
                                     <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out
                                 </button>
                             </form>
-
-
                         </div>
                     </li>
+
                 </ul>
                 <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
                     <span class="mdi mdi-menu"></span>
@@ -195,12 +196,12 @@
                 <ul class="nav">
 
                     <!-- DASHBOARD -->
-                    <li class="nav-item">
+                  @*   <li class="nav-item">
                         <a class="nav-link" asp-controller="Home" asp-action="Index">
                             <i class="mdi mdi-grid-large menu-icon"></i>
                             <span class="menu-title">Dashboard</span>
                         </a>
-                    </li>
+                    </li> *@
 
                     @if (role == "Admin")
                     {
@@ -240,12 +241,12 @@
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Admin" asp-action="ListTeacher">Danh sách giáo viên</a>
                                     </li>
-                                    <li class="nav-item">
+                                  @*   <li class="nav-item">
                                         <a class="nav-link" asp-controller="Teacher" asp-action="Create">Thêm giáo viên</a>
                                     </li>
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Teaching" asp-action="Assign">Phân công giảng dạy</a>
-                                    </li>
+                                    </li> *@
                                 </ul>
                             </div>
                         </li>
@@ -287,9 +288,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Subject" asp-action="Index">Danh sách môn học</a>
                                     </li>
-                                    <li class="nav-item">
+                                   @*  <li class="nav-item">
                                         <a class="nav-link" asp-controller="Curriculum" asp-action="Index">Chương trình học</a>
-                                    </li>
+                                    </li> *@
                                 </ul>
                             </div>
                         </li>
@@ -309,9 +310,9 @@
                                     <li class="nav-item">
                                         <a class="nav-link" asp-controller="Semester" asp-action="Create">Tạo kì học mới</a>
                                     </li>
-                                    <li class="nav-item">
+                                   @*  <li class="nav-item">
                                         <a class="nav-link" asp-controller="Schedule" asp-action="Index">Thời khóa biểu</a>
-                                    </li>
+                                    </li> *@
                                 </ul>
                             </div>
                         </li>

@@ -1,27 +1,20 @@
 ﻿using DataAccessLayer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using DataAccessLayer.Repositories.Interface.Common;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccessLayer.Repositories.Interface.RoleAdmin
 {
-    public interface IUserRepository
+    public interface IUserRepository : IRepository<User>
     {
         IQueryable<User> GetAllQueryable();
 
         IQueryable<User> GetAllRestoreQueryable();
-      
-        Task<User> GetByIdAsync(int id);
-        Task<User> GetByUsernameAsync(string username);
-        Task AddAsync(User user);
-        Task UpdateAsync(User user);
-        Task SoftDeleteAsync(int id);
-        Task SaveAsync();
-        Task<User> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate);
-    }
 
+        Task<User?> GetByUsernameAsync(string username);
+
+        Task<User?> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate);
+
+        Task SoftDeleteAsync(int id);
+    }
 
 }

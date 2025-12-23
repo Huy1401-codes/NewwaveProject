@@ -1,4 +1,5 @@
 ﻿using BusinessLogicLayer.Enums.Admin;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
 {
@@ -13,6 +14,8 @@ namespace BusinessLogicLayer.DTOs.Admin.ManagerClass
         public int TeacherId { get; set; }
 
         public List<int> StudentIds { get; set; } = new();
-    }
+        public IFormFile? StudentExcelFile { get; set; }
 
+    }
+   
 }

@@ -1,28 +1,19 @@
 ﻿using DataAccessLayer.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DataAccessLayer.Repositories.Interface.Common;
 
 namespace DataAccessLayer.Repositories.Interface.RoleAdmin
 {
-    public interface ITeacherRepository
+    public interface ITeacherRepository : IRepository<Teacher>
     {
-        Task<Teacher> GetByIdAsync(int id);
-        Task<IEnumerable<Teacher>> GetAllAsync();
-        Task<(IEnumerable<Teacher> Data, int TotalCount)> GetPagedAsync(int page, int pageSize, string search);
-        Task AddAsync(Teacher teacher);
-        Task UpdateAsync(Teacher teacher);
+        Task<(IEnumerable<Teacher> Data, int TotalCount)>
+            GetPagedAsync(int page, int pageSize, string search);
+
         Task SoftDeleteAsync(int id);
-        Task SaveAsync();
 
         Task<IEnumerable<Teacher>> GetAllNameAsync();
 
         Task<IEnumerable<User>> GetUsersByRoleAsync(string role);
 
         Task<int?> GetTeacherIdByUserIdAsync(int userId);
-
-
     }
 }

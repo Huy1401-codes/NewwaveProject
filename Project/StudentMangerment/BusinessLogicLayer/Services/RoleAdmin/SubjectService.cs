@@ -3,7 +3,7 @@ using BusinessLogicLayer.DTOs.ManagerTeacher;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -11,28 +11,22 @@ namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class SubjectService : ISubjectService
     {
-        private readonly ISubjectRepository _subjectRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<SubjectService> _logger;
 
-        public SubjectService(ISubjectRepository subjectRepo, ILogger<SubjectService> logger)
+        public SubjectService(IUnitOfWork unitOfWork, ILogger<SubjectService> logger)
         {
-            _subjectRepo = subjectRepo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Get list Subject
-        /// </summary>
-        /// <param name="search"></param>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
+        #region Get Paged Subjects
         public async Task<(IEnumerable<SubjectDto> data, int totalItems)> GetPagedSubjectsAsync(
-              string? search, int page, int pageSize)
+            string? search, int page, int pageSize)
         {
             try
             {
-                var query = _subjectRepo.GetAllQueryable();
+                var query = _unitOfWork.Subjects.GetActiveSubjects();
 
                 if (!string.IsNullOrEmpty(search))
                 {
@@ -61,17 +55,18 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,SubjectMessages.ErrorPaging);
+                _logger.LogError(ex, SubjectMessages.ErrorPaging);
                 throw;
             }
         }
+        #endregion
 
-
+        #region Get By Id
         public async Task<Subject?> GetByIdAsync(int id)
         {
             try
             {
-                var subject = await _subjectRepo.GetByIdAsync(id);
+                var subject = await _unitOfWork.Subjects.GetByIdAsync(id);
 
                 if (subject == null)
                     _logger.LogWarning(SubjectMessages.NotFound, id);
@@ -84,13 +79,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-
+        #region Create
         public async Task<bool> CreateAsync(Subject subject)
         {
             try
             {
-                bool exists = await _subjectRepo
+                bool exists = await _unitOfWork.Subjects
                     .AnyAsync(s => s.Name.ToLower() == subject.Name.ToLower());
 
                 if (exists)
@@ -99,40 +95,38 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     return false;
                 }
 
-                await _subjectRepo.AddAsync(subject);
-                await _subjectRepo.SaveAsync();
+                await _unitOfWork.Subjects.AddAsync(subject);
+                await _unitOfWork.SaveAsync();
 
-                _logger.LogInformation(SubjectMessages.CreateSuccess , subject.Name);
+                _logger.LogInformation(SubjectMessages.CreateSuccess, subject.Name);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, SubjectMessages.CreateFail , subject.Name);
+                _logger.LogError(ex, SubjectMessages.CreateFail, subject.Name);
                 return false;
             }
         }
+        #endregion
 
-
+        #region Update
         public async Task<bool> UpdateAsync(Subject subject)
         {
             try
             {
-                var exist = await _subjectRepo.GetByIdAsync(subject.Id);
+                var exist = await _unitOfWork.Subjects.GetByIdAsync(subject.Id);
                 if (exist == null)
                 {
-                    _logger.LogWarning(SubjectMessages.NotFound , subject.Id);
+                    _logger.LogWarning(SubjectMessages.NotFound, subject.Id);
                     return false;
                 }
 
-                bool duplicate = await _subjectRepo
-                    .AnyAsync(s =>
-                        s.Id != subject.Id &&
-                        s.Name.ToLower() == subject.Name.ToLower()
-                    );
+                bool duplicate = await _unitOfWork.Subjects
+                    .AnyAsync(s => s.Id != subject.Id && s.Name.ToLower() == subject.Name.ToLower());
 
                 if (duplicate)
                 {
-                    _logger.LogWarning(SubjectMessages.DuplicateName , subject.Name);
+                    _logger.LogWarning(SubjectMessages.DuplicateName, subject.Name);
                     return false;
                 }
 
@@ -140,8 +134,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 exist.Credit = subject.Credit;
                 exist.IsStatus = subject.IsStatus;
 
-                await _subjectRepo.UpdateAsync(exist);
-                await _subjectRepo.SaveAsync();
+                await _unitOfWork.Subjects.UpdateAsync(exist);
+                await _unitOfWork.SaveAsync();
 
                 _logger.LogInformation(SubjectMessages.UpdateSuccess, subject.Id);
                 return true;
@@ -152,30 +146,33 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 return false;
             }
         }
+        #endregion
 
-
+        #region Delete
         public async Task<bool> DeleteAsync(int id)
         {
             try
             {
-                await _subjectRepo.SoftDeleteAsync(id);
-                await _subjectRepo.SaveAsync();
+                await _unitOfWork.Subjects.SoftDeleteAsync(id);
+                await _unitOfWork.SaveAsync();
 
-                _logger.LogInformation(SubjectMessages.DeleteSuccess , id);
+                _logger.LogInformation(SubjectMessages.DeleteSuccess, id);
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, SubjectMessages.DeleteFail , id);
+                _logger.LogError(ex, SubjectMessages.DeleteFail, id);
                 return false;
             }
         }
+        #endregion
 
+        #region Get All
         public async Task<List<Subject>> GetAllAsync()
         {
             try
             {
-                return await _subjectRepo.GetAllQueryable().ToListAsync();
+                return await _unitOfWork.Subjects.GetActiveSubjects().ToListAsync();
             }
             catch (Exception ex)
             {
@@ -188,7 +185,7 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                return await _subjectRepo.GetAllAsync();
+                return await _unitOfWork.Subjects.GetAllAsync();
             }
             catch (Exception ex)
             {
@@ -196,5 +193,6 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
     }
 }

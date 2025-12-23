@@ -3,37 +3,30 @@ using BusinessLogicLayer.Messages;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using OfficeOpenXml;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class StudentService : IStudentService
     {
-        private readonly IStudentRepository _studentRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<StudentService> _logger;
 
-        public StudentService(
-            IStudentRepository studentRepo,
-            IUserRepository userRepo,
-            ILogger<StudentService> logger)
+        public StudentService(IUnitOfWork unitOfWork, ILogger<StudentService> logger)
         {
-            _studentRepo = studentRepo;
-            _userRepo = userRepo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Get Student by ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public async Task<Student> GetByIdAsync(int id)
+        #region Get By Id
+        public async Task<Student?> GetByIdAsync(int id)
         {
             try
             {
-                return await _studentRepo.GetByIdAsync(id);
+                return await _unitOfWork.Students.GetByIdAsync(id);
             }
             catch (Exception ex)
             {
@@ -41,20 +34,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Get All student
-        /// </summary>
-        /// <param name="page"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="search"></param>
-        /// <returns></returns>
-
+        #region Paged List
         public async Task<(IEnumerable<Student> Data, int TotalCount)> GetPagedAsync(int page, int pageSize, string search)
         {
             try
             {
-                return await _studentRepo.GetPagedAsync(page, pageSize, search);
+                return await _unitOfWork.Students.GetPagedAsync(page, pageSize, search);
             }
             catch (Exception ex)
             {
@@ -62,29 +49,25 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-        /// <summary>
-        /// Add student
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
+        #region Create
         public async Task<(bool Success, string ErrorMessage)> CreateAsync(CreateStudentDto dto)
         {
             try
             {
-                var user = (await _studentRepo.GetUsersByRoleAsync("Student"))
-                    .FirstOrDefault(u => u.Id == dto.UserId);
+                var users = await _unitOfWork.Users.GetAllAsync();
+                var user = users.FirstOrDefault(u => u.Id == dto.UserId && u.UserRoles.Any(ur => ur.Role.Name == "Student"));
 
                 if (user == null)
                     return (false, StudentMessages.InvalidUser);
 
-                var existedStudents = await _studentRepo.GetAllAsync();
+                var existedStudents = await _unitOfWork.Students.GetAllAsync();
 
                 if (existedStudents.Any(s => s.UserId == dto.UserId))
                     return (false, StudentMessages.UserAlreadyStudent);
 
-                if (existedStudents.Any(s =>
-                        s.StudentCode.Equals(dto.StudentCode, StringComparison.OrdinalIgnoreCase)))
+                if (existedStudents.Any(s => s.StudentCode.Equals(dto.StudentCode, StringComparison.OrdinalIgnoreCase)))
                     return (false, StudentMessages.StudentCodeExists);
 
                 var student = new Student
@@ -95,8 +78,8 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     Gender = dto.Gender
                 };
 
-                await _studentRepo.AddAsync(student);
-                await _studentRepo.SaveAsync();
+                await _unitOfWork.Students.AddAsync(student);
+                await _unitOfWork.SaveAsync();
 
                 return (true, string.Empty);
             }
@@ -106,13 +89,14 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-
+        #region Update
         public async Task<bool> UpdateAsync(Student student)
         {
             try
             {
-                var existing = await _studentRepo.GetByIdAsync(student.Id);
+                var existing = await _unitOfWork.Students.GetByIdAsync(student.Id);
                 if (existing == null)
                 {
                     _logger.LogWarning(StudentMessages.StudentNotFound, student.Id);
@@ -122,8 +106,9 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 existing.Gender = student.Gender;
                 existing.BirthDate = student.BirthDate;
 
-                await _studentRepo.UpdateAsync(existing);
-                await _studentRepo.SaveAsync();
+                await _unitOfWork.Students.UpdateAsync(existing);
+                await _unitOfWork.SaveAsync();
+
                 return true;
             }
             catch (Exception ex)
@@ -132,21 +117,23 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-
+        #region Soft Delete
         public async Task<bool> SoftDeleteAsync(int id)
         {
             try
             {
-                var student = await _studentRepo.GetByIdAsync(id);
+                var student = await _unitOfWork.Students.GetByIdAsync(id);
                 if (student == null)
                 {
                     _logger.LogWarning(StudentMessages.StudentNotFound, id);
                     return false;
                 }
 
-                await _studentRepo.SoftDeleteAsync(id);
-                await _studentRepo.SaveAsync();
+                await _unitOfWork.Users.SoftDeleteAsync(id);
+                await _unitOfWork.SaveAsync();
+
                 return true;
             }
             catch (Exception ex)
@@ -155,13 +142,15 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-
+        #region Get All
         public async Task<IEnumerable<Student>> GetAllAsync()
         {
             try
             {
-                return await _studentRepo.GetAllAsync();
+                return await _unitOfWork.Students.GetAllNameAsync();
+
             }
             catch (Exception ex)
             {
@@ -169,22 +158,21 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
 
-
+        #region Get Available Student Users
         public async Task<IEnumerable<UserDropdownDto>> GetAvailableStudentUsersAsync(string search = null)
         {
             try
             {
-                var users = await _studentRepo.GetUsersByRoleAsync("Student");
+                var users = await _unitOfWork.Users.GetAllAsync();
+                var students = await _unitOfWork.Students.GetAllAsync();
 
-                var students = await _studentRepo.GetAllAsync();
-
-                var available = users.Where(u => !students.Any(s => s.UserId == u.Id));
+                var available = users.Where(u => u.UserRoles.Any(ur => ur.Role.Name == "Student") && !students.Any(s => s.UserId == u.Id));
 
                 if (!string.IsNullOrWhiteSpace(search))
                 {
                     search = search.Trim().ToLower();
-
                     available = available.Where(u =>
                         (u.FullName?.ToLower().Contains(search) ?? false) ||
                         (u.Email?.ToLower().Contains(search) ?? false) ||
@@ -192,15 +180,13 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     );
                 }
 
-                return available
-                    .Select(u => new UserDropdownDto
-                    {
-                        UserId = u.Id,
-                        FullName = u.FullName,
-                        Email = u.Email,
-                        Phone = u.Phone
-                    })
-                    .ToList();
+                return available.Select(u => new UserDropdownDto
+                {
+                    UserId = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    Phone = u.Phone
+                }).ToList();
             }
             catch (Exception ex)
             {
@@ -208,5 +194,33 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 throw;
             }
         }
+        #endregion
+
+        public async Task<Student?> GetByStudentCodeAsync(string studentCode)
+        {
+            return await _unitOfWork.Students.GetByStudentCodeAsync(studentCode);
+
+        }
+        public async Task<List<int>> GetStudentIdsFromExcelAsync(IFormFile file)
+        {
+            var result = new HashSet<int>(); 
+
+            using var package = new ExcelPackage(file.OpenReadStream());
+            var sheet = package.Workbook.Worksheets[0];
+
+            for (int row = 2; row <= sheet.Dimension.End.Row; row++)
+            {
+                if (int.TryParse(sheet.Cells[row, 1].Text, out int studentId))
+                {
+                    var exists = await _unitOfWork.Students.GetByIdAsync(studentId);
+                    if (exists != null)
+                        result.Add(studentId);
+                }
+            }
+
+            return result.ToList();
+        }
+
+
     }
 }

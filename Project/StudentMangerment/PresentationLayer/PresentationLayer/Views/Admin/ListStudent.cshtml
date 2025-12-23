@@ -50,9 +50,16 @@
                         <h4 class="card-title mb-0">Quản lý Học Sinh</h4>
                         <p class="card-description">Quản lý, tìm kiếm và phân trang danh sách học sinh</p>
                     </div>
-                    <a asp-action="CreateStudent" class="btn btn-primary btn-sm">
-                        <i class="mdi mdi-plus"></i> Thêm Học Sinh
-                    </a>
+                    <div class="d-flex gap-2 mb-3">
+                        <a asp-action="CreateStudent" class="btn btn-primary btn-sm">
+                            <i class="mdi mdi-plus"></i> Thêm Học Sinh
+                        </a>
+                        <a asp-action="ExportStudentsExcel" class="btn btn-success btn-sm">
+                            <i class="mdi mdi-download"></i> Export danh sách học sinh
+                        </a>
+                    </div>
+
+
                 </div>
 
                 <!-- Search -->

@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.DTOs.ManagerStudent;
 using DataAccessLayer.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogicLayer.Services.Interface.RoleAdmin
 {
@@ -16,5 +17,10 @@ namespace BusinessLogicLayer.Services.Interface.RoleAdmin
         Task<IEnumerable<Student>> GetAllAsync();
 
         Task<IEnumerable<UserDropdownDto>> GetAvailableStudentUsersAsync(string search = null);
+
+        Task<Student?> GetByStudentCodeAsync(string studentCode);
+        Task<List<int>> GetStudentIdsFromExcelAsync(IFormFile file);
+
+
     }
 }

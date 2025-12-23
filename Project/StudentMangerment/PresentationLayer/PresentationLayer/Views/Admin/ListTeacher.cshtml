@@ -104,8 +104,8 @@
                                     <th>Teacher Code</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Hành động</th>
-                                </tr>
+@*                                     <th>Hành động</th>
+ *@                                </tr>
                             </thead>
                             <tbody>
                                 @foreach (var s in Model.Teachers)
@@ -117,7 +117,7 @@
                                         <td>@s.User.Email</td>
                                         <td>@s.User.Phone</td>
                                         <td>
-                                            <div class="btn-group" role="group">
+                                            @* <div class="btn-group" role="group">
                                                 <a asp-action="DetailTeacher" asp-route-id="@s.Id" class="btn btn-outline-info btn-sm btn-icon-text">
                                                     <i class="mdi mdi-eye"></i> Chi tiết
                                                 </a>
@@ -125,7 +125,7 @@
                                                     <i class="mdi mdi-pencil"></i> Sửa
                                                 </a>
 
-                                            </div>
+                                            </div> *@
                                         </td>
                                     </tr>
                                 }

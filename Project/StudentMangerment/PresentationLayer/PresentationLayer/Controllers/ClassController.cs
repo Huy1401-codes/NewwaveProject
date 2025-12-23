@@ -5,6 +5,7 @@ using DataAccessLayer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using OfficeOpenXml;
 using System.Security.Claims;
 
 namespace PresentationLayer.Controllers
@@ -50,15 +51,34 @@ namespace PresentationLayer.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(ClassCreateDto dto)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(ClassCreateDto dto, IFormFile StudentExcelFile)
         {
+            // Import học sinh từ Excel nếu có
+            if (StudentExcelFile != null && StudentExcelFile.Length > 0)
+            {
+                var importedStudentIds = await _studentService.GetStudentIdsFromExcelAsync(StudentExcelFile);
+
+                dto.StudentIds ??= new List<int>();
+
+                foreach (var id in importedStudentIds)
+                {
+                    if (!dto.StudentIds.Contains(id))
+                        dto.StudentIds.Add(id);
+                }
+            }
+
+            // Nếu dữ liệu không hợp lệ, load lại dropdowns và trả về view
             if (!ModelState.IsValid)
             {
-                await LoadDropdowns();
+                await LoadDropdowns(dto.SemesterId, dto.SubjectId, dto.TeacherId, dto.StudentIds);
                 return View(dto);
             }
 
+            // Tạo lớp
             await _classService.CreateAsync(dto);
+
+            TempData["Success"] = "Tạo lớp và thêm học sinh thành công!";
             return RedirectToAction("Index");
         }
 
@@ -86,10 +106,23 @@ namespace PresentationLayer.Controllers
             return View(dto);
         }
 
-
         [HttpPost]
         public async Task<IActionResult> Edit(ClassUpdateDto dto)
         {
+            if (dto.StudentExcelFile != null && dto.StudentExcelFile.Length > 0)
+            {
+                var importedStudentIds = await _studentService
+                    .GetStudentIdsFromExcelAsync(dto.StudentExcelFile);
+
+                dto.StudentIds ??= new List<int>();
+
+                foreach (var id in importedStudentIds)
+                {
+                    if (!dto.StudentIds.Contains(id))
+                        dto.StudentIds.Add(id);
+                }
+            }
+
             if (!ModelState.IsValid)
             {
                 await LoadDropdowns(dto.SemesterId, dto.SubjectId, dto.TeacherId, dto.StudentIds);
@@ -114,15 +147,14 @@ namespace PresentationLayer.Controllers
 
             ViewBag.Semesters = new SelectList(semesters, "Id", "Name", selectedSemesterId);
             ViewBag.Subjects = new SelectList(subjects, "Id", "Name", selectedSubjectId);
-            ViewBag.Teachers = teachers.Select(t => new {
-                Value = t.Id.ToString(),
-                Text = t.User?.FullName ?? "[No Name]"
-            }).ToList();
+            ViewBag.Teachers = teachers
+                  .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.User?.FullName ?? "[No Name]" })
+                  .ToList();
 
-            ViewBag.Students = students.Select(s => new {
-                Value = s.Id.ToString(),
-                Text = s.User?.FullName ?? "[No Name]"
-            }).ToList();
+            ViewBag.Students = students
+                .Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.User?.FullName ?? "[No Name]" })
+                .ToList();
+
         }
 
 

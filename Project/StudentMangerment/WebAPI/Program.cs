@@ -1,8 +1,11 @@
 ﻿using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using BusinessLogicLayer.Services.RoleAdmin;
 using DataAccessLayer.Context;
+using DataAccessLayer.Repositories.Implementations.RoleAdmin;
+using DataAccessLayer.Repositories.Implementations.RoleStudent;
+using DataAccessLayer.Repositories.Implementations.RoleTeacher;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
-using DataAccessLayer.Repositories.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -22,44 +25,31 @@ builder.Services.AddDbContext<SchoolContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Defaul")));
 
 // Configure DI for Repositories and Services
-/// Admin
-builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+
+// UnitOfWork
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// Services 
 builder.Services.AddScoped<IAccountService, AccountService>();
-
-builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
-
-builder.Services.AddScoped<ISemesterRepository, SemesterRepository>();
 builder.Services.AddScoped<ISemesterService, SemesterService>();
-
-builder.Services.AddScoped<IClassSemesterRepository, ClassSemesterRepository>();
 builder.Services.AddScoped<IClassSemesterService, ClassSemesterService>();
-
-builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IStudentService, StudentService>();
-
-builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<ISubjectService, SubjectService>();
-
-builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 builder.Services.AddScoped<ITeacherService, TeacherService>();
-
-builder.Services.AddScoped<IGradeComponentRepository, GradeComponentRepository>();
 builder.Services.AddScoped<IGradeComponentService, GradeComponentService>();
 
 /// Teacher
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IGradeRepository, DataAccessLayer.Repositories.RoleTeacher.GradeRepository>();
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassStudentRepository, DataAccessLayer.Repositories.RoleTeacher.ClassStudentRepository>();
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassRepository, DataAccessLayer.Repositories.RoleTeacher.ClassRepository>();
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassSemesterRepository, DataAccessLayer.Repositories.RoleTeacher.ClassSemesterRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IGradeRepository, GradeRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassStudentRepository, DataAccessLayer.Repositories.Implementations.RoleTeacher.ClassStudentRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassRepository, ClassRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleTeacher.IClassSemesterRepository, DataAccessLayer.Repositories.Implementations.RoleTeacher.ClassSemesterRepository>();
 
 builder.Services.AddScoped<BusinessLogicLayer.Services.Interface.RoleTeacher.ITeacherService, BusinessLogicLayer.Services.RoleTeacher.TeacherService>();
 
 /// Student
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentGradeRepository, DataAccessLayer.Repositories.RoleStudent.StudentGradeRepository>();
-builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentRepository, DataAccessLayer.Repositories.RoleStudent.StudentRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentGradeRepository, StudentGradeRepository>();
+builder.Services.AddScoped<DataAccessLayer.Repositories.Interface.RoleStudent.IStudentRepository, DataAccessLayer.Repositories.Implementations.RoleStudent.StudentRepository>();
 
 builder.Services.AddScoped<BusinessLogicLayer.Services.Interface.RoleStudent.IStudentService, BusinessLogicLayer.Services.RoleStudent.StudentService>();
 
@@ -112,6 +102,22 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
+
+
+
 // Excel license
 ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
@@ -121,9 +127,10 @@ var app = builder.Build();
 // Middleware
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error"); // API có thể dùng middleware trả JSON lỗi
+    app.UseExceptionHandler("/Error"); 
     app.UseHsts();
 }
+app.UseCors("AllowReact");
 
 app.UseMiddleware<ExceptionMiddleware>();
 

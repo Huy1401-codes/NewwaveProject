@@ -3,6 +3,7 @@ using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -12,6 +13,7 @@ namespace StudentManagement.Tests.Services.Admin
 {
     public class StudentServiceTests
     {
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
         private readonly Mock<IStudentRepository> _studentRepoMock;
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly Mock<ILogger<StudentService>> _loggerMock;
@@ -19,14 +21,18 @@ namespace StudentManagement.Tests.Services.Admin
 
         public StudentServiceTests()
         {
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
             _studentRepoMock = new Mock<IStudentRepository>();
             _userRepoMock = new Mock<IUserRepository>();
             _loggerMock = new Mock<ILogger<StudentService>>();
 
+            _unitOfWorkMock.Setup(u => u.Students).Returns(_studentRepoMock.Object);
+            _unitOfWorkMock.Setup(u => u.Users).Returns(_userRepoMock.Object);
+
             _service = new StudentService(
-                _studentRepoMock.Object,
-                _userRepoMock.Object,
-                _loggerMock.Object);
+                _unitOfWorkMock.Object,
+                _loggerMock.Object
+            );
         }
 
         #region Create
@@ -51,7 +57,6 @@ namespace StudentManagement.Tests.Services.Admin
             result.Success.Should().BeFalse();
             result.ErrorMessage.Should().Be(StudentMessages.InvalidUser);
         }
-
         [Fact]
         public async Task CreateAsync_UserAlreadyStudent_ReturnError()
         {
@@ -62,15 +67,25 @@ namespace StudentManagement.Tests.Services.Admin
                 StudentCode = "SV001"
             };
 
-            _studentRepoMock
-                .Setup(r => r.GetUsersByRoleAsync("Student"))
-                .ReturnsAsync(new List<User> { new User { Id = 1 } });
+            _unitOfWorkMock
+                .Setup(u => u.Users.GetAllAsync())
+                .ReturnsAsync(new List<User>
+                {
+            new User
+            {
+                Id = 1,
+                UserRoles = new List<UserRole>
+                {
+                    new UserRole { Role = new Role { Name = "Student" } }
+                }
+            }
+                });
 
-            _studentRepoMock
-                .Setup(r => r.GetAllAsync())
+            _unitOfWorkMock
+                .Setup(u => u.Students.GetAllAsync())
                 .ReturnsAsync(new List<Student>
                 {
-                    new Student { UserId = 1 }
+            new Student { UserId = 1 }
                 });
 
             // Act
@@ -91,15 +106,25 @@ namespace StudentManagement.Tests.Services.Admin
                 StudentCode = "SV001"
             };
 
-            _studentRepoMock
-                .Setup(r => r.GetUsersByRoleAsync("Student"))
-                .ReturnsAsync(new List<User> { new User { Id = 2 } });
+            _unitOfWorkMock
+                .Setup(u => u.Users.GetAllAsync())
+                .ReturnsAsync(new List<User>
+                {
+            new User
+            {
+                Id = 2,
+                UserRoles = new List<UserRole>
+                {
+                    new UserRole { Role = new Role { Name = "Student" } }
+                }
+            }
+                });
 
-            _studentRepoMock
-                .Setup(r => r.GetAllAsync())
+            _unitOfWorkMock
+                .Setup(u => u.Students.GetAllAsync())
                 .ReturnsAsync(new List<Student>
                 {
-                    new Student { UserId = 1, StudentCode = "SV001" }
+            new Student { UserId = 1, StudentCode = "SV001" }
                 });
 
             // Act
@@ -122,13 +147,32 @@ namespace StudentManagement.Tests.Services.Admin
                 Gender = "Male"
             };
 
-            _studentRepoMock
-                .Setup(r => r.GetUsersByRoleAsync("Student"))
-                .ReturnsAsync(new List<User> { new User { Id = 1 } });
+            _unitOfWorkMock
+                .Setup(u => u.Users.GetAllAsync())
+                .ReturnsAsync(new List<User>
+                {
+            new User
+            {
+                Id = 1,
+                UserRoles = new List<UserRole>
+                {
+                    new UserRole { Role = new Role { Name = "Student" } }
+                }
+            }
+                });
 
-            _studentRepoMock
-                .Setup(r => r.GetAllAsync())
+            _unitOfWorkMock
+                .Setup(u => u.Students.GetAllAsync())
                 .ReturnsAsync(new List<Student>());
+
+            _unitOfWorkMock
+                .Setup(u => u.Students.AddAsync(It.IsAny<Student>()))
+                .Returns(Task.CompletedTask);
+
+            _unitOfWorkMock
+                         .Setup(u => u.SaveAsync())
+                          .Returns(Task.FromResult(1));
+
 
             // Act
             var result = await _service.CreateAsync(dto);
@@ -137,6 +181,7 @@ namespace StudentManagement.Tests.Services.Admin
             result.Success.Should().BeTrue();
             result.ErrorMessage.Should().BeEmpty();
         }
+
         #endregion
 
         #region Update

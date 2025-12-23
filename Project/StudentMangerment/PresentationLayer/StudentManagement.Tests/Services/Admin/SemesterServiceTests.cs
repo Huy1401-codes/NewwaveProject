@@ -3,6 +3,7 @@ using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.RoleAdmin;
 using DataAccessLayer.Models;
 using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -16,14 +17,20 @@ namespace StudentManagement.Tests.Services.Admin
         private readonly Mock<ISemesterRepository> _repoMock;
         private readonly Mock<ILogger<SemesterService>> _loggerMock;
         private readonly SemesterService _service;
+        private readonly Mock<IUnitOfWork> _unitOfWorkMock;
+
 
         public SemesterServiceTests()
         {
+            _unitOfWorkMock = new Mock<IUnitOfWork>();
             _repoMock = new Mock<ISemesterRepository>();
             _loggerMock = new Mock<ILogger<SemesterService>>();
 
+            // UnitOfWork trả về repository mock
+            _unitOfWorkMock.Setup(u => u.Semesters).Returns(_repoMock.Object);
+
             _service = new SemesterService(
-                _repoMock.Object,
+                _unitOfWorkMock.Object,
                 _loggerMock.Object
             );
         }

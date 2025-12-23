@@ -1,0 +1,61 @@
+﻿@model BusinessLogicLayer.DTOs.Admin.UserProfileUpdateDto
+@{
+    ViewData["Title"] = "My Profile";
+
+    var role = User.Claims.FirstOrDefault(c => c.Type == System.Security.Claims.ClaimTypes.Role)?.Value;
+}
+
+<h2>My Profile</h2>
+
+<div class="row">
+    <!-- Avatar -->
+    <div class="col-md-4 text-center">
+        <img src="@(!string.IsNullOrEmpty(Model.ImageUrl) ? Model.ImageUrl : "/images/default-avatar.png")"
+             alt="Profile Image"
+             class="img-thumbnail"
+             style="max-width:400px;" />
+    </div>
+
+    <!-- Profile Information -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Profile Information</h5>
+
+                <div class="mb-2">
+                    <strong>Full Name:</strong> @Model.FullName
+                </div>
+
+                <div class="mb-2">
+                    <strong>Email:</strong> @Model.Email
+                </div>
+
+                <div class="mb-2">
+                    <strong>Phone:</strong> @Model.Phone
+                </div>
+
+                @* Hiển thị TeacherCode nếu user là Teacher *@
+                @if (role == "Teacher")
+                {
+                    <div class="mb-2">
+                        <strong>Teacher Code:</strong> @Model.TeacherCode
+                    </div>
+                }
+
+                @* Hiển thị StudentCode nếu user là Student *@
+                @if (role == "Student")
+                {
+                    <div class="mb-2">
+                        <strong>Student Code:</strong> @Model.StudentCode
+                    </div>
+                }
+
+                <a asp-action="Edit" class="btn btn-primary mt-3">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

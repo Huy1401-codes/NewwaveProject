@@ -3,27 +3,22 @@ using BusinessLogicLayer.Enums.Admin;
 using BusinessLogicLayer.Messages.Admin;
 using BusinessLogicLayer.Services.Interface.RoleAdmin;
 using DataAccessLayer.Models;
-using DataAccessLayer.Repositories.Interface.RoleAdmin;
+using DataAccessLayer.UnitOfWork;
 using Microsoft.Extensions.Logging;
 
 namespace BusinessLogicLayer.Services.RoleAdmin
 {
     public class ClassSemesterService : IClassSemesterService
     {
-        private readonly IClassSemesterRepository _classRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ClassSemesterService> _logger;
 
-        public ClassSemesterService(IClassSemesterRepository classRepo, ILogger<ClassSemesterService> logger)
+        public ClassSemesterService(IUnitOfWork unitOfWork, ILogger<ClassSemesterService> logger)
         {
-            _classRepo = classRepo;
+            _unitOfWork = unitOfWork;
             _logger = logger;
         }
 
-        /// <summary>
-        /// Create Sesmester
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
         public async Task<bool> CreateAsync(ClassCreateDto dto)
         {
             try
@@ -35,27 +30,25 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                     SubjectId = dto.SubjectId,
                     SemesterId = dto.SemesterId,
                     TeacherId = dto.TeacherId,
-                    ClassStudents = new List<ClassStudent>(),
+                    ClassStudents = dto.StudentIds?.Select(sid => new ClassStudent
+                    {
+                        StudentId = sid,
+                        EnrollDate = DateTime.UtcNow
+                    }).ToList() ?? new List<ClassStudent>(),
+                    ClassSemesters = new List<ClassSemester>
+                    {
+                        new ClassSemester
+                        {
+                            SemesterId = dto.SemesterId,
+                            IsStatus = true
+                        }
+                    }
                 };
 
-                if (dto.StudentIds != null)
-                {
-                    foreach (var studentId in dto.StudentIds)
-                    {
-                        entity.ClassStudents.Add(new ClassStudent
-                        {
-                            StudentId = studentId,
-                            EnrollDate = DateTime.Now
-                        });
-                    }
-                }
-                entity.ClassSemesters.Add(new ClassSemester
-                {
-                    SemesterId = dto.SemesterId,
-                    IsStatus = ClassStatus.Active == ClassStatus.Active
-                });
+                await _unitOfWork.ClassSemesters.AddAsync(entity);
+                await _unitOfWork.SaveAsync();
+
                 _logger.LogInformation(ClassMessages.CreateSuccess);
-                await _classRepo.AddAsync(entity);
                 return true;
             }
             catch (Exception ex)
@@ -65,16 +58,11 @@ namespace BusinessLogicLayer.Services.RoleAdmin
             }
         }
 
-        /// <summary>
-        /// Update sesmester
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
         public async Task<bool> UpdateAsync(ClassUpdateDto dto)
         {
             try
             {
-                var entity = await _classRepo.GetByIdAsync(dto.ClassId);
+                var entity = await _unitOfWork.ClassSemesters.GetByIdAsync(dto.ClassId);
                 if (entity == null) return false;
 
                 entity.Name = dto.ClassName;
@@ -83,43 +71,47 @@ namespace BusinessLogicLayer.Services.RoleAdmin
                 entity.SemesterId = dto.SemesterId;
                 entity.TeacherId = dto.TeacherId;
 
-                entity.ClassStudents.Clear();
-                entity.ClassSemesters.Add(new ClassSemester
-                {
-                    SemesterId = dto.SemesterId,
-                    IsStatus = true
-                });
+                var existingStudentIds = entity.ClassStudents
+                    .Select(cs => cs.StudentId)
+                    .ToHashSet();
 
                 if (dto.StudentIds != null)
                 {
-                    foreach (var studentId in dto.StudentIds)
+                    foreach (var studentId in dto.StudentIds.Distinct())
                     {
-                        entity.ClassStudents.Add(new ClassStudent
+                        if (!existingStudentIds.Contains(studentId))
                         {
-                            StudentId = studentId,
-                            EnrollDate = DateTime.UtcNow
-                        });
+                            entity.ClassStudents.Add(new ClassStudent
+                            {
+                                ClassId = entity.Id,
+                                StudentId = studentId,
+                                EnrollDate = DateTime.UtcNow
+                            });
+                        }
                     }
                 }
-                _logger.LogInformation(ClassMessages.UpdateSuccess);
 
-                await _classRepo.UpdateAsync(entity);
+                await _unitOfWork.ClassSemesters.UpdateAsync(entity);
+                await _unitOfWork.SaveAsync();
+
+                _logger.LogInformation(ClassMessages.UpdateSuccess);
                 return true;
             }
             catch (Exception ex)
             {
-                {
-                    _logger.LogError(ex, ClassMessages.UpdateError, dto.ClassId);
-                    throw;
-                }
+                _logger.LogError(ex, ClassMessages.UpdateError, dto.ClassId);
+                throw;
             }
         }
+
 
         public async Task<bool> DeleteAsync(int id)
         {
             try
             {
-                await _classRepo.DeleteAsync(id);
+                await _unitOfWork.ClassSemesters.DeleteAsync(id);
+                await _unitOfWork.SaveAsync();
+
                 _logger.LogInformation(ClassMessages.DeleteSuccess);
                 return true;
             }
@@ -134,32 +126,15 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var entity = await _classRepo.GetByIdAsync(id);
+                var entity = await _unitOfWork.ClassSemesters.GetByIdAsync(id);
                 if (entity == null)
                 {
                     _logger.LogWarning(ClassMessages.ClassNotFound, id);
                     return null;
                 }
+
                 _logger.LogInformation(ClassMessages.GetByIdSuccess);
-
-                return new ClassDetailDto
-                {
-                    ClassId = entity.Id,
-                    ClassName = entity.Name,
-                    IsStatus = entity.IsStatus,
-                    SubjectId = entity.SubjectId,
-                    SemesterId = entity.SemesterId,
-                    TeacherId = entity.TeacherId,
-                    SubjectName = entity.Subject?.Name,
-                    SemesterName = entity.Semester?.Name,
-                    TeacherName = entity.Teacher?.User.FullName,
-                    Students = entity.ClassStudents.Select(x => new StudentInClassDto
-                    {
-                        StudentId = x.StudentId,
-                        FullName = x.Student.User.FullName
-                    }).ToList()
-                };
-
+                return MapToDetailDto(entity);
             }
             catch (Exception ex)
             {
@@ -172,33 +147,37 @@ namespace BusinessLogicLayer.Services.RoleAdmin
         {
             try
             {
-                var list = await _classRepo.GetAllAsync();
+                var list = await _unitOfWork.ClassSemesters.GetAllAsync();
                 _logger.LogInformation(ClassMessages.GetAllSuccess);
 
-                return list.Select(entity => new ClassDetailDto
-                {
-                    ClassId = entity.Id,
-                    ClassName = entity.Name,
-                    IsStatus = entity.IsStatus,
-                    SubjectId = entity.SubjectId,
-                    SubjectName = entity.Subject?.Name ?? "[No Subject]",
-                    SemesterId = entity.SemesterId,
-                    SemesterName = entity.Semester?.Name ?? "[No Semester]",
-                    TeacherId = entity.TeacherId,
-                    TeacherName = entity.Teacher?.User?.FullName ?? "[No Teacher]",
-                    Students = entity.ClassStudents?.Select(cs => new StudentInClassDto
-                    {
-                        StudentId = cs.StudentId,
-                        FullName = cs.Student?.User?.FullName ?? "[No Name]"
-                    }).ToList() ?? new List<StudentInClassDto>()
-                }).ToList();
-
+                return list.Select(MapToDetailDto).ToList();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ClassMessages.GetAllError);
                 throw;
             }
+        }
+
+        private ClassDetailDto MapToDetailDto(Class entity)
+        {
+            return new ClassDetailDto
+            {
+                ClassId = entity.Id,
+                ClassName = entity.Name,
+                IsStatus = entity.IsStatus,
+                SubjectId = entity.SubjectId,
+                SubjectName = entity.Subject?.Name ?? "[No Subject]",
+                SemesterId = entity.SemesterId,
+                SemesterName = entity.Semester?.Name ?? "[No Semester]",
+                TeacherId = entity.TeacherId,
+                TeacherName = entity.Teacher?.User?.FullName ?? "[No Teacher]",
+                Students = entity.ClassStudents?.Select(cs => new StudentInClassDto
+                {
+                    StudentId = cs.StudentId,
+                    FullName = cs.Student?.User?.FullName ?? "[No Name]"
+                }).ToList() ?? new List<StudentInClassDto>()
+            };
         }
     }
 }
