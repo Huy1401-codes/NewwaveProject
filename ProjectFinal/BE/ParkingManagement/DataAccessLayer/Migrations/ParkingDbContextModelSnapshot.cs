@@ -119,6 +119,9 @@ namespace DataAccessLayer.Migrations
                     b.Property<decimal?>("Fee")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<bool>("IsPaid")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Note")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -188,6 +191,48 @@ namespace DataAccessLayer.Migrations
                         .IsUnique();
 
                     b.ToTable("ParkingSlots", (string)null);
+                });
+
+            modelBuilder.Entity("DomainLayer.Entities.PaymentTransaction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ParkingRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaymentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Provider")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TransactionCode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParkingRecordId");
+
+                    b.ToTable("PaymentTransaction");
                 });
 
             modelBuilder.Entity("DomainLayer.Entities.RefreshToken", b =>
@@ -448,6 +493,17 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("DomainLayer.Entities.PaymentTransaction", b =>
+                {
+                    b.HasOne("DomainLayer.Entities.ParkingRecord", "ParkingRecord")
+                        .WithMany("PaymentTransactions")
+                        .HasForeignKey("ParkingRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParkingRecord");
+                });
+
             modelBuilder.Entity("DomainLayer.Entities.RefreshToken", b =>
                 {
                     b.HasOne("DomainLayer.Entities.User", "User")
@@ -494,6 +550,11 @@ namespace DataAccessLayer.Migrations
                     b.Navigation("Owner");
 
                     b.Navigation("VehicleType");
+                });
+
+            modelBuilder.Entity("DomainLayer.Entities.ParkingRecord", b =>
+                {
+                    b.Navigation("PaymentTransactions");
                 });
 
             modelBuilder.Entity("DomainLayer.Entities.ParkingSlot", b =>

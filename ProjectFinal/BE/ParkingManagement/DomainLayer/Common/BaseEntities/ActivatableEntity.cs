@@ -8,7 +8,7 @@ namespace DomainLayer.Common.BaseEntities
 {
     public abstract class ActivatableEntity<T> : AuditableEntity<T>
     {
-        public bool IsActive { get; protected set; } = true;
+        public bool IsActive { get;  set; } = true;
 
         public void Activate() => IsActive = true;
         public void Deactivate() => IsActive = false;

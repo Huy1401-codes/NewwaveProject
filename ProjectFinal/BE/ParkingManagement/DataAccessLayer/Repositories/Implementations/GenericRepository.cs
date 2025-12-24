@@ -1,15 +1,9 @@
-﻿using DataAccessLayer.Common;
+﻿using DataAccessLayer.Repositories.Interfaces;
 using DomainLayer.Common.BaseEntities;
-using DomainLayer.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DataAccessLayer.Repositories
+namespace DataAccessLayer.Repositories.Implementations
 {
     public class GenericRepository<TEntity> : IGenericRepository<TEntity>
         where TEntity : class
@@ -57,7 +51,6 @@ namespace DataAccessLayer.Repositories
             if (entity is SoftDeleteEntity<int> softDelete)
             {
                 softDelete.SoftDelete();
-                _dbSet.Update(entity);
             }
             else
             {
@@ -72,44 +65,6 @@ namespace DataAccessLayer.Repositories
             return await _dbSet.AnyAsync(predicate);
         }
 
-        public async Task<PaginatedResult<TEntity>> GetPagedAsync(
-             int pageIndex,
-             int pageSize,
-             Expression<Func<TEntity, bool>>? filter = null,
-             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-             string includeProperties = "")
-        {
-            IQueryable<TEntity> query = _dbSet.AsQueryable();
-
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties
-                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty.Trim());
-            }
-
-            var totalCount = await query.CountAsync();
-
-            if (orderBy != null)
-            {
-                query = orderBy(query);
-            }
-
-            var items = await query
-                .Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
-                .AsNoTracking()
-                .ToListAsync();
-
-            return new PaginatedResult<TEntity>(
-                items,
-                pageIndex,
-                pageSize,
-                totalCount);
-        }
+      
     }
 }

@@ -9,9 +9,9 @@ namespace DomainLayer.Entities
 {
     public class ParkingSlot : SoftDeleteEntity<int>
     {
-        public string SlotCode { get; private set; } = null!;
-        public bool IsOccupied { get; private set; }
-        public string Description { get; private set; } = null!;
+        public string SlotCode { get;  set; } = null!;
+        public bool IsOccupied { get;  set; }
+        public string Description { get;  set; } = null!;
 
         public ICollection<ParkingRecord> ParkingRecords { get; private set; } = new List<ParkingRecord>();
     }

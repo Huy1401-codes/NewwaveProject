@@ -9,12 +9,12 @@ namespace DomainLayer.Entities
 {
     public class Vehicle : SoftDeleteEntity<int>
     {
-        public string PlateNumber { get; private set; } = null!;
-        public int VehicleTypeId { get; private set; }
-        public int? OwnerId { get; private set; }
+        public string PlateNumber { get;  set; } = null!;
+        public int VehicleTypeId { get;  set; }
+        public int? OwnerId { get;  set; }
 
-        public VehicleType VehicleType { get; private set; } = null!;
-        public User? Owner { get; private set; }
+        public VehicleType VehicleType { get;  set; } = null!;
+        public User? Owner { get;  set; }
 
         public ICollection<ParkingRecord> ParkingRecords { get; private set; } = new List<ParkingRecord>();
         public ICollection<MonthlyPass> MonthlyPasses { get; private set; } = new List<MonthlyPass>();

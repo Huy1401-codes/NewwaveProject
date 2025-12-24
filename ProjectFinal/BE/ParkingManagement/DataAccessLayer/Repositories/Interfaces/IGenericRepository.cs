@@ -1,7 +1,6 @@
-﻿using DataAccessLayer.Common;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
-namespace DomainLayer.Interfaces
+namespace DataAccessLayer.Repositories.Interfaces
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
@@ -16,12 +15,7 @@ namespace DomainLayer.Interfaces
         void Remove(TEntity entity);
 
         Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
-        Task<PaginatedResult<TEntity>> GetPagedAsync(
-                       int pageIndex,
-                       int pageSize,
-                       Expression<Func<TEntity, bool>>? filter = null,
-                       Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-                       string includeProperties = "");
+       
 
     }
 }

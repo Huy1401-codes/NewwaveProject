@@ -1,23 +1,32 @@
 ﻿using DomainLayer.Common.BaseEntities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DomainLayer.Entities
 {
     public class ParkingRecord : AuditableEntity<int>
     {
-        public int VehicleId { get; private set; }
-        public int? ParkingSlotId { get; private set; }
+        public int VehicleId { get;  set; }
+        public int? ParkingSlotId { get;  set; }
 
-        public DateTime TimeIn { get; private set; }
-        public DateTime? TimeOut { get; private set; }
-        public decimal? Fee { get; private set; }
-        public string Note { get; private set; } = null!;
-
+        public DateTime TimeIn { get;  set; }
+        public DateTime? TimeOut { get;  set; }
+        public decimal? Fee { get;  set; }
+        public string Note { get;  set; } = null!;
+        public bool IsPaid { get;  set; } = false; 
         public Vehicle Vehicle { get; private set; } = null!;
         public ParkingSlot? ParkingSlot { get; private set; }
+        public ICollection<PaymentTransaction> PaymentTransactions { get; private set; } = new List<PaymentTransaction>();
+
+        public void CheckOut(decimal fee)
+        {
+            TimeOut = DateTime.Now;
+            Fee = fee;
+            IsPaid = false; 
+        }
+
+        public void MarkPaid()
+        {
+            IsPaid = true;
+        }
+
     }
 }
