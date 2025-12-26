@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="6f673fa0397045daa3f80ffebdaa6c0c" Name="Diagram1">
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Author" Width="1.5" PointX="0.75" PointY="2.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Book" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.BorrowDetail" Width="1.5" PointX="5.25" PointY="2" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.BorrowTicket" Width="1.5" PointX="3" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Category" Width="1.5" PointX="0.75" PointY="5.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Deposit" Width="1.5" PointX="5.25" PointY="12.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Payment" Width="1.5" PointX="7.5" PointY="13" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Publisher" Width="1.5" PointX="0.75" PointY="9.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.Role" Width="1.5" PointX="1.5" PointY="17.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.sysdiagram" Width="1.5" PointX="5.75" PointY="5.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="LibraryManagementDBModel.User" Width="1.5" PointX="0.75" PointY="12.875" IsExpanded="true" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_Books_Authors" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_Books_Categories" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_Books_Publishers" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_BorrowDetails_Books" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_BorrowDetails_Tickets" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_BorrowTickets_Users" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_Deposits_BorrowTickets" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.FK_Payments_Deposits" ManuallyRouted="false" />
+        <AssociationConnector Association="LibraryManagementDBModel.UserRoles" ManuallyRouted="false" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

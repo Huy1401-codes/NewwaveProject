@@ -62,6 +62,18 @@ builder.Services.AddLogging(loggingbuider =>
     loggingbuider.ClearProviders();
     loggingbuider.AddNLogWeb();
 });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:5173")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 
 var app = builder.Build();
 
@@ -71,6 +83,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowReact");
 
 app.UseHttpsRedirection();
 
