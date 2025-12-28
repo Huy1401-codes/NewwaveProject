@@ -10,6 +10,13 @@ Partial Public Class User
     Public Property Phone As String
     Public Property IsActive As Boolean
 
+    ' Lưu mã OTP (6 số). 
+    Public Property VerificationCode As String
+
+    ' Lưu thời hạn của mã
+    Public Property CodeExpiration As DateTime?
+
+
     ' Navigation
     Public Overridable Property BorrowTickets As ICollection(Of BorrowTicket)
     Public Overridable Property UserRoles As ICollection(Of UserRole)

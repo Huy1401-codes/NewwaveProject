@@ -20,12 +20,12 @@ Public Class UnitOfWork
         End Get
     End Property
 
-    Private _books As IGenericRepository(Of Book)
-    Public ReadOnly Property Books As IGenericRepository(Of Book) _
+    Private _books As IBookRepository
+    Public ReadOnly Property Books As IBookRepository _
         Implements IUnitOfWork.Books
         Get
             If _books Is Nothing Then
-                _books = New GenericRepository(Of Book)(_context)
+                _books = New BookRepository(_context)
             End If
             Return _books
         End Get

@@ -11,7 +11,7 @@ Public Class FrmLogin
 
         ' Khởi tạo service
         Dim uow As New UnitOfWork()
-        Dim emailService As New EmailService("your@gmail.com", "app-password")
+        Dim emailService As New EmailService("huydo272@gmail.com", "app-password")
         _authService = New AuthService(uow, emailService)
     End Sub
 
@@ -50,7 +50,7 @@ Public Class FrmLogin
         If String.IsNullOrWhiteSpace(email) Then Return
 
         Try
-            _authService.ResetPassword(email)
+            _authService.ForgotPassword(email)
             MessageBox.Show("Mật khẩu mới đã được gửi qua email", "Thông báo")
         Catch ex As Exception
             MessageBox.Show(ex.Message)

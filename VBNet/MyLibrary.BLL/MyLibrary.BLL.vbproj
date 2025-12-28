@@ -141,6 +141,7 @@
     <Compile Include="ExternalServices\Implementations\EmailService.vb" />
     <Compile Include="ExternalServices\Interfaces\IEmailService.vb" />
     <Compile Include="Mapping\AuthMappingProfile.vb" />
+    <Compile Include="Mapping\BookMappingProfile.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -157,7 +158,9 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Services\Implementations\AuthService.vb" />
+    <Compile Include="Services\Implementations\BookService.vb" />
     <Compile Include="Services\Interface\IAuthService.vb" />
+    <Compile Include="Services\Interface\IBookService.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
