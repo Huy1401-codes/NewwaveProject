@@ -1,13 +1,16 @@
-﻿Imports System.Security.Cryptography
+﻿Imports System.Data.SqlClient
+Imports System.Security.Cryptography
 Imports System.Text
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
+Imports NLog
 
 Public Class AuthService
     Implements IAuthService
 
     Private ReadOnly _uow As IUnitOfWork
     Private ReadOnly _emailService As IEmailService
+    Private Shared logger As Logger = LogManager.GetCurrentClassLogger()
 
     Public Sub New(uow As IUnitOfWork, emailService As IEmailService)
         _uow = uow
@@ -19,83 +22,112 @@ Public Class AuthService
         Implements IAuthService.Login
 
         If String.IsNullOrWhiteSpace(email) OrElse String.IsNullOrWhiteSpace(password) Then
-            Throw New Exception("Email và mật khẩu không được để trống")
+            Throw New Exception(AuthMessages.EmailOrPasswordEmpty)
         End If
 
         Dim user = _uow.Users.GetByEmail(email)
         If user Is Nothing Then
-            Throw New Exception("Sai email hoặc mật khẩu")
+            logger.Warn("Sai email hoặc mật khẩu")
+            Throw New Exception(AuthMessages.EmailOrPasswordErorr)
+
         End If
 
         Dim hash = HashPassword(password)
         If user.PasswordHash <> hash Then
-            Throw New Exception("Sai email hoặc mật khẩu")
+            logger.Warn("Sai email hoặc mật khẩu")
+            Throw New Exception(AuthMessages.EmailOrPasswordErorr)
         End If
 
         If Not user.IsActive Then
-            Throw New Exception("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để lấy mã xác thực.")
+            logger.Warn("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để lấy mã xác thực.")
+            Throw New Exception(AuthMessages.AccountNotActive)
         End If
 
-        Dim roleName = _uow.UserRoles.GetRoleNameByUserId(user.UserId)
+        Dim roleName = _uow.UserRoles.GetRoleNameByUserId(user.Id)
         If String.IsNullOrEmpty(roleName) Then
-            Throw New Exception("Tài khoản chưa được phân quyền")
+            logger.Warn("Tài khoản chưa được phân quyền.")
+            Throw New Exception(AuthMessages.AccountNotRole)
         End If
+
+        logger.Info("Login thành công")
 
         Return New LoginResponseDto With {
-            .UserId = user.UserId,
+            .UserId = user.Id,
             .Email = user.Email,
             .RoleName = roleName
         }
     End Function
 
-    Public Sub Register(dto As RegisterRequestDto) _
-    Implements IAuthService.Register
-
-        If dto Is Nothing Then Throw New Exception("Dữ liệu không hợp lệ")
-        If String.IsNullOrWhiteSpace(dto.FullName) Then Throw New Exception("Họ tên không được để trống")
-        If String.IsNullOrWhiteSpace(dto.Email) Then Throw New Exception("Email không được để trống")
-        If String.IsNullOrWhiteSpace(dto.Password) Then Throw New Exception("Mật khẩu không được để trống")
+    Public Sub Register(dto As RegisterRequestDto) Implements IAuthService.Register
+        If dto Is Nothing Then Throw New Exception(AuthMessages.InforError)
+        If String.IsNullOrWhiteSpace(dto.FullName) Then Throw New Exception(AuthMessages.FullNameNotNull)
+        If String.IsNullOrWhiteSpace(dto.Email) Then Throw New Exception(AuthMessages.EmailOrPasswordErorr)
+        If String.IsNullOrWhiteSpace(dto.Password) Then Throw New Exception(AuthMessages.PasswordNotNull)
 
         Dim email As String = dto.Email.Trim().ToLower()
+
+        Dim defaultRole = _uow.Roles.GetByName("Customer")
+
+        If defaultRole Is Nothing Then
+            defaultRole = New Role With {
+            .RoleName = "Customer",
+            .IsDeleted = False
+        }
+            _uow.Roles.Add(defaultRole)
+            _uow.Save()
+        End If
 
         If _uow.Users.ExistsByEmail(email) Then
             Throw New Exception("Email đã tồn tại")
         End If
 
-
         Dim otpCode As String = GenerateOTP()
 
-        Dim user As New DAL.User With {
-            .Email = email,
-            .PasswordHash = HashPassword(dto.Password),
-            .FullName = dto.FullName.Trim(),
-            .IsActive = False,
-            .VerificationCode = otpCode,
-            .CodeExpiration = DateTime.Now.AddMinutes(1),
-            .CreatedAt = DateTime.Now
-        }
+        Dim user As New User With {
+        .Email = email,
+        .PasswordHash = HashPassword(dto.Password),
+        .FullName = dto.FullName.Trim(),
+        .IsActive = False,
+        .VerificationCode = otpCode,
+        .CodeExpiration = DateTime.Now.AddMinutes(3),
+        .CreatedAt = DateTime.Now,
+        .IsDeleted = False,
+        .UpdatedAt = DateTime.Now
+    }
 
         _uow.Users.Add(user)
-        _uow.Save()
-
-        Dim defaultRole = _uow.Roles.GetByName("User")
-        If defaultRole Is Nothing Then Throw New Exception("Role mặc định không tồn tại")
 
         _uow.UserRoles.Add(New UserRole With {
-            .UserId = user.UserId,
-            .RoleId = defaultRole.RoleId
-        })
-        _uow.Save()
+        .User = user,
+        .RoleId = defaultRole.Id
+    })
 
-        _emailService.SendEmail(
+        Try
+            _uow.Save()
+        Catch ex As Exception
+            Dim msg As String = ex.Message
+            If ex.InnerException IsNot Nothing Then
+                msg &= vbCrLf & "Inner: " & ex.InnerException.Message
+                If ex.InnerException.InnerException IsNot Nothing Then
+                    msg &= vbCrLf & "SQL Error: " & ex.InnerException.InnerException.Message
+                End If
+            End If
+            Throw New Exception("Lỗi lưu Database: " & msg)
+        End Try
+
+        Try
+            _emailService.SendEmail(
             user.Email,
             "Xác thực đăng ký tài khoản",
-            $"<h3>Xin chào {user.FullName}</h3>
-              <p>Cảm ơn bạn đã đăng ký. Mã xác thực của bạn là:</p>
-              <h2 style='color:red;'>{otpCode}</h2>
-              <p>Mã này có hiệu lực trong 15 phút.</p>"
+            $"<h3>Xin chào {user.FullName}</h3><p>Mã OTP: {otpCode}</p>"
         )
+        Catch ex As Exception
+
+        End Try
+
     End Sub
+
+
 
     Public Sub VerifyAccount(email As String, code As String) _
     Implements IAuthService.VerifyAccount

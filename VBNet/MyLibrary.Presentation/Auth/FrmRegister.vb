@@ -51,8 +51,19 @@ Public Class FrmRegister
             pnlVerify.Visible = True
 
         Catch ex As Exception
-            Cursor = Cursors.Default
-            lblError.Text = ex.Message
+            Dim loiChiTiet As String = ex.Message
+
+            If ex.InnerException IsNot Nothing Then
+                loiChiTiet &= vbCrLf & "INNER 1: " & ex.InnerException.Message
+
+                If ex.InnerException.InnerException IsNot Nothing Then
+                    loiChiTiet &= vbCrLf & "SQL ERROR: " & ex.InnerException.InnerException.Message
+                End If
+            End If
+
+            MessageBox.Show(loiChiTiet, "LỖI CHI TIẾT", MessageBoxButtons.OK, MessageBoxIcon.Error)
+
+            lblError.Text = "Lỗi hệ thống: " & ex.Message
         End Try
     End Sub
 

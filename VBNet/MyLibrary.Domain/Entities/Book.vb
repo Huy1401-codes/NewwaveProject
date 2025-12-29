@@ -2,8 +2,6 @@
 
 Partial Public Class Book
     Inherits BaseEntity
-
-    Public Property BookId As Integer
     Public Property BookCode As String
     Public Property Title As String
     Public Property AuthorId As Nullable(Of Integer)

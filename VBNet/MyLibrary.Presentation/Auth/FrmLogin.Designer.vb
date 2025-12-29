@@ -26,56 +26,57 @@ Partial Class FrmLogin
         Me.lnkRegister = New System.Windows.Forms.LinkLabel()
         Me.lnkForgotPassword = New System.Windows.Forms.LinkLabel()
         Me.lblError = New System.Windows.Forms.Label()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.SuspendLayout()
         '
         'lblTitle
         '
         Me.lblTitle.AutoSize = True
         Me.lblTitle.Font = New System.Drawing.Font("Segoe UI", 16.0!, System.Drawing.FontStyle.Bold)
-        Me.lblTitle.Location = New System.Drawing.Point(120, 20)
+        Me.lblTitle.Location = New System.Drawing.Point(103, 17)
         Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(142, 30)
+        Me.lblTitle.Size = New System.Drawing.Size(80, 30)
         Me.lblTitle.TabIndex = 0
         Me.lblTitle.Text = "LOGIN"
         '
         'lblEmail
         '
         Me.lblEmail.AutoSize = True
-        Me.lblEmail.Location = New System.Drawing.Point(40, 80)
+        Me.lblEmail.Location = New System.Drawing.Point(34, 69)
         Me.lblEmail.Name = "lblEmail"
-        Me.lblEmail.Size = New System.Drawing.Size(42, 15)
+        Me.lblEmail.Size = New System.Drawing.Size(35, 13)
         Me.lblEmail.TabIndex = 1
         Me.lblEmail.Text = "Email:"
         '
         'lblPassword
         '
         Me.lblPassword.AutoSize = True
-        Me.lblPassword.Location = New System.Drawing.Point(40, 130)
+        Me.lblPassword.Location = New System.Drawing.Point(34, 113)
         Me.lblPassword.Name = "lblPassword"
-        Me.lblPassword.Size = New System.Drawing.Size(60, 15)
+        Me.lblPassword.Size = New System.Drawing.Size(56, 13)
         Me.lblPassword.TabIndex = 2
         Me.lblPassword.Text = "Password:"
         '
         'txtEmail
         '
-        Me.txtEmail.Location = New System.Drawing.Point(40, 100)
+        Me.txtEmail.Location = New System.Drawing.Point(34, 87)
         Me.txtEmail.Name = "txtEmail"
-        Me.txtEmail.Size = New System.Drawing.Size(280, 23)
+        Me.txtEmail.Size = New System.Drawing.Size(241, 20)
         Me.txtEmail.TabIndex = 3
         '
         'txtPassword
         '
-        Me.txtPassword.Location = New System.Drawing.Point(40, 150)
+        Me.txtPassword.Location = New System.Drawing.Point(34, 130)
         Me.txtPassword.Name = "txtPassword"
         Me.txtPassword.PasswordChar = Global.Microsoft.VisualBasic.ChrW(42)
-        Me.txtPassword.Size = New System.Drawing.Size(280, 23)
+        Me.txtPassword.Size = New System.Drawing.Size(241, 20)
         Me.txtPassword.TabIndex = 4
         '
         'btnLogin
         '
-        Me.btnLogin.Location = New System.Drawing.Point(40, 200)
+        Me.btnLogin.Location = New System.Drawing.Point(34, 173)
         Me.btnLogin.Name = "btnLogin"
-        Me.btnLogin.Size = New System.Drawing.Size(280, 35)
+        Me.btnLogin.Size = New System.Drawing.Size(240, 30)
         Me.btnLogin.TabIndex = 5
         Me.btnLogin.Text = "Login"
         Me.btnLogin.UseVisualStyleBackColor = True
@@ -83,9 +84,9 @@ Partial Class FrmLogin
         'lnkRegister
         '
         Me.lnkRegister.AutoSize = True
-        Me.lnkRegister.Location = New System.Drawing.Point(40, 250)
+        Me.lnkRegister.Location = New System.Drawing.Point(34, 217)
         Me.lnkRegister.Name = "lnkRegister"
-        Me.lnkRegister.Size = New System.Drawing.Size(52, 15)
+        Me.lnkRegister.Size = New System.Drawing.Size(46, 13)
         Me.lnkRegister.TabIndex = 6
         Me.lnkRegister.TabStop = True
         Me.lnkRegister.Text = "Register"
@@ -93,9 +94,9 @@ Partial Class FrmLogin
         'lnkForgotPassword
         '
         Me.lnkForgotPassword.AutoSize = True
-        Me.lnkForgotPassword.Location = New System.Drawing.Point(210, 250)
+        Me.lnkForgotPassword.Location = New System.Drawing.Point(180, 217)
         Me.lnkForgotPassword.Name = "lnkForgotPassword"
-        Me.lnkForgotPassword.Size = New System.Drawing.Size(110, 15)
+        Me.lnkForgotPassword.Size = New System.Drawing.Size(91, 13)
         Me.lnkForgotPassword.TabIndex = 7
         Me.lnkForgotPassword.TabStop = True
         Me.lnkForgotPassword.Text = "Forgot password?"
@@ -104,16 +105,26 @@ Partial Class FrmLogin
         '
         Me.lblError.AutoSize = True
         Me.lblError.ForeColor = System.Drawing.Color.Red
-        Me.lblError.Location = New System.Drawing.Point(40, 280)
+        Me.lblError.Location = New System.Drawing.Point(34, 243)
         Me.lblError.Name = "lblError"
-        Me.lblError.Size = New System.Drawing.Size(0, 15)
+        Me.lblError.Size = New System.Drawing.Size(0, 13)
         Me.lblError.TabIndex = 8
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(108, 251)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 9
+        Me.Button1.Text = "Button1"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'FrmLogin
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(360, 330)
+        Me.ClientSize = New System.Drawing.Size(309, 286)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.lblError)
         Me.Controls.Add(Me.lnkForgotPassword)
         Me.Controls.Add(Me.lnkRegister)
@@ -125,8 +136,8 @@ Partial Class FrmLogin
         Me.Controls.Add(Me.lblTitle)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
-        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Name = "FrmLogin"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = "Login"
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -142,5 +153,5 @@ Partial Class FrmLogin
     Friend WithEvents lnkRegister As LinkLabel
     Friend WithEvents lnkForgotPassword As LinkLabel
     Friend WithEvents lblError As Label
-
+    Friend WithEvents Button1 As Button
 End Class

@@ -3,7 +3,6 @@
 Partial Public Class Deposit
     Inherits BaseEntity
 
-    Public Property DepositId As Integer
     Public Property BorrowTicketId As Integer
     Public Property DepositAmount As Decimal
     Public Property IsRefunded As Boolean

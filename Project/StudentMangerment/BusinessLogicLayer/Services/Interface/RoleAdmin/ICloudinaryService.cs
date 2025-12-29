@@ -1,5 +1,4 @@
-﻿using BusinessLogicLayer.DTOs.Admin;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace BusinessLogicLayer.Services.Interface.RoleAdmin
 {

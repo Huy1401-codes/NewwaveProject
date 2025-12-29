@@ -1,11 +1,11 @@
 ﻿Imports System.Data.Entity
+Imports System.Data.Entity.ModelConfiguration.Conventions
 Imports MyLibrary.Domain
-
 Public Class AppDbContext
     Inherits DbContext
 
     Public Sub New()
-        MyBase.New("name=LibraryManagementDB")
+        MyBase.New("name=MyLibraryContext")
     End Sub
 
     Public Property Authors As DbSet(Of Author)
@@ -24,10 +24,12 @@ Public Class AppDbContext
     Public Property Payments As DbSet(Of Payment)
 
     Protected Overrides Sub OnModelCreating(modelBuilder As DbModelBuilder)
+        modelBuilder.Conventions.Remove(Of OneToManyCascadeDeleteConvention)()
+        modelBuilder.Conventions.Remove(Of ManyToManyCascadeDeleteConvention)()
 
-        ' Composite key
         modelBuilder.Entity(Of UserRole)().
             HasKey(Function(x) New With {x.UserId, x.RoleId})
+
 
         MyBase.OnModelCreating(modelBuilder)
     End Sub

@@ -2,8 +2,6 @@
 
 Partial Public Class Payment
     Inherits BaseEntity
-
-    Public Property PaymentId As Integer
     Public Property DepositId As Integer
     Public Property PaymentMethod As String
     Public Property TransactionCode As String

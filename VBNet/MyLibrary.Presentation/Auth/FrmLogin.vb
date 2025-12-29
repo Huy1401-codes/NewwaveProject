@@ -24,10 +24,8 @@ Public Class FrmLogin
 
             Dim result = _authService.Login(email, password)
 
-            ' Lưu session
             SessionManager.CurrentUser = result
 
-            ' Phân quyền
             If result.RoleName = "Admin" Then
                 Dim f As New FrmAdminMain()
                 f.Show()
@@ -64,4 +62,16 @@ Public Class FrmLogin
         f.ShowDialog()
     End Sub
 
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Try
+            Using context As New AppDbContext()
+
+                Dim count = context.Users.Count()
+
+                MessageBox.Show($"Kết nối THÀNH CÔNG! Hiện có {count} user trong DB.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            End Using
+        Catch ex As Exception
+            MessageBox.Show("Lỗi kết nối: " & ex.Message & vbCrLf & "Inner: " & If(ex.InnerException IsNot Nothing, ex.InnerException.Message, ""), "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        End Try
+    End Sub
 End Class

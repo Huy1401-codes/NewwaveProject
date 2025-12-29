@@ -1,4 +1,6 @@
 ﻿
+Imports MyLibrary.Domain
+
 Public Interface IRoleRepository
     Inherits IGenericRepository(Of Role)
 

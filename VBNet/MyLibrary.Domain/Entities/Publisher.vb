@@ -2,8 +2,6 @@
 
 Partial Public Class Publisher
     Inherits BaseEntity
-
-    Public Property PublisherId As Integer
     Public Property PublisherName As String
 
     ' Navigation

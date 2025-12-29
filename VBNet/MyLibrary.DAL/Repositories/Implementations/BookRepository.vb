@@ -1,4 +1,6 @@
-﻿Public Class BookRepository
+﻿Imports MyLibrary.Domain
+
+Public Class BookRepository
     Inherits GenericRepository(Of Book)
     Implements IBookRepository
 

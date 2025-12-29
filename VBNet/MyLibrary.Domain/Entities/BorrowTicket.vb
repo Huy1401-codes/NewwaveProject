@@ -3,7 +3,6 @@
 Partial Public Class BorrowTicket
     Inherits BaseEntity
 
-    Public Property BorrowTicketId As Integer
     Public Property UserId As Integer
     Public Property BorrowDate As DateTime
     Public Property DueDate As DateTime

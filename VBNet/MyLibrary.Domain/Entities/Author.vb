@@ -3,7 +3,6 @@
 Partial Public Class Author
     Inherits BaseEntity
 
-    Public Property AuthorId As Integer
     Public Property AuthorName As String
 
     ' Navigation

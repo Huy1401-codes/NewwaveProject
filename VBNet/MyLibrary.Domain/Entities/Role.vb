@@ -3,7 +3,6 @@
 Partial Public Class Role
     Inherits BaseEntity
 
-    Public Property RoleId As Integer
     Public Property RoleName As String
 
     ' Navigation

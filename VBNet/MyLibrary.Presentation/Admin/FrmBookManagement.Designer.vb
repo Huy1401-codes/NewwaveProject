@@ -2,6 +2,7 @@
 Partial Class FrmBookManagement
     Inherits System.Windows.Forms.Form
 
+    'Form overrides dispose to clean up the component list.
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
@@ -17,326 +18,279 @@ Partial Class FrmBookManagement
 
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.grpInfo = New System.Windows.Forms.GroupBox()
-        Me.lblCode = New System.Windows.Forms.Label()
-        Me.txtCode = New System.Windows.Forms.TextBox()
-        Me.lblTitle = New System.Windows.Forms.Label()
-        Me.txtTitle = New System.Windows.Forms.TextBox()
-        Me.lblPrice = New System.Windows.Forms.Label()
-        Me.txtPrice = New System.Windows.Forms.TextBox()
-        Me.lblQuantity = New System.Windows.Forms.Label()
-        Me.txtQuantity = New System.Windows.Forms.TextBox()
-        Me.lblAuthor = New System.Windows.Forms.Label()
-        Me.cboAuthor = New System.Windows.Forms.ComboBox()
-        Me.lblCategory = New System.Windows.Forms.Label()
-        Me.cboCategory = New System.Windows.Forms.ComboBox()
-        Me.lblPublisher = New System.Windows.Forms.Label()
-        Me.cboPublisher = New System.Windows.Forms.ComboBox()
-        Me.lblYear = New System.Windows.Forms.Label()
-        Me.txtYear = New System.Windows.Forms.TextBox()
+        Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.btnExcel = New System.Windows.Forms.Button()
+        Me.lblTitleHeader = New System.Windows.Forms.Label()
         Me.btnAdd = New System.Windows.Forms.Button()
-        Me.btnEdit = New System.Windows.Forms.Button()
-        Me.btnDelete = New System.Windows.Forms.Button()
-        Me.btnClear = New System.Windows.Forms.Button()
-        Me.grpList = New System.Windows.Forms.GroupBox()
-        Me.txtSearch = New System.Windows.Forms.TextBox()
+        Me.cboFilterYear = New System.Windows.Forms.ComboBox()
+        Me.lblFilterYear = New System.Windows.Forms.Label()
+        Me.cboFilterPublisher = New System.Windows.Forms.ComboBox()
+        Me.lblFilterPub = New System.Windows.Forms.Label()
         Me.btnSearch = New System.Windows.Forms.Button()
+        Me.txtSearch = New System.Windows.Forms.TextBox()
+        Me.pnlTools = New System.Windows.Forms.Panel()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.btnDelete = New System.Windows.Forms.Button()
+        Me.btnEdit = New System.Windows.Forms.Button()
+        Me.pnlBottom = New System.Windows.Forms.Panel()
+        Me.btnNext = New System.Windows.Forms.Button()
+        Me.lblPageInfo = New System.Windows.Forms.Label()
+        Me.btnPrev = New System.Windows.Forms.Button()
         Me.dgvBooks = New System.Windows.Forms.DataGridView()
-        Me.grpInfo.SuspendLayout()
-        Me.grpList.SuspendLayout()
+        Me.pnlTop.SuspendLayout()
+        Me.pnlTools.SuspendLayout()
+        Me.pnlBottom.SuspendLayout()
         CType(Me.dgvBooks, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        ' grpInfo
+        'pnlTop
         '
-        Me.grpInfo.Controls.Add(Me.btnClear)
-        Me.grpInfo.Controls.Add(Me.btnDelete)
-        Me.grpInfo.Controls.Add(Me.btnEdit)
-        Me.grpInfo.Controls.Add(Me.btnAdd)
-        Me.grpInfo.Controls.Add(Me.txtYear)
-        Me.grpInfo.Controls.Add(Me.lblYear)
-        Me.grpInfo.Controls.Add(Me.cboPublisher)
-        Me.grpInfo.Controls.Add(Me.lblPublisher)
-        Me.grpInfo.Controls.Add(Me.cboCategory)
-        Me.grpInfo.Controls.Add(Me.lblCategory)
-        Me.grpInfo.Controls.Add(Me.cboAuthor)
-        Me.grpInfo.Controls.Add(Me.lblAuthor)
-        Me.grpInfo.Controls.Add(Me.txtQuantity)
-        Me.grpInfo.Controls.Add(Me.lblQuantity)
-        Me.grpInfo.Controls.Add(Me.txtPrice)
-        Me.grpInfo.Controls.Add(Me.lblPrice)
-        Me.grpInfo.Controls.Add(Me.txtTitle)
-        Me.grpInfo.Controls.Add(Me.lblTitle)
-        Me.grpInfo.Controls.Add(Me.txtCode)
-        Me.grpInfo.Controls.Add(Me.lblCode)
-        Me.grpInfo.Location = New System.Drawing.Point(12, 12)
-        Me.grpInfo.Name = "grpInfo"
-        Me.grpInfo.Size = New System.Drawing.Size(880, 220)
-        Me.grpInfo.TabIndex = 0
-        Me.grpInfo.TabStop = False
-        Me.grpInfo.Text = "Thông tin chi tiết"
+        Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.btnExcel)
+        Me.pnlTop.Controls.Add(Me.lblTitleHeader)
+        Me.pnlTop.Controls.Add(Me.btnAdd)
+        Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
+        Me.pnlTop.Location = New System.Drawing.Point(0, 0)
+        Me.pnlTop.Name = "pnlTop"
+        Me.pnlTop.Size = New System.Drawing.Size(1122, 70)
+        Me.pnlTop.TabIndex = 0
         '
-        ' lblCode
+        'btnExcel
         '
-        Me.lblCode.AutoSize = True
-        Me.lblCode.Location = New System.Drawing.Point(20, 30)
-        Me.lblCode.Name = "lblCode"
-        Me.lblCode.Size = New System.Drawing.Size(85, 19)
-        Me.lblCode.TabIndex = 0
-        Me.lblCode.Text = "Mã sách (*):"
+        Me.btnExcel.BackColor = System.Drawing.Color.BlueViolet
+        Me.btnExcel.ForeColor = System.Drawing.Color.White
+        Me.btnExcel.Location = New System.Drawing.Point(894, 17)
+        Me.btnExcel.Name = "btnExcel"
+        Me.btnExcel.Size = New System.Drawing.Size(100, 30)
+        Me.btnExcel.TabIndex = 1
+        Me.btnExcel.Text = "Xuất Excel"
+        Me.btnExcel.UseVisualStyleBackColor = False
         '
-        ' txtCode
+        'lblTitleHeader
         '
-        Me.txtCode.Location = New System.Drawing.Point(120, 27)
-        Me.txtCode.Name = "txtCode"
-        Me.txtCode.Size = New System.Drawing.Size(150, 25)
-        Me.txtCode.TabIndex = 1
+        Me.lblTitleHeader.AutoSize = True
+        Me.lblTitleHeader.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
+        Me.lblTitleHeader.ForeColor = System.Drawing.Color.DimGray
+        Me.lblTitleHeader.Location = New System.Drawing.Point(33, 17)
+        Me.lblTitleHeader.Name = "lblTitleHeader"
+        Me.lblTitleHeader.Size = New System.Drawing.Size(150, 25)
+        Me.lblTitleHeader.TabIndex = 0
+        Me.lblTitleHeader.Text = "QUẢN LÝ SÁCH"
         '
-        ' lblTitle
+        'btnAdd
         '
-        Me.lblTitle.AutoSize = True
-        Me.lblTitle.Location = New System.Drawing.Point(20, 65)
-        Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(86, 19)
-        Me.lblTitle.TabIndex = 2
-        Me.lblTitle.Text = "Tên sách (*):"
-        '
-        ' txtTitle
-        '
-        Me.txtTitle.Location = New System.Drawing.Point(120, 62)
-        Me.txtTitle.Name = "txtTitle"
-        Me.txtTitle.Size = New System.Drawing.Size(300, 25)
-        Me.txtTitle.TabIndex = 3
-        '
-        ' lblPrice
-        '
-        Me.lblPrice.AutoSize = True
-        Me.lblPrice.Location = New System.Drawing.Point(20, 100)
-        Me.lblPrice.Name = "lblPrice"
-        Me.lblPrice.Size = New System.Drawing.Size(60, 19)
-        Me.lblPrice.TabIndex = 4
-        Me.lblPrice.Text = "Giá tiền:"
-        '
-        ' txtPrice
-        '
-        Me.txtPrice.Location = New System.Drawing.Point(120, 97)
-        Me.txtPrice.Name = "txtPrice"
-        Me.txtPrice.Size = New System.Drawing.Size(150, 25)
-        Me.txtPrice.TabIndex = 5
-        Me.txtPrice.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        ' lblQuantity
-        '
-        Me.lblQuantity.AutoSize = True
-        Me.lblQuantity.Location = New System.Drawing.Point(20, 135)
-        Me.lblQuantity.Name = "lblQuantity"
-        Me.lblQuantity.Size = New System.Drawing.Size(66, 19)
-        Me.lblQuantity.TabIndex = 6
-        Me.lblQuantity.Text = "Số lượng:"
-        '
-        ' txtQuantity
-        '
-        Me.txtQuantity.Location = New System.Drawing.Point(120, 132)
-        Me.txtQuantity.Name = "txtQuantity"
-        Me.txtQuantity.Size = New System.Drawing.Size(100, 25)
-        Me.txtQuantity.TabIndex = 7
-        Me.txtQuantity.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
-        '
-        ' lblAuthor
-        '
-        Me.lblAuthor.AutoSize = True
-        Me.lblAuthor.Location = New System.Drawing.Point(450, 30)
-        Me.lblAuthor.Name = "lblAuthor"
-        Me.lblAuthor.Size = New System.Drawing.Size(56, 19)
-        Me.lblAuthor.TabIndex = 8
-        Me.lblAuthor.Text = "Tác giả:"
-        '
-        ' cboAuthor
-        '
-        Me.cboAuthor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboAuthor.FormattingEnabled = True
-        Me.cboAuthor.Location = New System.Drawing.Point(530, 27)
-        Me.cboAuthor.Name = "cboAuthor"
-        Me.cboAuthor.Size = New System.Drawing.Size(250, 25)
-        Me.cboAuthor.TabIndex = 9
-        '
-        ' lblCategory
-        '
-        Me.lblCategory.AutoSize = True
-        Me.lblCategory.Location = New System.Drawing.Point(450, 65)
-        Me.lblCategory.Name = "lblCategory"
-        Me.lblCategory.Size = New System.Drawing.Size(60, 19)
-        Me.lblCategory.TabIndex = 10
-        Me.lblCategory.Text = "Thể loại:"
-        '
-        ' cboCategory
-        '
-        Me.cboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboCategory.FormattingEnabled = True
-        Me.cboCategory.Location = New System.Drawing.Point(530, 62)
-        Me.cboCategory.Name = "cboCategory"
-        Me.cboCategory.Size = New System.Drawing.Size(250, 25)
-        Me.cboCategory.TabIndex = 11
-        '
-        ' lblPublisher
-        '
-        Me.lblPublisher.AutoSize = True
-        Me.lblPublisher.Location = New System.Drawing.Point(450, 100)
-        Me.lblPublisher.Name = "lblPublisher"
-        Me.lblPublisher.Size = New System.Drawing.Size(41, 19)
-        Me.lblPublisher.TabIndex = 12
-        Me.lblPublisher.Text = "NXB:"
-        '
-        ' cboPublisher
-        '
-        Me.cboPublisher.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.cboPublisher.FormattingEnabled = True
-        Me.cboPublisher.Location = New System.Drawing.Point(530, 97)
-        Me.cboPublisher.Name = "cboPublisher"
-        Me.cboPublisher.Size = New System.Drawing.Size(250, 25)
-        Me.cboPublisher.TabIndex = 13
-        '
-        ' lblYear
-        '
-        Me.lblYear.AutoSize = True
-        Me.lblYear.Location = New System.Drawing.Point(450, 135)
-        Me.lblYear.Name = "lblYear"
-        Me.lblYear.Size = New System.Drawing.Size(64, 19)
-        Me.lblYear.TabIndex = 14
-        Me.lblYear.Text = "Năm XB:"
-        '
-        ' txtYear
-        '
-        Me.txtYear.Location = New System.Drawing.Point(530, 132)
-        Me.txtYear.Name = "txtYear"
-        Me.txtYear.Size = New System.Drawing.Size(100, 25)
-        Me.txtYear.TabIndex = 15
-        '
-        ' btnAdd
-        '
-        Me.btnAdd.BackColor = System.Drawing.Color.LightGreen
-        Me.btnAdd.Location = New System.Drawing.Point(120, 175)
+        Me.btnAdd.BackColor = System.Drawing.Color.SeaGreen
+        Me.btnAdd.ForeColor = System.Drawing.Color.White
+        Me.btnAdd.Location = New System.Drawing.Point(1010, 17)
         Me.btnAdd.Name = "btnAdd"
-        Me.btnAdd.Size = New System.Drawing.Size(100, 35)
-        Me.btnAdd.TabIndex = 16
+        Me.btnAdd.Size = New System.Drawing.Size(100, 30)
+        Me.btnAdd.TabIndex = 0
         Me.btnAdd.Text = "Thêm mới"
         Me.btnAdd.UseVisualStyleBackColor = False
         '
-        ' btnEdit
+        'cboFilterYear
         '
-        Me.btnEdit.BackColor = System.Drawing.Color.LightYellow
-        Me.btnEdit.Location = New System.Drawing.Point(230, 175)
-        Me.btnEdit.Name = "btnEdit"
-        Me.btnEdit.Size = New System.Drawing.Size(100, 35)
-        Me.btnEdit.TabIndex = 17
-        Me.btnEdit.Text = "Cập nhật"
-        Me.btnEdit.UseVisualStyleBackColor = False
+        Me.cboFilterYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboFilterYear.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboFilterYear.FormattingEnabled = True
+        Me.cboFilterYear.Location = New System.Drawing.Point(589, 14)
+        Me.cboFilterYear.Name = "cboFilterYear"
+        Me.cboFilterYear.Size = New System.Drawing.Size(100, 25)
+        Me.cboFilterYear.TabIndex = 6
         '
-        ' btnDelete
+        'lblFilterYear
         '
-        Me.btnDelete.BackColor = System.Drawing.Color.LightPink
-        Me.btnDelete.Location = New System.Drawing.Point(340, 175)
-        Me.btnDelete.Name = "btnDelete"
-        Me.btnDelete.Size = New System.Drawing.Size(100, 35)
-        Me.btnDelete.TabIndex = 18
-        Me.btnDelete.Text = "Xóa"
-        Me.btnDelete.UseVisualStyleBackColor = False
+        Me.lblFilterYear.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblFilterYear.AutoSize = True
+        Me.lblFilterYear.Location = New System.Drawing.Point(540, 17)
+        Me.lblFilterYear.Name = "lblFilterYear"
+        Me.lblFilterYear.Size = New System.Drawing.Size(41, 19)
+        Me.lblFilterYear.TabIndex = 5
+        Me.lblFilterYear.Text = "Năm:"
         '
-        ' btnClear
+        'cboFilterPublisher
         '
-        Me.btnClear.Location = New System.Drawing.Point(450, 175)
-        Me.btnClear.Name = "btnClear"
-        Me.btnClear.Size = New System.Drawing.Size(100, 35)
-        Me.btnClear.TabIndex = 19
-        Me.btnClear.Text = "Làm mới"
-        Me.btnClear.UseVisualStyleBackColor = True
+        Me.cboFilterPublisher.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.cboFilterPublisher.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboFilterPublisher.FormattingEnabled = True
+        Me.cboFilterPublisher.Location = New System.Drawing.Point(417, 14)
+        Me.cboFilterPublisher.Name = "cboFilterPublisher"
+        Me.cboFilterPublisher.Size = New System.Drawing.Size(115, 25)
+        Me.cboFilterPublisher.TabIndex = 4
         '
-        ' grpList
+        'lblFilterPub
         '
-        Me.grpList.Controls.Add(Me.dgvBooks)
-        Me.grpList.Controls.Add(Me.btnSearch)
-        Me.grpList.Controls.Add(Me.txtSearch)
-        Me.grpList.Location = New System.Drawing.Point(12, 240)
-        Me.grpList.Name = "grpList"
-        Me.grpList.Size = New System.Drawing.Size(880, 350)
-        Me.grpList.TabIndex = 1
-        Me.grpList.TabStop = False
-        Me.grpList.Text = "Danh sách sách"
+        Me.lblFilterPub.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.lblFilterPub.AutoSize = True
+        Me.lblFilterPub.Location = New System.Drawing.Point(363, 17)
+        Me.lblFilterPub.Name = "lblFilterPub"
+        Me.lblFilterPub.Size = New System.Drawing.Size(38, 19)
+        Me.lblFilterPub.TabIndex = 3
+        Me.lblFilterPub.Text = "NXB:"
         '
-        ' txtSearch
+        'btnSearch
         '
-        Me.txtSearch.Location = New System.Drawing.Point(20, 30)
-        Me.txtSearch.Name = "txtSearch"
-        'Me.txtSearch.PlaceholderText = "Nhập tên sách hoặc mã sách..."
-        Me.txtSearch.Size = New System.Drawing.Size(300, 25)
-        Me.txtSearch.TabIndex = 0
-        '
-        ' btnSearch
-        '
-        Me.btnSearch.Location = New System.Drawing.Point(330, 29)
+        Me.btnSearch.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.btnSearch.Location = New System.Drawing.Point(721, 11)
         Me.btnSearch.Name = "btnSearch"
-        Me.btnSearch.Size = New System.Drawing.Size(100, 27)
-        Me.btnSearch.TabIndex = 1
+        Me.btnSearch.Size = New System.Drawing.Size(90, 30)
+        Me.btnSearch.TabIndex = 2
         Me.btnSearch.Text = "Tìm kiếm"
         Me.btnSearch.UseVisualStyleBackColor = True
         '
-        ' dgvBooks
+        'txtSearch
         '
-        Me.dgvBooks.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.txtSearch.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.txtSearch.Location = New System.Drawing.Point(170, 15)
+        Me.txtSearch.Name = "txtSearch"
+        Me.txtSearch.Size = New System.Drawing.Size(177, 25)
+        Me.txtSearch.TabIndex = 1
+        '
+        'pnlTools
+        '
+        Me.pnlTools.Controls.Add(Me.Label1)
+        Me.pnlTools.Controls.Add(Me.btnSearch)
+        Me.pnlTools.Controls.Add(Me.lblFilterPub)
+        Me.pnlTools.Controls.Add(Me.lblFilterYear)
+        Me.pnlTools.Controls.Add(Me.cboFilterYear)
+        Me.pnlTools.Controls.Add(Me.btnDelete)
+        Me.pnlTools.Controls.Add(Me.btnEdit)
+        Me.pnlTools.Controls.Add(Me.cboFilterPublisher)
+        Me.pnlTools.Controls.Add(Me.txtSearch)
+        Me.pnlTools.Dock = System.Windows.Forms.DockStyle.Top
+        Me.pnlTools.Location = New System.Drawing.Point(0, 70)
+        Me.pnlTools.Name = "pnlTools"
+        Me.pnlTools.Size = New System.Drawing.Size(1122, 50)
+        Me.pnlTools.TabIndex = 1
+        '
+        'Label1
+        '
+        Me.Label1.Anchor = CType((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(8, 18)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(156, 19)
+        Me.Label1.TabIndex = 7
+        Me.Label1.Text = "Tìm theo tên hoặc code:"
+        '
+        'btnDelete
+        '
+        Me.btnDelete.BackColor = System.Drawing.Color.IndianRed
+        Me.btnDelete.ForeColor = System.Drawing.Color.White
+        Me.btnDelete.Location = New System.Drawing.Point(1010, 10)
+        Me.btnDelete.Name = "btnDelete"
+        Me.btnDelete.Size = New System.Drawing.Size(100, 30)
+        Me.btnDelete.TabIndex = 2
+        Me.btnDelete.Text = "Xóa sách"
+        Me.btnDelete.UseVisualStyleBackColor = False
+        '
+        'btnEdit
+        '
+        Me.btnEdit.BackColor = System.Drawing.Color.Orange
+        Me.btnEdit.ForeColor = System.Drawing.Color.White
+        Me.btnEdit.Location = New System.Drawing.Point(894, 12)
+        Me.btnEdit.Name = "btnEdit"
+        Me.btnEdit.Size = New System.Drawing.Size(96, 27)
+        Me.btnEdit.TabIndex = 1
+        Me.btnEdit.Text = "Cập nhật"
+        Me.btnEdit.UseVisualStyleBackColor = False
+        '
+        'pnlBottom
+        '
+        Me.pnlBottom.Controls.Add(Me.btnNext)
+        Me.pnlBottom.Controls.Add(Me.lblPageInfo)
+        Me.pnlBottom.Controls.Add(Me.btnPrev)
+        Me.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.pnlBottom.Location = New System.Drawing.Point(0, 621)
+        Me.pnlBottom.Name = "pnlBottom"
+        Me.pnlBottom.Size = New System.Drawing.Size(1122, 40)
+        Me.pnlBottom.TabIndex = 3
+        '
+        'btnNext
+        '
+        Me.btnNext.Location = New System.Drawing.Point(1030, 6)
+        Me.btnNext.Name = "btnNext"
+        Me.btnNext.Size = New System.Drawing.Size(80, 30)
+        Me.btnNext.TabIndex = 2
+        Me.btnNext.Text = "Sau >"
+        Me.btnNext.UseVisualStyleBackColor = True
+        '
+        'lblPageInfo
+        '
+        Me.lblPageInfo.AutoSize = True
+        Me.lblPageInfo.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
+        Me.lblPageInfo.Location = New System.Drawing.Point(459, 11)
+        Me.lblPageInfo.Name = "lblPageInfo"
+        Me.lblPageInfo.Size = New System.Drawing.Size(73, 19)
+        Me.lblPageInfo.TabIndex = 1
+        Me.lblPageInfo.Text = "Trang 0/0"
+        '
+        'btnPrev
+        '
+        Me.btnPrev.Location = New System.Drawing.Point(12, 6)
+        Me.btnPrev.Name = "btnPrev"
+        Me.btnPrev.Size = New System.Drawing.Size(80, 30)
+        Me.btnPrev.TabIndex = 0
+        Me.btnPrev.Text = "< Trước"
+        Me.btnPrev.UseVisualStyleBackColor = True
+        '
+        'dgvBooks
+        '
+        Me.dgvBooks.AllowUserToAddRows = False
+        Me.dgvBooks.AllowUserToDeleteRows = False
         Me.dgvBooks.BackgroundColor = System.Drawing.Color.White
         Me.dgvBooks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgvBooks.Location = New System.Drawing.Point(20, 70)
+        Me.dgvBooks.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.dgvBooks.Location = New System.Drawing.Point(0, 120)
         Me.dgvBooks.MultiSelect = False
         Me.dgvBooks.Name = "dgvBooks"
         Me.dgvBooks.ReadOnly = True
         Me.dgvBooks.RowTemplate.Height = 25
         Me.dgvBooks.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.dgvBooks.Size = New System.Drawing.Size(840, 260)
+        Me.dgvBooks.Size = New System.Drawing.Size(1122, 501)
         Me.dgvBooks.TabIndex = 2
         '
-        ' FrmBookManagement
+        'FrmBookManagement
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(900, 600)
-        Me.Controls.Add(Me.grpList)
-        Me.Controls.Add(Me.grpInfo)
+        Me.ClientSize = New System.Drawing.Size(1122, 661)
+        Me.Controls.Add(Me.dgvBooks)
+        Me.Controls.Add(Me.pnlBottom)
+        Me.Controls.Add(Me.pnlTools)
+        Me.Controls.Add(Me.pnlTop)
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.Name = "FrmBookManagement"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = "Quản Lý Sách - Thư Viện"
-        Me.grpInfo.ResumeLayout(False)
-        Me.grpInfo.PerformLayout()
-        Me.grpList.ResumeLayout(False)
-        Me.grpList.PerformLayout()
+        Me.Text = "Hệ thống quản lý thư viện"
+        Me.pnlTop.ResumeLayout(False)
+        Me.pnlTop.PerformLayout()
+        Me.pnlTools.ResumeLayout(False)
+        Me.pnlTools.PerformLayout()
+        Me.pnlBottom.ResumeLayout(False)
+        Me.pnlBottom.PerformLayout()
         CType(Me.dgvBooks, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 
     End Sub
 
-    Friend WithEvents grpInfo As System.Windows.Forms.GroupBox
-    Friend WithEvents lblCode As System.Windows.Forms.Label
-    Friend WithEvents txtCode As System.Windows.Forms.TextBox
-    Friend WithEvents lblTitle As System.Windows.Forms.Label
-    Friend WithEvents txtTitle As System.Windows.Forms.TextBox
-    Friend WithEvents lblPrice As System.Windows.Forms.Label
-    Friend WithEvents txtPrice As System.Windows.Forms.TextBox
-    Friend WithEvents lblQuantity As System.Windows.Forms.Label
-    Friend WithEvents txtQuantity As System.Windows.Forms.TextBox
-    Friend WithEvents lblAuthor As System.Windows.Forms.Label
-    Friend WithEvents cboAuthor As System.Windows.Forms.ComboBox
-    Friend WithEvents lblCategory As System.Windows.Forms.Label
-    Friend WithEvents cboCategory As System.Windows.Forms.ComboBox
-    Friend WithEvents lblPublisher As System.Windows.Forms.Label
-    Friend WithEvents cboPublisher As System.Windows.Forms.ComboBox
-    Friend WithEvents lblYear As System.Windows.Forms.Label
-    Friend WithEvents txtYear As System.Windows.Forms.TextBox
-    Friend WithEvents btnAdd As System.Windows.Forms.Button
-    Friend WithEvents btnEdit As System.Windows.Forms.Button
-    Friend WithEvents btnDelete As System.Windows.Forms.Button
-    Friend WithEvents btnClear As System.Windows.Forms.Button
-    Friend WithEvents grpList As System.Windows.Forms.GroupBox
-    Friend WithEvents txtSearch As System.Windows.Forms.TextBox
-    Friend WithEvents btnSearch As System.Windows.Forms.Button
-    Friend WithEvents dgvBooks As System.Windows.Forms.DataGridView
+    Friend WithEvents pnlTop As Panel
+    Friend WithEvents lblTitleHeader As Label
+    Friend WithEvents txtSearch As TextBox
+    Friend WithEvents btnSearch As Button
+    Friend WithEvents pnlTools As Panel
+    Friend WithEvents btnAdd As Button
+    Friend WithEvents btnEdit As Button
+    Friend WithEvents btnDelete As Button
+    Friend WithEvents dgvBooks As DataGridView
+    Friend WithEvents cboFilterYear As ComboBox
+    Friend WithEvents lblFilterYear As Label
+    Friend WithEvents cboFilterPublisher As ComboBox
+    Friend WithEvents lblFilterPub As Label
+    Friend WithEvents pnlBottom As Panel
+    Friend WithEvents btnNext As Button
+    Friend WithEvents lblPageInfo As Label
+    Friend WithEvents btnPrev As Button
+    Friend WithEvents Label1 As Label
+    Friend WithEvents btnExcel As Button
 End Class
