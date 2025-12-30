@@ -22,13 +22,11 @@ Public Class FrmAuthorEditor
 
     Private Sub FrmAuthorEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If _authorId = 0 Then
-            ' Chế độ THÊM MỚI
             Me.Text = "Thêm Tác Giả Mới"
             btnSave.Text = "Thêm mới"
             dtpBirthDate.Value = DateTime.Now
             picAvatar.Image = Nothing
         Else
-            ' Chế độ CẬP NHẬT
             Me.Text = "Cập Nhật Tác Giả"
             btnSave.Text = "Lưu thay đổi"
             LoadAuthorData()
@@ -44,7 +42,6 @@ Public Class FrmAuthorEditor
                 txtNation.Text = author.Nationality
                 If author.BirthDate.HasValue Then dtpBirthDate.Value = author.BirthDate.Value
 
-                ' Load ảnh từ URL
                 _currentUrl = author.Avatar
                 If Not String.IsNullOrEmpty(_currentUrl) Then
                     picAvatar.ImageLocation = _currentUrl
@@ -56,7 +53,6 @@ Public Class FrmAuthorEditor
         End Try
     End Sub
 
-    ' Chọn ảnh từ máy tính
     Private Sub btnBrowse_Click(sender As Object, e As EventArgs) Handles btnBrowse.Click
         Using dialog As New OpenFileDialog()
             dialog.Title = "Chọn ảnh đại diện"
@@ -69,10 +65,8 @@ Public Class FrmAuthorEditor
         End Using
     End Sub
 
-    ' Xử lý Lưu (Async để chờ Upload ảnh)
     Private Async Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         Try
-            ' Validate sơ bộ
             If String.IsNullOrWhiteSpace(txtName.Text) Then
                 MessageBox.Show("Vui lòng nhập tên tác giả.")
                 Return
@@ -82,18 +76,16 @@ Public Class FrmAuthorEditor
             btnSave.Text = "Đang xử lý..."
             Cursor = Cursors.WaitCursor
 
-            ' 1. Upload ảnh lên Cloudinary (nếu có thay đổi)
-            Dim finalAvatarUrl As String = _currentUrl ' Mặc định giữ url cũ
+            Dim finalAvatarUrl As String = _currentUrl
 
             If _isImageChanged AndAlso Not String.IsNullOrEmpty(_localImagePath) Then
-                ' Upload lên folder "authors" trên cloud
                 Dim uploadedUrl = Await _cloudinaryService.UploadImageAsync(_localImagePath, "authors")
                 If Not String.IsNullOrEmpty(uploadedUrl) Then
                     finalAvatarUrl = uploadedUrl
                 End If
             End If
 
-            ' 2. Tạo DTO
+
             Dim dto As New AuthorDto With {
                 .AuthorName = txtName.Text.Trim(),
                 .Biography = txtBio.Text.Trim(),
@@ -102,7 +94,7 @@ Public Class FrmAuthorEditor
                 .Avatar = finalAvatarUrl
             }
 
-            ' 3. Gọi Service
+
             If _authorId = 0 Then
                 _service.Add(dto)
                 MessageBox.Show("Thêm mới thành công!")
@@ -111,7 +103,7 @@ Public Class FrmAuthorEditor
                 MessageBox.Show("Cập nhật thành công!")
             End If
 
-            ' 4. Đóng form và trả về OK
+
             Me.DialogResult = DialogResult.OK
             Me.Close()
 
