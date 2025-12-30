@@ -144,5 +144,4 @@ Public Class FrmAuthorList
         End If
         Return Convert.ToInt32(dgvAuthors.SelectedRows(0).Cells("Id").Value)
     End Function
-
 End Class
