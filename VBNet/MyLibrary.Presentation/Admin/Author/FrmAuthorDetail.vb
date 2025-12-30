@@ -5,10 +5,12 @@ Public Class FrmAuthorDetail
     Private ReadOnly _authorId As Integer
     Private ReadOnly _service As IAuthorService
     Private ReadOnly _serviceBook As IBookService
+    Private ReadOnly _imageCache As New Dictionary(Of String, Image)
 
     Private _currentPage As Integer = 1
     Private _pageSize As Integer = 5
     Private _totalPages As Integer = 1
+    Private _currentUrl As String = ""
 
     Private _currentKeyword As String = ""
     Private _currentPublisherId As Integer? = Nothing
@@ -72,6 +74,7 @@ Public Class FrmAuthorDetail
 
     Private Sub LoadData()
         Try
+            Dim author = _service.GetById(_authorId)
 
             Dim detail = _service.GetDetail(_authorId,
                                             _currentKeyword,
@@ -81,6 +84,11 @@ Public Class FrmAuthorDetail
 
             lblAuthorName.Text = detail.AuthorName.ToUpper()
             Me.Text = "Chi tiết: " & detail.AuthorName
+
+            _currentUrl = author.Avatar
+            If Not String.IsNullOrEmpty(_currentUrl) Then
+                picAvatar.ImageLocation = _currentUrl
+            End If
 
             dgvBooks.DataSource = detail.Books.Items
 
@@ -122,6 +130,40 @@ Public Class FrmAuthorDetail
         If _currentPage < _totalPages Then
             _currentPage += 1
             LoadData()
+        End If
+    End Sub
+    Private Sub dgvBooks_CellFormatting(
+    sender As Object,
+    e As DataGridViewCellFormattingEventArgs
+) Handles dgvBooks.CellFormatting
+
+        If dgvBooks.Columns(e.ColumnIndex).Name = "Image" AndAlso e.RowIndex >= 0 Then
+
+            Dim book = TryCast(dgvBooks.Rows(e.RowIndex).DataBoundItem, AuthorBookDto)
+            If book Is Nothing Then Return
+
+            If String.IsNullOrWhiteSpace(book.ImagePath) Then
+                e.Value = Nothing
+                Return
+            End If
+
+            If _imageCache.ContainsKey(book.ImagePath) Then
+                e.Value = _imageCache(book.ImagePath)
+                Return
+            End If
+
+            Try
+                Using wc As New Net.WebClient()
+                    Dim bytes = wc.DownloadData(book.ImagePath)
+                    Using ms As New IO.MemoryStream(bytes)
+                        Dim img = Image.FromStream(ms)
+                        _imageCache(book.ImagePath) = img
+                        e.Value = img
+                    End Using
+                End Using
+            Catch
+                e.Value = Nothing
+            End Try
         End If
     End Sub
 
