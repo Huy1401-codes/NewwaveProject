@@ -3,10 +3,10 @@
 Public Interface IUnitOfWork
     Inherits IDisposable
 
-    ReadOnly Property Authors As IGenericRepository(Of Author)
+    ReadOnly Property Authors As IAuthorRepository
     ReadOnly Property Books As IBookRepository
-    ReadOnly Property Categories As IGenericRepository(Of Category)
-    ReadOnly Property Publishers As IGenericRepository(Of Publisher)
+    ReadOnly Property Categories As ICategoryRepository
+    ReadOnly Property Publishers As IPublisherRepository
 
     ReadOnly Property Users As IUserRepository
     ReadOnly Property Roles As IRoleRepository

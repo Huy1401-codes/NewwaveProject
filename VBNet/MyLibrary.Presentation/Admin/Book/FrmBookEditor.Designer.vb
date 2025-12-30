@@ -38,51 +38,53 @@ Partial Class FrmBookEditor
         Me.picCover = New System.Windows.Forms.PictureBox()
         Me.btnBrowse = New System.Windows.Forms.Button()
         Me.ofdImage = New System.Windows.Forms.OpenFileDialog()
+        Me.lblAvailableQty = New System.Windows.Forms.Label()
+        Me.txtAvailableQty = New System.Windows.Forms.TextBox()
         CType(Me.picCover, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        ' lblCode
+        'lblCode
         '
         Me.lblCode.AutoSize = True
         Me.lblCode.Location = New System.Drawing.Point(20, 25)
         Me.lblCode.Name = "lblCode"
-        Me.lblCode.Size = New System.Drawing.Size(85, 19)
+        Me.lblCode.Size = New System.Drawing.Size(81, 19)
         Me.lblCode.TabIndex = 0
         Me.lblCode.Text = "Mã sách (*):"
         '
-        ' txtCode
+        'txtCode
         '
         Me.txtCode.Location = New System.Drawing.Point(110, 22)
         Me.txtCode.Name = "txtCode"
         Me.txtCode.Size = New System.Drawing.Size(180, 25)
         Me.txtCode.TabIndex = 1
         '
-        ' lblTitle
+        'lblTitle
         '
         Me.lblTitle.AutoSize = True
         Me.lblTitle.Location = New System.Drawing.Point(20, 65)
         Me.lblTitle.Name = "lblTitle"
-        Me.lblTitle.Size = New System.Drawing.Size(86, 19)
+        Me.lblTitle.Size = New System.Drawing.Size(82, 19)
         Me.lblTitle.TabIndex = 2
         Me.lblTitle.Text = "Tên sách (*):"
         '
-        ' txtTitle
+        'txtTitle
         '
         Me.txtTitle.Location = New System.Drawing.Point(110, 62)
         Me.txtTitle.Name = "txtTitle"
         Me.txtTitle.Size = New System.Drawing.Size(300, 25)
         Me.txtTitle.TabIndex = 3
         '
-        ' lblPrice
+        'lblPrice
         '
         Me.lblPrice.AutoSize = True
         Me.lblPrice.Location = New System.Drawing.Point(20, 105)
         Me.lblPrice.Name = "lblPrice"
-        Me.lblPrice.Size = New System.Drawing.Size(60, 19)
+        Me.lblPrice.Size = New System.Drawing.Size(59, 19)
         Me.lblPrice.TabIndex = 4
         Me.lblPrice.Text = "Giá tiền:"
         '
-        ' txtPrice
+        'txtPrice
         '
         Me.txtPrice.Location = New System.Drawing.Point(110, 102)
         Me.txtPrice.Name = "txtPrice"
@@ -90,7 +92,7 @@ Partial Class FrmBookEditor
         Me.txtPrice.TabIndex = 5
         Me.txtPrice.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        ' lblQuantity
+        'lblQuantity
         '
         Me.lblQuantity.AutoSize = True
         Me.lblQuantity.Location = New System.Drawing.Point(20, 145)
@@ -99,7 +101,7 @@ Partial Class FrmBookEditor
         Me.lblQuantity.TabIndex = 6
         Me.lblQuantity.Text = "Số lượng:"
         '
-        ' txtQuantity
+        'txtQuantity
         '
         Me.txtQuantity.Location = New System.Drawing.Point(110, 142)
         Me.txtQuantity.Name = "txtQuantity"
@@ -107,16 +109,16 @@ Partial Class FrmBookEditor
         Me.txtQuantity.TabIndex = 7
         Me.txtQuantity.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
         '
-        ' lblAuthor
+        'lblAuthor
         '
         Me.lblAuthor.AutoSize = True
         Me.lblAuthor.Location = New System.Drawing.Point(20, 185)
         Me.lblAuthor.Name = "lblAuthor"
-        Me.lblAuthor.Size = New System.Drawing.Size(56, 19)
+        Me.lblAuthor.Size = New System.Drawing.Size(52, 19)
         Me.lblAuthor.TabIndex = 8
         Me.lblAuthor.Text = "Tác giả:"
         '
-        ' cboAuthor
+        'cboAuthor
         '
         Me.cboAuthor.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboAuthor.FormattingEnabled = True
@@ -125,16 +127,16 @@ Partial Class FrmBookEditor
         Me.cboAuthor.Size = New System.Drawing.Size(300, 25)
         Me.cboAuthor.TabIndex = 9
         '
-        ' lblCategory
+        'lblCategory
         '
         Me.lblCategory.AutoSize = True
         Me.lblCategory.Location = New System.Drawing.Point(20, 225)
         Me.lblCategory.Name = "lblCategory"
-        Me.lblCategory.Size = New System.Drawing.Size(60, 19)
+        Me.lblCategory.Size = New System.Drawing.Size(59, 19)
         Me.lblCategory.TabIndex = 10
         Me.lblCategory.Text = "Thể loại:"
         '
-        ' cboCategory
+        'cboCategory
         '
         Me.cboCategory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboCategory.FormattingEnabled = True
@@ -143,16 +145,16 @@ Partial Class FrmBookEditor
         Me.cboCategory.Size = New System.Drawing.Size(300, 25)
         Me.cboCategory.TabIndex = 11
         '
-        ' lblPublisher
+        'lblPublisher
         '
         Me.lblPublisher.AutoSize = True
         Me.lblPublisher.Location = New System.Drawing.Point(20, 265)
         Me.lblPublisher.Name = "lblPublisher"
-        Me.lblPublisher.Size = New System.Drawing.Size(41, 19)
+        Me.lblPublisher.Size = New System.Drawing.Size(38, 19)
         Me.lblPublisher.TabIndex = 12
         Me.lblPublisher.Text = "NXB:"
         '
-        ' cboPublisher
+        'cboPublisher
         '
         Me.cboPublisher.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.cboPublisher.FormattingEnabled = True
@@ -161,23 +163,23 @@ Partial Class FrmBookEditor
         Me.cboPublisher.Size = New System.Drawing.Size(300, 25)
         Me.cboPublisher.TabIndex = 13
         '
-        ' lblYear
+        'lblYear
         '
         Me.lblYear.AutoSize = True
-        Me.lblYear.Location = New System.Drawing.Point(220, 145)
+        Me.lblYear.Location = New System.Drawing.Point(25, 310)
         Me.lblYear.Name = "lblYear"
-        Me.lblYear.Size = New System.Drawing.Size(64, 19)
+        Me.lblYear.Size = New System.Drawing.Size(61, 19)
         Me.lblYear.TabIndex = 14
         Me.lblYear.Text = "Năm XB:"
         '
-        ' txtYear
+        'txtYear
         '
-        Me.txtYear.Location = New System.Drawing.Point(290, 142)
+        Me.txtYear.Location = New System.Drawing.Point(110, 307)
         Me.txtYear.Name = "txtYear"
         Me.txtYear.Size = New System.Drawing.Size(120, 25)
         Me.txtYear.TabIndex = 15
         '
-        ' btnSave
+        'btnSave
         '
         Me.btnSave.BackColor = System.Drawing.Color.DodgerBlue
         Me.btnSave.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
@@ -189,7 +191,7 @@ Partial Class FrmBookEditor
         Me.btnSave.Text = "LƯU"
         Me.btnSave.UseVisualStyleBackColor = False
         '
-        ' btnCancel
+        'btnCancel
         '
         Me.btnCancel.BackColor = System.Drawing.Color.WhiteSmoke
         Me.btnCancel.Location = New System.Drawing.Point(560, 310)
@@ -199,7 +201,7 @@ Partial Class FrmBookEditor
         Me.btnCancel.Text = "Hủy bỏ"
         Me.btnCancel.UseVisualStyleBackColor = False
         '
-        ' picCover
+        'picCover
         '
         Me.picCover.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle
         Me.picCover.Location = New System.Drawing.Point(440, 22)
@@ -209,7 +211,7 @@ Partial Class FrmBookEditor
         Me.picCover.TabIndex = 18
         Me.picCover.TabStop = False
         '
-        ' btnBrowse
+        'btnBrowse
         '
         Me.btnBrowse.Location = New System.Drawing.Point(440, 260)
         Me.btnBrowse.Name = "btnBrowse"
@@ -218,16 +220,34 @@ Partial Class FrmBookEditor
         Me.btnBrowse.Text = "Chọn ảnh bìa..."
         Me.btnBrowse.UseVisualStyleBackColor = True
         '
-        ' ofdImage
+        'ofdImage
         '
         Me.ofdImage.Filter = "Image Files|*.jpg;*.jpeg;*.png;*.bmp"
         Me.ofdImage.Title = "Chọn ảnh bìa sách"
         '
-        ' FrmBookEditor
+        'lblAvailableQty
+        '
+        Me.lblAvailableQty.AutoSize = True
+        Me.lblAvailableQty.Location = New System.Drawing.Point(216, 145)
+        Me.lblAvailableQty.Name = "lblAvailableQty"
+        Me.lblAvailableQty.Size = New System.Drawing.Size(109, 19)
+        Me.lblAvailableQty.TabIndex = 20
+        Me.lblAvailableQty.Text = "Số lượng sẵn có:"
+        '
+        'txtAvailableQty
+        '
+        Me.txtAvailableQty.Location = New System.Drawing.Point(331, 142)
+        Me.txtAvailableQty.Name = "txtAvailableQty"
+        Me.txtAvailableQty.Size = New System.Drawing.Size(79, 25)
+        Me.txtAvailableQty.TabIndex = 21
+        Me.txtAvailableQty.TextAlign = System.Windows.Forms.HorizontalAlignment.Right
+        '
+        'FrmBookEditor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 17.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(694, 371)
+        Me.Controls.Add(Me.txtAvailableQty)
         Me.Controls.Add(Me.btnBrowse)
         Me.Controls.Add(Me.picCover)
         Me.Controls.Add(Me.btnCancel)
@@ -248,6 +268,7 @@ Partial Class FrmBookEditor
         Me.Controls.Add(Me.lblTitle)
         Me.Controls.Add(Me.txtCode)
         Me.Controls.Add(Me.lblCode)
+        Me.Controls.Add(Me.lblAvailableQty)
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog
         Me.MaximizeBox = False
@@ -258,6 +279,7 @@ Partial Class FrmBookEditor
         CType(Me.picCover, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
+
     End Sub
 
     Friend WithEvents lblCode As Label
@@ -281,4 +303,6 @@ Partial Class FrmBookEditor
     Friend WithEvents picCover As PictureBox
     Friend WithEvents btnBrowse As Button
     Friend WithEvents ofdImage As OpenFileDialog
+    Friend WithEvents lblAvailableQty As Label
+    Friend WithEvents txtAvailableQty As TextBox
 End Class

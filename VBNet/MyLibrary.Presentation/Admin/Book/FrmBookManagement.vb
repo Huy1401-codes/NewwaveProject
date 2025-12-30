@@ -2,7 +2,6 @@
 Imports AutoMapper
 Imports MyLibrary.BLL
 Imports MyLibrary.BLL.BusinessAccessLayer.Services
-Imports MyLibrary.BusinessAccessLayer.Services
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
 
@@ -33,6 +32,14 @@ Public Class FrmBookManagement
         LoadFilters()
 
         LoadData()
+
+        Me.BackColor = Color.WhiteSmoke
+        Dim lbl As New Label()
+        lbl.Text = "QUẢN LÝ SÁCH"
+        lbl.Font = New Font("Segoe UI", 14, FontStyle.Bold)
+        lbl.AutoSize = True
+        lbl.Location = New Point(20, 20)
+        Me.Controls.Add(lbl)
     End Sub
 
     Private Sub ConfigGrid()
@@ -173,12 +180,12 @@ Public Class FrmBookManagement
         If dgvBooks.SelectedRows.Count = 0 Then Return
         Dim selectedId As Integer = Convert.ToInt32(dgvBooks.SelectedRows(0).Cells("Id").Value)
 
-        If MessageBox.Show("Bạn có chắc muốn xóa?", "Xác nhận", MessageBoxButtons.YesNo) = DialogResult.Yes Then
+        If MessageBox.Show("Bạn có chắc muốn xóa ?", "Xác nhận", MessageBoxButtons.YesNo) = DialogResult.Yes Then
             Try
                 _bookService.DeleteBook(selectedId)
                 LoadData()
             Catch ex As Exception
-                MessageBox.Show(ex.Message)
+                MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             End Try
         End If
     End Sub
@@ -212,5 +219,25 @@ Public Class FrmBookManagement
                 frm.ShowDialog()
             End Using
         End If
+    End Sub
+
+    Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
+        Using ofd As New OpenFileDialog()
+            ofd.Title = "Chọn file Excel"
+            ofd.Filter = "Excel Files (*.xlsx)|*.xlsx"
+            ofd.Multiselect = False
+
+            If ofd.ShowDialog() = DialogResult.OK Then
+                Dim filePath As String = ofd.FileName
+                Dim fileBytes As Byte() = IO.File.ReadAllBytes(filePath)
+
+                _bookService.ImportBooksFromExcelToDb(fileBytes)
+
+                MessageBox.Show("Import thành công!",
+                            "Thông báo",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information)
+            End If
+        End Using
     End Sub
 End Class

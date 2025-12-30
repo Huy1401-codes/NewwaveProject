@@ -7,5 +7,10 @@
     Public Const FullNameNotNull As String = "Họ tên không được để trống"
     Public Const EmailNotNull As String = "Email không được để trống"
     Public Const PasswordNotNull As String = "Password không được để trống"
+    Public Const EmailExist As String = "Email đã tồn tại"
+    Public Const AccountIsActive As String = "Acoount đã được kích hoạt"
+    Public Const CodeError As String = "Code hết hạn"
+    Public Const CodeExpired As String = "Mã xác thực đã hết hạn. Vui lòng đăng ký lại"
+    Public Const AccountNotExist As String = "User không tồn tại"
 
 End Class
