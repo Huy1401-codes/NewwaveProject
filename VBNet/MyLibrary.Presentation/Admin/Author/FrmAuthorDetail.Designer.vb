@@ -38,7 +38,7 @@ Partial Class FrmAuthorDetail
         Me.pnlPaging.SuspendLayout()
         Me.SuspendLayout()
         '
-        'pnlInfo (Thông tin tác giả)
+        'pnlInfo 
         '
         Me.pnlInfo.BackColor = System.Drawing.Color.WhiteSmoke
         Me.pnlInfo.Controls.Add(Me.lblAuthorName)
@@ -126,17 +126,18 @@ Partial Class FrmAuthorDetail
         Me.btnSearch.Text = "Tìm kiếm"
         Me.btnSearch.UseVisualStyleBackColor = True
         '
-        'dgvBooks (Lưới hiển thị sách)
+        'dgvBooks 
         '
         Me.dgvBooks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvBooks.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgvBooks.Location = New System.Drawing.Point(0, 150)
         Me.dgvBooks.Name = "dgvBooks"
-        Me.dgvBooks.RowTemplate.Height = 25
+        Me.dgvBooks.ColumnHeadersHeight = 60
+        Me.dgvBooks.RowTemplate.Height = 150
         Me.dgvBooks.Size = New System.Drawing.Size(800, 250)
         Me.dgvBooks.TabIndex = 2
         '
-        'pnlPaging (Thanh phân trang ở dưới)
+        'pnlPaging 
         '
         Me.pnlPaging.Controls.Add(Me.lblPageInfo)
         Me.pnlPaging.Controls.Add(Me.btnNext)
