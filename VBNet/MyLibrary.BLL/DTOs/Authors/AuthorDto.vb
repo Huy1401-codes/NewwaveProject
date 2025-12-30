@@ -1,7 +1,8 @@
 ﻿Public Class AuthorDto
     Public Property Id As Integer
     Public Property AuthorName As String
-    Public Property CreatedAt As DateTime
-    Public Property UpdatedAt As DateTime?
-    Public Property IsDeleted As Boolean
+    Public Property Biography As String
+    Public Property BirthDate As DateTime?
+    Public Property Nationality As String
+    Public Property Avatar As String
 End Class

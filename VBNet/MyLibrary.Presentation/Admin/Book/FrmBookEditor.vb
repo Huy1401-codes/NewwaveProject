@@ -42,6 +42,7 @@ Public Class FrmBookEditor
             txtPrice.ReadOnly = True
             txtQuantity.ReadOnly = True
             txtYear.ReadOnly = True
+            txtAvailableQty.ReadOnly = True
             cboAuthor.Enabled = False
             cboCategory.Enabled = False
             cboPublisher.Enabled = False
@@ -67,6 +68,7 @@ Public Class FrmBookEditor
         txtTitle.Clear()
         txtPrice.Text = "0"
         txtQuantity.Text = "0"
+        txtAvailableQty.Text = "0"
         txtYear.Clear()
         cboAuthor.SelectedIndex = -1
         cboCategory.SelectedIndex = -1
@@ -86,7 +88,7 @@ Public Class FrmBookEditor
             txtPrice.Text = If(book.Price.HasValue, book.Price.Value.ToString("0"), "0")
             txtQuantity.Text = book.Quantity.ToString()
             txtYear.Text = If(book.PublishYear.HasValue, book.PublishYear.Value.ToString(), "")
-
+            txtAvailableQty.Text = book.AvailableQuantity.ToString()
             cboAuthor.SelectedValue = If(book.AuthorId, -1)
             cboCategory.SelectedValue = If(book.CategoryId, -1)
             cboPublisher.SelectedValue = If(book.PublisherId, -1)
@@ -122,52 +124,65 @@ Public Class FrmBookEditor
                 MessageBox.Show("Vui lòng nhập Mã sách")
                 Return
             End If
+
             If String.IsNullOrWhiteSpace(txtTitle.Text) Then
                 MessageBox.Show("Vui lòng nhập Tên sách")
                 Return
             End If
-            If String.IsNullOrWhiteSpace(txtPrice.Text) Then
-                MessageBox.Show("Vui lòng nhập giá tiền")
-                Return
-            End If
-            If String.IsNullOrWhiteSpace(txtQuantity.Text) Then
-                MessageBox.Show("Vui lòng nhập số lượng")
-                Return
-            End If
-            If String.IsNullOrWhiteSpace(txtYear.Text) Then
-                MessageBox.Show("Vui lòng nhập năm xuất bản")
-                Return
-            End If
 
             Dim price As Decimal
-            If Not Decimal.TryParse(txtPrice.Text.Trim(), price) Then
-                MessageBox.Show("Giá tiền phải là số hợp lệ")
-                Return
-            End If
-            If price < 0 Then
-                MessageBox.Show("Giá tiền không được là số âm")
+            If Not Decimal.TryParse(txtPrice.Text.Trim(), price) OrElse price < 0 Then
+                MessageBox.Show("Giá tiền phải là số không âm")
                 Return
             End If
 
             Dim quantity As Integer
-            If Not Integer.TryParse(txtQuantity.Text.Trim(), quantity) Then
-                MessageBox.Show("Số lượng phải là số nguyên")
+            If Not Integer.TryParse(txtQuantity.Text.Trim(), quantity) OrElse quantity < 0 Then
+                MessageBox.Show("Số lượng phải là số nguyên không âm")
                 Return
             End If
-            If quantity < 0 Then
-                MessageBox.Show("Số lượng không được là số âm")
+
+            Dim availableQty As Integer
+            If Not Integer.TryParse(txtAvailableQty.Text.Trim(), availableQty) OrElse availableQty < 0 Then
+                MessageBox.Show("Số lượng còn phải là số nguyên không âm")
                 Return
+            End If
+
+            If availableQty > quantity Then
+                MessageBox.Show(
+                "Số lượng còn không được lớn hơn tổng số lượng",
+                "Không hợp lệ",
+                MessageBoxButtons.OK,
+                MessageBoxIcon.Warning)
+                Return
+            End If
+
+            If _bookId > 0 Then
+                Dim oldBook = _bookService.GetBookById(_bookId)
+                If oldBook Is Nothing Then
+                    MessageBox.Show("Không tìm thấy sách")
+                    Return
+                End If
+
+                Dim borrowed = oldBook.Quantity - oldBook.AvailableQuantity
+                If quantity < borrowed Then
+                    MessageBox.Show(
+                    $"Số lượng mới ({quantity}) không được nhỏ hơn số đang cho mượn ({borrowed})",
+                    "Không hợp lệ",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning)
+                    Return
+                End If
             End If
 
             Dim year As Integer? = Nothing
             If Not String.IsNullOrWhiteSpace(txtYear.Text) Then
                 Dim tempYear As Integer
-                If Integer.TryParse(txtYear.Text.Trim(), tempYear) Then
-                    year = tempYear
-                Else
-                    MessageBox.Show("Năm xuất bản phải là số nguyên hợp lệ")
+                If Not Integer.TryParse(txtYear.Text.Trim(), tempYear) Then
+                    MessageBox.Show("Năm xuất bản phải là số nguyên")
                     Return
                 End If
+                year = tempYear
             End If
 
             btnSave.Enabled = False
@@ -175,13 +190,10 @@ Public Class FrmBookEditor
             Me.Cursor = Cursors.WaitCursor
 
             Dim finalImageUrl As String = _currentUrl
-
             If _isImageChanged AndAlso Not String.IsNullOrEmpty(_currentLocalPath) Then
                 Dim uploadedUrl = Await _cloudinaryService.UploadImageAsync(_currentLocalPath, "book-covers")
                 If Not String.IsNullOrEmpty(uploadedUrl) Then
                     finalImageUrl = uploadedUrl
-                Else
-                    MessageBox.Show("Không thể upload ảnh, sẽ lưu sách không có ảnh mới.")
                 End If
             End If
 
@@ -191,10 +203,11 @@ Public Class FrmBookEditor
             .Title = txtTitle.Text.Trim(),
             .Price = price,
             .Quantity = quantity,
+            .AvailableQuantity = availableQty,
             .PublishYear = year,
-            .AuthorId = Convert.ToInt32(cboAuthor.SelectedValue),
-            .CategoryId = Convert.ToInt32(cboCategory.SelectedValue),
-            .PublisherId = Convert.ToInt32(cboPublisher.SelectedValue),
+            .AuthorId = CInt(cboAuthor.SelectedValue),
+            .CategoryId = CInt(cboCategory.SelectedValue),
+            .PublisherId = CInt(cboPublisher.SelectedValue),
             .ImagePath = finalImageUrl
         }
 
@@ -218,9 +231,10 @@ Public Class FrmBookEditor
         End Try
     End Sub
 
-
     Private Sub btnCancel_Click(sender As Object, e As EventArgs) Handles btnCancel.Click
         Me.DialogResult = DialogResult.Cancel
         Me.Close()
     End Sub
+
+
 End Class

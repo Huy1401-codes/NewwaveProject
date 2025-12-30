@@ -12,4 +12,6 @@ Public Interface IBookService
     Sub DeleteBook(id As Integer)
     Function GetBookById(id As Integer) As Book
     Function ExportBooksToExcel(books As List(Of BookDto)) As Byte()
+    Sub ImportBooksFromExcelToDb(fileBytes As Byte())
+
 End Interface

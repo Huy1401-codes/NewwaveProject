@@ -15,4 +15,11 @@ Public Class BookRepository
                      .Where(Function(b) Not b.IsDeleted) _
                      .ToList()
     End Function
+
+    Public Function ExistsByCode(bookCode As String) As Boolean _
+       Implements IBookRepository.ExistsByCode
+
+        Return _dbSet.Any(Function(b) _
+            b.BookCode = bookCode AndAlso b.IsDeleted = False)
+    End Function
 End Class

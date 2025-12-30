@@ -98,22 +98,46 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Admin\Author\FrmAuthorDetail.Designer.vb">
+      <DependentUpon>FrmAuthorDetail.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Author\FrmAuthorDetail.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Author\FrmAuthorEditor.Designer.vb">
+      <DependentUpon>FrmAuthorEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Author\FrmAuthorEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Author\FrmAuthorList.Designer.vb">
+      <DependentUpon>FrmAuthorList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Author\FrmAuthorList.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Book\FrmLibraryManager.Designer.vb">
+      <DependentUpon>FrmLibraryManager.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Book\FrmLibraryManager.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Admin\FrmAdminMain.Designer.vb">
       <DependentUpon>FrmAdminMain.vb</DependentUpon>
     </Compile>
     <Compile Include="Admin\FrmAdminMain.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Admin\FrmBookEditor.Designer.vb">
+    <Compile Include="Admin\Book\FrmBookEditor.Designer.vb">
       <DependentUpon>FrmBookEditor.vb</DependentUpon>
     </Compile>
-    <Compile Include="Admin\FrmBookEditor.vb">
+    <Compile Include="Admin\Book\FrmBookEditor.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Admin\FrmBookManagement.Designer.vb">
+    <Compile Include="Admin\Book\FrmBookManagement.Designer.vb">
       <DependentUpon>FrmBookManagement.vb</DependentUpon>
     </Compile>
-    <Compile Include="Admin\FrmBookManagement.vb">
+    <Compile Include="Admin\Book\FrmBookManagement.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Admin\FrmBorrowManagement.Designer.vb">
@@ -153,7 +177,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Auth\SessionManager.vb" />
-    <Compile Include="Helper\CloudinaryConfigProvider.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -178,8 +201,17 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Admin\FrmBookManagement.resx">
+    <EmbeddedResource Include="Admin\Author\FrmAuthorDetail.resx">
+      <DependentUpon>FrmAuthorDetail.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Book\FrmBookEditor.resx">
+      <DependentUpon>FrmBookEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Book\FrmBookManagement.resx">
       <DependentUpon>FrmBookManagement.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Book\FrmLibraryManager.resx">
+      <DependentUpon>FrmLibraryManager.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Auth\FrmLogin.resx">
       <DependentUpon>FrmLogin.vb</DependentUpon>
@@ -224,7 +256,9 @@
       <Name>MyLibrary.Domain</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Helper\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

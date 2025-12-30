@@ -9,12 +9,12 @@ Public Class UnitOfWork
         _context = New AppDbContext()
     End Sub
 
-    Private _authors As IGenericRepository(Of Author)
-    Public ReadOnly Property Authors As IGenericRepository(Of Author) _
+    Private _authors As IAuthorRepository
+    Public ReadOnly Property Authors As IAuthorRepository _
         Implements IUnitOfWork.Authors
         Get
             If _authors Is Nothing Then
-                _authors = New GenericRepository(Of Author)(_context)
+                _authors = New AuthorRepository(_context)
             End If
             Return _authors
         End Get
@@ -31,23 +31,23 @@ Public Class UnitOfWork
         End Get
     End Property
 
-    Private _categories As IGenericRepository(Of Category)
-    Public ReadOnly Property Categories As IGenericRepository(Of Category) _
+    Private _categories As ICategoryRepository
+    Public ReadOnly Property Categories As ICategoryRepository _
         Implements IUnitOfWork.Categories
         Get
             If _categories Is Nothing Then
-                _categories = New GenericRepository(Of Category)(_context)
+                _categories = New CategoryRepository(_context)
             End If
             Return _categories
         End Get
     End Property
 
-    Private _publishers As IGenericRepository(Of Publisher)
-    Public ReadOnly Property Publishers As IGenericRepository(Of Publisher) _
+    Private _publishers As IPublisherRepository
+    Public ReadOnly Property Publishers As IPublisherRepository _
         Implements IUnitOfWork.Publishers
         Get
             If _publishers Is Nothing Then
-                _publishers = New GenericRepository(Of Publisher)(_context)
+                _publishers = New PublisherRepository(_context)
             End If
             Return _publishers
         End Get
