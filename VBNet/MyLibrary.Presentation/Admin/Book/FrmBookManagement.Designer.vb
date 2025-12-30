@@ -19,6 +19,7 @@ Partial Class FrmBookManagement
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.btnImport = New System.Windows.Forms.Button()
         Me.btnExcel = New System.Windows.Forms.Button()
         Me.lblTitleHeader = New System.Windows.Forms.Label()
@@ -47,6 +48,7 @@ Partial Class FrmBookManagement
         'pnlTop
         '
         Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.Button1)
         Me.pnlTop.Controls.Add(Me.btnImport)
         Me.pnlTop.Controls.Add(Me.btnExcel)
         Me.pnlTop.Controls.Add(Me.lblTitleHeader)
@@ -56,6 +58,15 @@ Partial Class FrmBookManagement
         Me.pnlTop.Name = "pnlTop"
         Me.pnlTop.Size = New System.Drawing.Size(1122, 70)
         Me.pnlTop.TabIndex = 0
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(16, 18)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(98, 29)
+        Me.Button1.TabIndex = 3
+        Me.Button1.Text = "Quay lại"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'btnImport
         '
@@ -84,7 +95,7 @@ Partial Class FrmBookManagement
         Me.lblTitleHeader.AutoSize = True
         Me.lblTitleHeader.Font = New System.Drawing.Font("Segoe UI", 14.0!, System.Drawing.FontStyle.Bold)
         Me.lblTitleHeader.ForeColor = System.Drawing.Color.DimGray
-        Me.lblTitleHeader.Location = New System.Drawing.Point(33, 17)
+        Me.lblTitleHeader.Location = New System.Drawing.Point(431, 17)
         Me.lblTitleHeader.Name = "lblTitleHeader"
         Me.lblTitleHeader.Size = New System.Drawing.Size(150, 25)
         Me.lblTitleHeader.TabIndex = 0
@@ -307,4 +318,5 @@ Partial Class FrmBookManagement
     Friend WithEvents Label1 As Label
     Friend WithEvents btnExcel As Button
     Friend WithEvents btnImport As Button
+    Friend WithEvents Button1 As Button
 End Class

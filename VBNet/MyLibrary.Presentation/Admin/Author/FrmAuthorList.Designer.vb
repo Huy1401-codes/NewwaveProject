@@ -21,6 +21,8 @@ Partial Class FrmAuthorList
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.Button1 = New System.Windows.Forms.Button()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.btnSearch = New System.Windows.Forms.Button()
         Me.txtSearch = New System.Windows.Forms.TextBox()
@@ -42,19 +44,40 @@ Partial Class FrmAuthorList
         '
         'pnlTop
         '
+        Me.pnlTop.Controls.Add(Me.Button1)
+        Me.pnlTop.Controls.Add(Me.Label2)
         Me.pnlTop.Controls.Add(Me.Label1)
         Me.pnlTop.Controls.Add(Me.btnSearch)
         Me.pnlTop.Controls.Add(Me.txtSearch)
         Me.pnlTop.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlTop.Location = New System.Drawing.Point(0, 0)
         Me.pnlTop.Name = "pnlTop"
-        Me.pnlTop.Size = New System.Drawing.Size(741, 43)
+        Me.pnlTop.Size = New System.Drawing.Size(741, 90)
         Me.pnlTop.TabIndex = 0
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(15, 20)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(75, 23)
+        Me.Button1.TabIndex = 4
+        Me.Button1.Text = "Quay Lại"
+        Me.Button1.UseVisualStyleBackColor = True
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Font = New System.Drawing.Font("Segoe UI", 16.0!, System.Drawing.FontStyle.Bold)
+        Me.Label2.Location = New System.Drawing.Point(299, 13)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(176, 30)
+        Me.Label2.TabIndex = 3
+        Me.Label2.Text = "Quản Lý Tác Giả"
         '
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(12, 15)
+        Me.Label1.Location = New System.Drawing.Point(12, 67)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(126, 13)
         Me.Label1.TabIndex = 2
@@ -62,7 +85,7 @@ Partial Class FrmAuthorList
         '
         'btnSearch
         '
-        Me.btnSearch.Location = New System.Drawing.Point(420, 12)
+        Me.btnSearch.Location = New System.Drawing.Point(421, 62)
         Me.btnSearch.Name = "btnSearch"
         Me.btnSearch.Size = New System.Drawing.Size(64, 22)
         Me.btnSearch.TabIndex = 1
@@ -71,7 +94,7 @@ Partial Class FrmAuthorList
         '
         'txtSearch
         '
-        Me.txtSearch.Location = New System.Drawing.Point(144, 14)
+        Me.txtSearch.Location = New System.Drawing.Point(144, 64)
         Me.txtSearch.Name = "txtSearch"
         Me.txtSearch.Size = New System.Drawing.Size(258, 20)
         Me.txtSearch.TabIndex = 0
@@ -82,7 +105,7 @@ Partial Class FrmAuthorList
         Me.pnlBottom.Controls.Add(Me.btnNext)
         Me.pnlBottom.Controls.Add(Me.btnPrev)
         Me.pnlBottom.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.pnlBottom.Location = New System.Drawing.Point(0, 470)
+        Me.pnlBottom.Location = New System.Drawing.Point(0, 507)
         Me.pnlBottom.Name = "pnlBottom"
         Me.pnlBottom.Size = New System.Drawing.Size(741, 43)
         Me.pnlBottom.TabIndex = 1
@@ -121,9 +144,9 @@ Partial Class FrmAuthorList
         Me.pnlActions.Controls.Add(Me.btnEdit)
         Me.pnlActions.Controls.Add(Me.btnAdd)
         Me.pnlActions.Dock = System.Windows.Forms.DockStyle.Right
-        Me.pnlActions.Location = New System.Drawing.Point(612, 43)
+        Me.pnlActions.Location = New System.Drawing.Point(612, 90)
         Me.pnlActions.Name = "pnlActions"
-        Me.pnlActions.Size = New System.Drawing.Size(129, 427)
+        Me.pnlActions.Size = New System.Drawing.Size(129, 417)
         Me.pnlActions.TabIndex = 2
         '
         'btnDetail
@@ -166,17 +189,17 @@ Partial Class FrmAuthorList
         '
         Me.dgvAuthors.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgvAuthors.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.dgvAuthors.Location = New System.Drawing.Point(0, 43)
+        Me.dgvAuthors.Location = New System.Drawing.Point(0, 90)
         Me.dgvAuthors.Name = "dgvAuthors"
         Me.dgvAuthors.RowTemplate.Height = 25
-        Me.dgvAuthors.Size = New System.Drawing.Size(612, 427)
+        Me.dgvAuthors.Size = New System.Drawing.Size(612, 417)
         Me.dgvAuthors.TabIndex = 3
         '
         'FrmAuthorList
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(741, 513)
+        Me.ClientSize = New System.Drawing.Size(741, 550)
         Me.Controls.Add(Me.dgvAuthors)
         Me.Controls.Add(Me.pnlActions)
         Me.Controls.Add(Me.pnlBottom)
@@ -208,4 +231,6 @@ Partial Class FrmAuthorList
     Friend WithEvents btnAdd As System.Windows.Forms.Button
     Friend WithEvents dgvAuthors As System.Windows.Forms.DataGridView
     Friend WithEvents Label1 As Label
+    Friend WithEvents Button1 As Button
+    Friend WithEvents Label2 As Label
 End Class

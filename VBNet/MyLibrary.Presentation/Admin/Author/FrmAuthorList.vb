@@ -144,4 +144,9 @@ Public Class FrmAuthorList
         End If
         Return Convert.ToInt32(dgvAuthors.SelectedRows(0).Cells("Id").Value)
     End Function
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        FrmLibraryManager.Show()
+        Me.Close()
+    End Sub
 End Class
