@@ -14,9 +14,11 @@ Public Class FrmAuthorDetail
 
     Private _currentKeyword As String = ""
     Private _currentPublisherId As Integer? = Nothing
-
-    Public Sub New(id As Integer, service As IAuthorService, serviceBook As IBookService)
+    Public Sub New()
         InitializeComponent()
+    End Sub
+    Public Sub New(id As Integer, service As IAuthorService, serviceBook As IBookService)
+        Me.New()
         _authorId = id
         _service = service
         _serviceBook = serviceBook
