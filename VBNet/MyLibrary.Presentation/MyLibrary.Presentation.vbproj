@@ -204,6 +204,9 @@
     <EmbeddedResource Include="Admin\Author\FrmAuthorDetail.resx">
       <DependentUpon>FrmAuthorDetail.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Author\FrmAuthorList.resx">
+      <DependentUpon>FrmAuthorList.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\Book\FrmBookEditor.resx">
       <DependentUpon>FrmBookEditor.vb</DependentUpon>
     </EmbeddedResource>
