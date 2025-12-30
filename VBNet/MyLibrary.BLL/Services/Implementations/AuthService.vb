@@ -73,12 +73,14 @@ Public Class AuthService
             .RoleName = "Customer",
             .IsDeleted = False
         }
+            logger.Info("Tạo role mới thành công")
             _uow.Roles.Add(defaultRole)
             _uow.Save()
         End If
 
         If _uow.Users.ExistsByEmail(email) Then
-            Throw New Exception("Email đã tồn tại")
+            logger.Warn("Email tồn tại")
+            Throw New Exception(AuthMessages.EmailExist)
         End If
 
         Dim otpCode As String = GenerateOTP()
@@ -102,7 +104,9 @@ Public Class AuthService
         .RoleId = defaultRole.Id
     })
 
+
         Try
+            logger.Info("Tạo account mới thành công")
             _uow.Save()
         Catch ex As Exception
             Dim msg As String = ex.Message
@@ -121,6 +125,7 @@ Public Class AuthService
             "Xác thực đăng ký tài khoản",
             $"<h3>Xin chào {user.FullName}</h3><p>Mã OTP: {otpCode}</p>"
         )
+            logger.Info("Gửi email thành công")
         Catch ex As Exception
 
         End Try
@@ -135,25 +140,30 @@ Public Class AuthService
         Dim user = _uow.Users.GetByEmail(email.Trim().ToLower())
 
         If user Is Nothing Then
-            Throw New Exception("Email không tồn tại")
+            logger.Warn("Email tồn tại")
+            Throw New Exception(AuthMessages.EmailExist)
         End If
 
         If user.IsActive Then
-            Throw New Exception("Tài khoản này đã được kích hoạt rồi.")
+            logger.Warn("Account đã được kích hoạt")
+            Throw New Exception(AuthMessages.AccountIsActive)
         End If
 
         If user.VerificationCode <> code Then
-            Throw New Exception("Mã xác thực không đúng.")
+            logger.Info("Code không đúng")
+            Throw New Exception(AuthMessages.CodeError)
         End If
 
         If user.CodeExpiration.HasValue AndAlso user.CodeExpiration.Value < DateTime.Now Then
-            Throw New Exception("Mã xác thực đã hết hạn. Vui lòng đăng ký lại.")
+            logger.Info("Code hết hạn")
+            Throw New Exception(AuthMessages.CodeExpired)
         End If
 
         user.IsActive = True
         user.VerificationCode = Nothing
         user.CodeExpiration = Nothing
 
+        logger.Info("Tạo mới thành công")
         _uow.Users.Update(user)
         _uow.Save()
     End Sub
@@ -176,6 +186,7 @@ Public Class AuthService
         user.VerificationCode = otpCode
         user.CodeExpiration = DateTime.Now.AddMinutes(15)
 
+        logger.Info("Thành công")
         _uow.Users.Update(user)
         _uow.Save()
 
@@ -193,15 +204,17 @@ Public Class AuthService
     Implements IAuthService.CompletePasswordReset
 
         Dim user = _uow.Users.GetByEmail(email.Trim().ToLower())
-        If user Is Nothing Then Throw New Exception("User không tồn tại")
+        If user Is Nothing Then Throw New Exception(AuthMessages.AccountNotExist)
 
 
         If String.IsNullOrEmpty(user.VerificationCode) OrElse user.VerificationCode <> otp Then
-            Throw New Exception("Mã xác thực sai hoặc không hợp lệ")
+            logger.Warn("Code lỗi")
+            Throw New Exception(AuthMessages.CodeError)
         End If
 
         If user.CodeExpiration.HasValue AndAlso user.CodeExpiration.Value < DateTime.Now Then
-            Throw New Exception("Mã xác thực đã hết hạn")
+            logger.Warn("Code hết hạn")
+            Throw New Exception(AuthMessages.CodeExpired)
         End If
 
         user.PasswordHash = HashPassword(newPassword)
@@ -209,6 +222,7 @@ Public Class AuthService
         user.VerificationCode = Nothing
         user.CodeExpiration = Nothing
 
+        logger.Warn("Reset password thành công")
         _uow.Users.Update(user)
         _uow.Save()
     End Sub

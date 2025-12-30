@@ -19,6 +19,7 @@ Partial Class FrmBookManagement
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlTop = New System.Windows.Forms.Panel()
+        Me.btnImport = New System.Windows.Forms.Button()
         Me.btnExcel = New System.Windows.Forms.Button()
         Me.lblTitleHeader = New System.Windows.Forms.Label()
         Me.btnAdd = New System.Windows.Forms.Button()
@@ -46,6 +47,7 @@ Partial Class FrmBookManagement
         'pnlTop
         '
         Me.pnlTop.BackColor = System.Drawing.Color.WhiteSmoke
+        Me.pnlTop.Controls.Add(Me.btnImport)
         Me.pnlTop.Controls.Add(Me.btnExcel)
         Me.pnlTop.Controls.Add(Me.lblTitleHeader)
         Me.pnlTop.Controls.Add(Me.btnAdd)
@@ -54,6 +56,17 @@ Partial Class FrmBookManagement
         Me.pnlTop.Name = "pnlTop"
         Me.pnlTop.Size = New System.Drawing.Size(1122, 70)
         Me.pnlTop.TabIndex = 0
+        '
+        'btnImport
+        '
+        Me.btnImport.BackColor = System.Drawing.Color.BurlyWood
+        Me.btnImport.ForeColor = System.Drawing.Color.White
+        Me.btnImport.Location = New System.Drawing.Point(772, 17)
+        Me.btnImport.Name = "btnImport"
+        Me.btnImport.Size = New System.Drawing.Size(100, 30)
+        Me.btnImport.TabIndex = 2
+        Me.btnImport.Text = "Import Excel"
+        Me.btnImport.UseVisualStyleBackColor = False
         '
         'btnExcel
         '
@@ -293,4 +306,5 @@ Partial Class FrmBookManagement
     Friend WithEvents btnPrev As Button
     Friend WithEvents Label1 As Label
     Friend WithEvents btnExcel As Button
+    Friend WithEvents btnImport As Button
 End Class

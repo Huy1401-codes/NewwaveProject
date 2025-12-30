@@ -7,7 +7,7 @@
     End Sub
 
     Private Sub btnManageBooks_Click(sender As Object, e As EventArgs) Handles btnManageBooks.Click
-        Dim frm As New FrmBookManagement()
+        Dim frm As New FrmLibraryManager()
         Me.Hide()
         frm.ShowDialog()
         Me.Show()

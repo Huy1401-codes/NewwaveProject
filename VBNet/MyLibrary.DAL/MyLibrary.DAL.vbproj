@@ -103,13 +103,19 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Repositories\Implementations\AuthorRepository.vb" />
     <Compile Include="Repositories\Implementations\BookRepository.vb" />
+    <Compile Include="Repositories\Implementations\CategoryRepository.vb" />
     <Compile Include="Repositories\Implementations\GenericRepository.vb" />
+    <Compile Include="Repositories\Implementations\PublisherRepository.vb" />
+    <Compile Include="Repositories\Interfaces\IAuthorRepository.vb" />
     <Compile Include="Repositories\Implementations\RoleRepository.vb" />
     <Compile Include="Repositories\Implementations\UserRepository.vb" />
     <Compile Include="Repositories\Implementations\UserRoleRepository.vb" />
     <Compile Include="Repositories\Interfaces\IBookRepository.vb" />
+    <Compile Include="Repositories\Interfaces\ICategoryRepository.vb" />
     <Compile Include="Repositories\Interfaces\IGenericRepository.vb" />
+    <Compile Include="Repositories\Interfaces\IPublisherRepository.vb" />
     <Compile Include="Repositories\Interfaces\IRoleRepository.vb" />
     <Compile Include="Repositories\Interfaces\IUserRepository.vb" />
     <Compile Include="Repositories\Interfaces\IUserRoleRepository.vb" />
