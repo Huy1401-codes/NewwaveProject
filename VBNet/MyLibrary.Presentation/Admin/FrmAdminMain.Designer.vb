@@ -46,7 +46,7 @@ Partial Class FrmAdminMain
 
         Me.btnManageBooks.Location = New Point(30, 40)
         Me.btnManageBooks.Size = New Size(220, 80)
-        Me.btnManageBooks.Text = "QUẢN LÝ SÁCH"
+        Me.btnManageBooks.Text = "QUẢN LÝ THƯ VIỆN"
         Me.btnManageBooks.Font = New Font("Segoe UI", 10, FontStyle.Bold)
         Me.btnManageBooks.BackColor = Color.LightBlue
 
