@@ -206,11 +206,13 @@
     <Compile Include="Mapping\CategoryMappingProfile.vb" />
     <Compile Include="Messages\Auth\AuthMessages.vb" />
     <Compile Include="Messages\Auth\BookMessages.vb" />
+    <Compile Include="Messages\Category\CategoryMessages.vb" />
     <Compile Include="Messages\Publisher\PublisherMessages.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -231,9 +233,6 @@
     <Compile Include="Services\Interface\IBookService.vb" />
     <Compile Include="Services\Interface\IPublisherService.vb" />
     <Compile Include="Services\Implementations\CategoryService.vb" />
-    <Compile Include="Services\Interface\IAuthorService.vb" />
-    <Compile Include="Services\Interface\IAuthService.vb" />
-    <Compile Include="Services\Interface\IBookService.vb" />
     <Compile Include="Services\Interface\ICategoryService.vb" />
   </ItemGroup>
   <ItemGroup>

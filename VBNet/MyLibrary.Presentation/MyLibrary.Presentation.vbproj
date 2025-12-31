@@ -50,6 +50,9 @@
   <PropertyGroup>
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AutoMapper, Version=10.0.0.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>packages\AutoMapper.10.0.0\lib\net461\AutoMapper.dll</HintPath>
@@ -257,7 +260,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\Publisher\FrmPublisherList.resx">
       <DependentUpon>FrmPublisherList.vb</DependentUpon>
-	</EmbeddedResource>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\Category\FrmCategoryDetail.resx">
       <DependentUpon>FrmCategoryDetail.vb</DependentUpon>
     </EmbeddedResource>
@@ -272,6 +275,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
