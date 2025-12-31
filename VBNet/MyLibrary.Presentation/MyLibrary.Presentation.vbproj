@@ -261,6 +261,9 @@
     <EmbeddedResource Include="Admin\Category\FrmCategoryList.resx">
       <DependentUpon>FrmCategoryList.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Admin\FrmUserManagement.resx">
+      <DependentUpon>FrmUserManagement.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\Publisher\FrmPublisherDetail.resx">
       <DependentUpon>FrmPublisherDetail.vb</DependentUpon>
     </EmbeddedResource>

@@ -23,4 +23,8 @@ Public Class UserRepository
         Return _dbSet.Any(Function(u) u.Email = email AndAlso u.IsDeleted = False)
     End Function
 
+    Public Function GetAllIncludedDeleted() As IQueryable(Of User) Implements IUserRepository.GetAllIncludedDeleted
+        Return _context.Users
+    End Function
+
 End Class
