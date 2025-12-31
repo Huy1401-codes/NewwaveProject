@@ -18,7 +18,6 @@ Partial Class FrmLibraryManager
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.pnlHeader = New System.Windows.Forms.Panel()
-        Me.btnReturn = New System.Windows.Forms.Button()
         Me.lblTitle = New System.Windows.Forms.Label()
         Me.pnlMenu = New System.Windows.Forms.Panel()
         Me.btnPublishers = New System.Windows.Forms.Button()
@@ -33,7 +32,6 @@ Partial Class FrmLibraryManager
         'pnlHeader
         '
         Me.pnlHeader.BackColor = System.Drawing.Color.FromArgb(CType(CType(245, Byte), Integer), CType(CType(246, Byte), Integer), CType(CType(248, Byte), Integer))
-        Me.pnlHeader.Controls.Add(Me.btnReturn)
         Me.pnlHeader.Controls.Add(Me.lblTitle)
         Me.pnlHeader.Dock = System.Windows.Forms.DockStyle.Top
         Me.pnlHeader.Location = New System.Drawing.Point(0, 0)
@@ -46,7 +44,7 @@ Partial Class FrmLibraryManager
         Me.lblTitle.AutoSize = True
         Me.lblTitle.Font = New System.Drawing.Font("Segoe UI", 12.0!, System.Drawing.FontStyle.Bold)
         Me.lblTitle.ForeColor = System.Drawing.Color.FromArgb(CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer), CType(CType(64, Byte), Integer))
-        Me.lblTitle.Location = New System.Drawing.Point(222, 12)
+        Me.lblTitle.Location = New System.Drawing.Point(231, 15)
         Me.lblTitle.Name = "lblTitle"
         Me.lblTitle.Size = New System.Drawing.Size(137, 21)
         Me.lblTitle.TabIndex = 0
@@ -163,5 +161,4 @@ Partial Class FrmLibraryManager
     Friend WithEvents btnReaders As Button
     Friend WithEvents btnPublishers As Button
     Friend WithEvents pnlContent As Panel
-    Friend WithEvents btnReturn As Button
 End Class
