@@ -228,9 +228,11 @@
     <Compile Include="Services\Implementations\AuthService.vb" />
     <Compile Include="Services\Implementations\BookService.vb" />
     <Compile Include="Services\Implementations\PublisherService.vb" />
+    <Compile Include="Services\Implementations\UserService.vb" />
     <Compile Include="Services\Interface\IAuthorService.vb" />
     <Compile Include="Services\Interface\IAuthService.vb" />
     <Compile Include="Services\Interface\IBookService.vb" />
+    <Compile Include="Services\Interface\IUserService.vb" />
     <Compile Include="Services\Interface\IPublisherService.vb" />
     <Compile Include="Services\Implementations\CategoryService.vb" />
     <Compile Include="Services\Interface\ICategoryService.vb" />
