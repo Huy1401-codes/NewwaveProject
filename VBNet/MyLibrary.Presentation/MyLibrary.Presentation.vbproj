@@ -255,6 +255,12 @@
     <EmbeddedResource Include="Admin\Book\FrmLibraryManager.resx">
       <DependentUpon>FrmLibraryManager.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Category\FrmCategoryEditor.resx">
+      <DependentUpon>FrmCategoryEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Category\FrmCategoryList.resx">
+      <DependentUpon>FrmCategoryList.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Admin\Publisher\FrmPublisherDetail.resx">
       <DependentUpon>FrmPublisherDetail.vb</DependentUpon>
     </EmbeddedResource>
