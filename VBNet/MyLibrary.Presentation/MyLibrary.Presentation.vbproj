@@ -122,6 +122,24 @@
     <Compile Include="Admin\Book\FrmLibraryManager.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Admin\Category\FrmCategoryDetail.Designer.vb">
+      <DependentUpon>FrmCategoryDetail.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Category\FrmCategoryDetail.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Category\FrmCategoryEditor.Designer.vb">
+      <DependentUpon>FrmCategoryEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Category\FrmCategoryEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Category\FrmCategoryList.Designer.vb">
+      <DependentUpon>FrmCategoryList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Category\FrmCategoryList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Admin\FrmAdminMain.Designer.vb">
       <DependentUpon>FrmAdminMain.vb</DependentUpon>
     </Compile>
@@ -215,6 +233,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Admin\Book\FrmLibraryManager.resx">
       <DependentUpon>FrmLibraryManager.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Category\FrmCategoryDetail.resx">
+      <DependentUpon>FrmCategoryDetail.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Auth\FrmLogin.resx">
       <DependentUpon>FrmLogin.vb</DependentUpon>
