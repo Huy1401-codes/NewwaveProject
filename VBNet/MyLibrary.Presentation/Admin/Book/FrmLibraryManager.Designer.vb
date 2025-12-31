@@ -21,7 +21,7 @@ Partial Class FrmLibraryManager
         Me.btnReturn = New System.Windows.Forms.Button()
         Me.lblTitle = New System.Windows.Forms.Label()
         Me.pnlMenu = New System.Windows.Forms.Panel()
-        Me.btnSettings = New System.Windows.Forms.Button()
+        Me.btnPublishers = New System.Windows.Forms.Button()
         Me.btnReaders = New System.Windows.Forms.Button()
         Me.btnAuthors = New System.Windows.Forms.Button()
         Me.btnBooks = New System.Windows.Forms.Button()
@@ -64,7 +64,7 @@ Partial Class FrmLibraryManager
         'pnlMenu
         '
         Me.pnlMenu.BackColor = System.Drawing.Color.FromArgb(CType(CType(52, Byte), Integer), CType(CType(73, Byte), Integer), CType(CType(94, Byte), Integer))
-        Me.pnlMenu.Controls.Add(Me.btnSettings)
+        Me.pnlMenu.Controls.Add(Me.btnPublishers)
         Me.pnlMenu.Controls.Add(Me.btnReaders)
         Me.pnlMenu.Controls.Add(Me.btnAuthors)
         Me.pnlMenu.Controls.Add(Me.btnBooks)
@@ -74,20 +74,20 @@ Partial Class FrmLibraryManager
         Me.pnlMenu.Size = New System.Drawing.Size(599, 55)
         Me.pnlMenu.TabIndex = 1
         '
-        'btnSettings
+        'btnPublishers
         '
-        Me.btnSettings.BackColor = System.Drawing.Color.FromArgb(CType(CType(61, Byte), Integer), CType(CType(141, Byte), Integer), CType(CType(188, Byte), Integer))
-        Me.btnSettings.Dock = System.Windows.Forms.DockStyle.Left
-        Me.btnSettings.FlatAppearance.BorderSize = 0
-        Me.btnSettings.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnSettings.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
-        Me.btnSettings.ForeColor = System.Drawing.Color.White
-        Me.btnSettings.Location = New System.Drawing.Point(450, 0)
-        Me.btnSettings.Name = "btnSettings"
-        Me.btnSettings.Size = New System.Drawing.Size(150, 55)
-        Me.btnSettings.TabIndex = 3
-        Me.btnSettings.Text = "⚙️  Nhà xuất bản"
-        Me.btnSettings.UseVisualStyleBackColor = False
+        Me.btnPublishers.BackColor = System.Drawing.Color.FromArgb(CType(CType(61, Byte), Integer), CType(CType(141, Byte), Integer), CType(CType(188, Byte), Integer))
+        Me.btnPublishers.Dock = System.Windows.Forms.DockStyle.Left
+        Me.btnPublishers.FlatAppearance.BorderSize = 0
+        Me.btnPublishers.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnPublishers.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
+        Me.btnPublishers.ForeColor = System.Drawing.Color.White
+        Me.btnPublishers.Location = New System.Drawing.Point(450, 0)
+        Me.btnPublishers.Name = "btnPublishers"
+        Me.btnPublishers.Size = New System.Drawing.Size(150, 55)
+        Me.btnPublishers.TabIndex = 3
+        Me.btnPublishers.Text = "⚙️  Nhà xuất bản"
+        Me.btnPublishers.UseVisualStyleBackColor = False
         '
         'btnReaders
         '
@@ -170,7 +170,7 @@ Partial Class FrmLibraryManager
     Friend WithEvents btnBooks As Button
     Friend WithEvents btnAuthors As Button
     Friend WithEvents btnReaders As Button
-    Friend WithEvents btnSettings As Button
+    Friend WithEvents btnPublishers As Button
     Friend WithEvents pnlContent As Panel
     Friend WithEvents btnReturn As Button
 End Class

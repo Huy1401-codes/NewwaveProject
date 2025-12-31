@@ -176,6 +176,24 @@
     <Compile Include="Admin\FrmUserManagement.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherDetail.Designer.vb">
+      <DependentUpon>FrmPublisherDetail.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherDetail.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherEditor.Designer.vb">
+      <DependentUpon>FrmPublisherEditor.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherList.Designer.vb">
+      <DependentUpon>FrmPublisherList.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\Publisher\FrmPublisherList.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Auth\FrmForgotPassword.Designer.vb">
       <DependentUpon>FrmForgotPassword.vb</DependentUpon>
     </Compile>
@@ -234,6 +252,11 @@
     <EmbeddedResource Include="Admin\Book\FrmLibraryManager.resx">
       <DependentUpon>FrmLibraryManager.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Publisher\FrmPublisherDetail.resx">
+      <DependentUpon>FrmPublisherDetail.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Admin\Publisher\FrmPublisherList.resx">
+      <DependentUpon>FrmPublisherList.vb</DependentUpon>
     <EmbeddedResource Include="Admin\Category\FrmCategoryDetail.resx">
       <DependentUpon>FrmCategoryDetail.vb</DependentUpon>
     </EmbeddedResource>

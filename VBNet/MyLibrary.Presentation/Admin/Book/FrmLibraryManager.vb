@@ -17,6 +17,9 @@
         End If
     End Sub
 
+    Private Sub btnPublishers_Click(sender As Object, e As EventArgs) Handles btnPublishers.Click
+        If Not Me.DesignMode Then
+            Dim frm As New FrmPublisherList()
     Private Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
         FrmAdminMain.Show()
         Me.Close()
