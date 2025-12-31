@@ -22,5 +22,4 @@ Public Class AuthorRepository
             b.Quantity <> b.AvailableQuantity)
     End Function
 
-
 End Class

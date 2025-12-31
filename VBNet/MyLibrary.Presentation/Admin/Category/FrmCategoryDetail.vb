@@ -1,9 +1,9 @@
 ﻿Imports MyLibrary.BLL
 Imports MyLibrary.Domain
 
-Public Class FrmAuthorDetail
-    Private ReadOnly _authorId As Integer
-    Private ReadOnly _service As IAuthorService
+Public Class FrmCategoryDetail
+    Private ReadOnly _categoryId As Integer
+    Private ReadOnly _service As ICategoryService
     Private ReadOnly _serviceBook As IBookService
     Private ReadOnly _imageCache As New Dictionary(Of String, Image)
 
@@ -17,14 +17,14 @@ Public Class FrmAuthorDetail
     Public Sub New()
         InitializeComponent()
     End Sub
-    Public Sub New(id As Integer, service As IAuthorService, serviceBook As IBookService)
+    Public Sub New(id As Integer, service As ICategoryService, serviceBook As IBookService)
         Me.New()
-        _authorId = id
+        _categoryId = id
         _service = service
         _serviceBook = serviceBook
     End Sub
 
-    Private Sub FrmAuthorDetail_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub FrmCategoryDetail_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetupGrid()
         LoadPublishers()
         LoadData()
@@ -49,8 +49,8 @@ Public Class FrmAuthorDetail
         dgvBooks.Columns.Add("Title", "Tên sách")
         dgvBooks.Columns("Title").DataPropertyName = "Title"
 
-        dgvBooks.Columns.Add("CategoryName", "Thể loại")
-        dgvBooks.Columns("CategoryName").DataPropertyName = "CategoryName"
+        dgvBooks.Columns.Add("AuthorName", "Tác giả")
+        dgvBooks.Columns("AuthorName").DataPropertyName = "AuthorName"
 
         dgvBooks.Columns.Add("PublisherName", "Nhà xuất bản")
         dgvBooks.Columns("PublisherName").DataPropertyName = "PublisherName"
@@ -76,21 +76,16 @@ Public Class FrmAuthorDetail
 
     Private Sub LoadData()
         Try
-            Dim author = _service.GetById(_authorId)
+            Dim author = _service.GetById(_categoryId)
 
-            Dim detail = _service.GetDetail(_authorId,
+            Dim detail = _service.GetDetail(_categoryId,
                                             _currentKeyword,
                                             _currentPage,
                                             _pageSize,
                                             _currentPublisherId)
 
-            lblAuthorName.Text = detail.AuthorName.ToUpper()
-            Me.Text = "Chi tiết: " & detail.AuthorName
-
-            _currentUrl = author.Avatar
-            If Not String.IsNullOrEmpty(_currentUrl) Then
-                picAvatar.ImageLocation = _currentUrl
-            End If
+            lblCategoryName.Text = detail.CategoryName.ToUpper()
+            Me.Text = "Chi tiết: " & detail.CategoryName
 
             dgvBooks.DataSource = detail.Books.Items
 
@@ -140,7 +135,7 @@ Public Class FrmAuthorDetail
 
         If dgvBooks.Columns(e.ColumnIndex).Name = "Image" AndAlso e.RowIndex >= 0 Then
 
-            Dim book = TryCast(dgvBooks.Rows(e.RowIndex).DataBoundItem, AuthorBookDto)
+            Dim book = TryCast(dgvBooks.Rows(e.RowIndex).DataBoundItem, CategoryBookDto)
             If book Is Nothing Then Return
 
             If String.IsNullOrWhiteSpace(book.ImagePath) Then
