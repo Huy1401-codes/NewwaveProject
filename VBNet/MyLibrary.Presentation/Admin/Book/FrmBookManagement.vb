@@ -9,6 +9,7 @@ Public Class FrmBookManagement
 
     Private _bookService As BookService
     Private _cloudinaryService As ICloudinaryService
+    Private ReadOnly _imageCache As New Dictionary(Of String, Image)
 
     Private _currentPage As Integer = 1
     Private _pageSize As Integer = 15
@@ -56,6 +57,17 @@ Public Class FrmBookManagement
         AddColumn("SL", "Quantity", 60)
         AddColumn("Id", "Id", 0, False)
 
+        Dim imgCol As New DataGridViewImageColumn()
+        imgCol.Name = "Image"
+        imgCol.HeaderText = "Hình ảnh"
+        imgCol.ImageLayout = DataGridViewImageCellLayout.Zoom
+        imgCol.Width = 90
+        imgCol.ValueType = GetType(Image)
+        dgvBooks.Columns.Add(imgCol)
+
+        dgvBooks.RowTemplate.Height = 90
+
+
         Dim btnDetail As New DataGridViewButtonColumn()
         btnDetail.HeaderText = "Chi tiết"
         btnDetail.Name = "btnDetail"
@@ -64,6 +76,42 @@ Public Class FrmBookManagement
         btnDetail.Width = 60
         dgvBooks.Columns.Add(btnDetail)
     End Sub
+
+    Private Sub dgvBooks_CellFormatting(
+    sender As Object,
+    e As DataGridViewCellFormattingEventArgs) Handles dgvBooks.CellFormatting
+
+        If dgvBooks.Columns(e.ColumnIndex).Name = "Image" AndAlso e.RowIndex >= 0 Then
+
+            Dim book = TryCast(dgvBooks.Rows(e.RowIndex).DataBoundItem, AuthorBookDto)
+            If book Is Nothing Then Return
+
+            If String.IsNullOrWhiteSpace(book.ImagePath) Then
+                e.Value = Nothing
+                Return
+            End If
+
+            If _imageCache.ContainsKey(book.ImagePath) Then
+                e.Value = _imageCache(book.ImagePath)
+                Return
+            End If
+
+            Try
+                Using wc As New Net.WebClient()
+                    Dim bytes = wc.DownloadData(book.ImagePath)
+                    Using ms As New IO.MemoryStream(bytes)
+                        Dim img = Image.FromStream(ms)
+                        _imageCache(book.ImagePath) = img
+                        e.Value = img
+                    End Using
+                End Using
+            Catch
+                e.Value = Nothing
+            End Try
+        End If
+    End Sub
+
+
 
     Private Sub AddColumn(header As String, propName As String, width As Integer,
                          Optional visible As Boolean = True, Optional format As String = "")

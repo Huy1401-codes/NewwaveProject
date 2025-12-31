@@ -166,10 +166,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DTOs\Authors\AuthorBookDto.vb" />
-    <Compile Include="DTOs\Authors\AuthorCreateDto.vb" />
     <Compile Include="DTOs\Authors\AuthorDetailDto.vb" />
     <Compile Include="DTOs\Authors\AuthorDto.vb" />
-    <Compile Include="DTOs\Authors\AuthorUpdateDto.vb" />
     <Compile Include="DTOs\Auth\LoginRequestDto.vb" />
     <Compile Include="DTOs\Auth\LoginResponseDto.vb" />
     <Compile Include="DTOs\Auth\RegisterRequestDto.vb" />
@@ -183,9 +181,9 @@
     <Compile Include="DTOs\BorrowDetails\BorrowDetailDto.vb" />
     <Compile Include="DTOs\BorrowTickets\BorrowTicketCreateDto.vb" />
     <Compile Include="DTOs\BorrowTickets\BorrowTicketDto.vb" />
-    <Compile Include="DTOs\Categories\CategoryCreateDto.vb" />
+    <Compile Include="DTOs\Categories\CategoryBookDto.vb" />
+    <Compile Include="DTOs\Categories\CategoryDetailDto.vb" />
     <Compile Include="DTOs\Categories\CategoryDto.vb" />
-    <Compile Include="DTOs\Categories\CategoryUpdateDto.vb" />
     <Compile Include="DTOs\Deposit\DepositCreateDto.vb" />
     <Compile Include="DTOs\Deposit\DepositDto.vb" />
     <Compile Include="DTOs\PagedResult.vb" />
@@ -205,6 +203,7 @@
     <Compile Include="Mapping\AuthorMappingProfile.vb" />
     <Compile Include="Mapping\BookMappingProfile.vb" />
     <Compile Include="Mapping\PublisherMappingProfile.vb" />
+    <Compile Include="Mapping\CategoryMappingProfile.vb" />
     <Compile Include="Messages\Auth\AuthMessages.vb" />
     <Compile Include="Messages\Auth\BookMessages.vb" />
     <Compile Include="Messages\Publisher\PublisherMessages.vb" />
@@ -231,6 +230,11 @@
     <Compile Include="Services\Interface\IAuthService.vb" />
     <Compile Include="Services\Interface\IBookService.vb" />
     <Compile Include="Services\Interface\IPublisherService.vb" />
+    <Compile Include="Services\Implementations\CategoryService.vb" />
+    <Compile Include="Services\Interface\IAuthorService.vb" />
+    <Compile Include="Services\Interface\IAuthService.vb" />
+    <Compile Include="Services\Interface\IBookService.vb" />
+    <Compile Include="Services\Interface\ICategoryService.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

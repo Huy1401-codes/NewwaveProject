@@ -20,6 +20,14 @@
     Private Sub btnPublishers_Click(sender As Object, e As EventArgs) Handles btnPublishers.Click
         If Not Me.DesignMode Then
             Dim frm As New FrmPublisherList()
+    Private Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
+        FrmAdminMain.Show()
+        Me.Close()
+    End Sub
+
+    Private Sub btnReaders_Click(sender As Object, e As EventArgs) Handles btnReaders.Click
+        If Not Me.DesignMode Then
+            Dim frm As New FrmCategoryList()
             Me.Hide()
             frm.ShowDialog()
             Me.Show()
