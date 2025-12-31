@@ -191,9 +191,9 @@
     <Compile Include="DTOs\PagedResult.vb" />
     <Compile Include="DTOs\Payments\PaymentCreateDto.vb" />
     <Compile Include="DTOs\Payments\PaymentDto.vb" />
-    <Compile Include="DTOs\Publishers\PublisherCreateDto.vb" />
+    <Compile Include="DTOs\Publishers\PublisherDetailDto.vb" />
     <Compile Include="DTOs\Publishers\PublisherDto.vb" />
-    <Compile Include="DTOs\Publishers\PublisherUpdateDto.vb" />
+    <Compile Include="DTOs\Publishers\PublisherBookDto.vb" />
     <Compile Include="DTOs\Users\UserCreateDto.vb" />
     <Compile Include="DTOs\Users\UserDto.vb" />
     <Compile Include="DTOs\Users\UserUpdateDto.vb" />
@@ -204,8 +204,10 @@
     <Compile Include="Mapping\AuthMappingProfile.vb" />
     <Compile Include="Mapping\AuthorMappingProfile.vb" />
     <Compile Include="Mapping\BookMappingProfile.vb" />
+    <Compile Include="Mapping\PublisherMappingProfile.vb" />
     <Compile Include="Messages\Auth\AuthMessages.vb" />
     <Compile Include="Messages\Auth\BookMessages.vb" />
+    <Compile Include="Messages\Publisher\PublisherMessages.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -224,9 +226,11 @@
     <Compile Include="Services\Implementations\AuthorService.vb" />
     <Compile Include="Services\Implementations\AuthService.vb" />
     <Compile Include="Services\Implementations\BookService.vb" />
+    <Compile Include="Services\Implementations\PublisherService.vb" />
     <Compile Include="Services\Interface\IAuthorService.vb" />
     <Compile Include="Services\Interface\IAuthService.vb" />
     <Compile Include="Services\Interface\IBookService.vb" />
+    <Compile Include="Services\Interface\IPublisherService.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
