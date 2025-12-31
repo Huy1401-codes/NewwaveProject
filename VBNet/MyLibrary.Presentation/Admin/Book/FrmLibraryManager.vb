@@ -25,13 +25,4 @@
             Me.Show()
         End If
     End Sub
-
-    Private Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
-        If Not Me.DesignMode Then
-            Dim frm As New FrmAdminMain()
-            Me.Hide()
-            frm.ShowDialog()
-            Me.Show()
-        End If
-    End Sub
 End Class

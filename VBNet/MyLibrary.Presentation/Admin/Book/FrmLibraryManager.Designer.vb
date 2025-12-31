@@ -41,15 +41,6 @@ Partial Class FrmLibraryManager
         Me.pnlHeader.Size = New System.Drawing.Size(599, 55)
         Me.pnlHeader.TabIndex = 0
         '
-        'btnReturn
-        '
-        Me.btnReturn.Location = New System.Drawing.Point(27, 13)
-        Me.btnReturn.Name = "btnReturn"
-        Me.btnReturn.Size = New System.Drawing.Size(75, 23)
-        Me.btnReturn.TabIndex = 1
-        Me.btnReturn.Text = "Quay Lại"
-        Me.btnReturn.UseVisualStyleBackColor = True
-        '
         'lblTitle
         '
         Me.lblTitle.AutoSize = True
