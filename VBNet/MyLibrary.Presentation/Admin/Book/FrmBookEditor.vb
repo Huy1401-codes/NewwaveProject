@@ -4,14 +4,14 @@ Imports MyLibrary.Domain
 
 Public Class FrmBookEditor
 
-    Private _bookService As BookService
-    Private _cloudinaryService As ICloudinaryService
-    Private _bookId As Integer = 0
+    Private ReadOnly _bookService As IBookService
+    Private ReadOnly _cloudinaryService As ICloudinaryService
+    Private ReadOnly _bookId As Integer = 0
     Private _currentLocalPath As String = ""
     Private _currentUrl As String = ""
     Private _isImageChanged As Boolean = False
     Private _isViewOnly As Boolean = False
-    Public Sub New(service As BookService, cloudService As ICloudinaryService,
+    Public Sub New(service As IBookService, cloudService As ICloudinaryService,
                    Optional id As Integer = 0, Optional isViewOnly As Boolean = False)
         InitializeComponent()
         _bookService = service

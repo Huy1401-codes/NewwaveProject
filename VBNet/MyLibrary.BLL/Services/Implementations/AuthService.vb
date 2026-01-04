@@ -32,6 +32,11 @@ Public Class AuthService
 
         End If
 
+        If user Is Nothing OrElse user.IsDeleted Then
+            logger.Warn($"Login thất bại: Email {email} không tồn tại hoặc đã bị xóa.")
+            Throw New Exception(AuthMessages.EmailOrPasswordErorr)
+        End If
+
         Dim hash = HashPassword(password)
         If user.PasswordHash <> hash Then
             logger.Warn("Sai email hoặc mật khẩu")

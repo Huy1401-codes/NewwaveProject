@@ -14,7 +14,7 @@
     End Sub
 
     Private Sub btnManageBorrow_Click(sender As Object, e As EventArgs) Handles btnManageBorrow.Click
-        Dim frm As New FrmBorrowManagement()
+        Dim frm As New FrmAdminApproval()
         Me.Hide()
         frm.ShowDialog()
         Me.Show()

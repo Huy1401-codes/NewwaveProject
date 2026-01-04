@@ -136,8 +136,7 @@ Public Class FrmAuthorDetail
     End Sub
     Private Sub dgvBooks_CellFormatting(
     sender As Object,
-    e As DataGridViewCellFormattingEventArgs
-) Handles dgvBooks.CellFormatting
+    e As DataGridViewCellFormattingEventArgs) Handles dgvBooks.CellFormatting
 
         If dgvBooks.Columns(e.ColumnIndex).Name = "Image" AndAlso e.RowIndex >= 0 Then
 

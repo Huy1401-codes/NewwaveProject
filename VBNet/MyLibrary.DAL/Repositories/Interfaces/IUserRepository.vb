@@ -5,4 +5,6 @@ Public Interface IUserRepository
 
     Function GetByEmail(email As String) As User
     Function ExistsByEmail(email As String) As Boolean
+
+    Function GetAllIncludedDeleted() As IQueryable(Of User)
 End Interface
