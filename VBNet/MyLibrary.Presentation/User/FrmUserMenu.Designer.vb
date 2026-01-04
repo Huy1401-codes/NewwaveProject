@@ -43,7 +43,7 @@ Partial Class FrmUserMenu
         '
         'btnReturn
         '
-        Me.btnReturn.BackColor = System.Drawing.Color.Red
+        Me.btnReturn.BackColor = System.Drawing.Color.OrangeRed
         Me.btnReturn.Location = New System.Drawing.Point(680, 18)
         Me.btnReturn.Margin = New System.Windows.Forms.Padding(4)
         Me.btnReturn.Name = "btnReturn"

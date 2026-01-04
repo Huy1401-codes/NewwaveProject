@@ -73,19 +73,18 @@ Public Class FrmBookDetail
 
             If SessionManager.CurrentUser Is Nothing Then
                 MessageBox.Show("Phiên đăng nhập đã hết hạn hoặc bạn chưa đăng nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                ' Có thể redirect về form Login tại đây nếu muốn
                 Return
             End If
             ' 2. Xác nhận lại người dùng
+
             Dim result = MessageBox.Show($"Bạn có chắc muốn mượn sách '{lblTitle.Text}'?" & vbCrLf &
                                          $"Ngày trả dự kiến: {dtpDueDate.Value:dd/MM/yyyy}",
                                          "Xác nhận mượn", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
             If result = DialogResult.Yes Then
-                ' 3. Tạo list sách (hiện tại UI chỉ mượn 1 cuốn, nhưng Service hỗ trợ List)
+
                 Dim bookIds As New List(Of Integer) From {_bookId}
 
-                ' 4. Gọi Service
                 _borrowService.RequestBorrow(SessionManager.CurrentUser.UserId, bookIds, dtpDueDate.Value)
 
                 MessageBox.Show("Gửi yêu cầu mượn thành công! Vui lòng chờ Admin duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information)
