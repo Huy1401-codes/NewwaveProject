@@ -177,10 +177,11 @@
     <Compile Include="DTOs\Book\BookCreateDto.vb" />
     <Compile Include="DTOs\Book\BookDto.vb" />
     <Compile Include="DTOs\Book\BookUpdateDto.vb" />
+    <Compile Include="DTOs\BorrowDetails\BookDetailDto.vb" />
     <Compile Include="DTOs\BorrowDetails\BorrowDetailCreateDto.vb" />
-    <Compile Include="DTOs\BorrowDetails\BorrowDetailDto.vb" />
+    <Compile Include="DTOs\BorrowDetails\BookForBorrowDto.vb" />
+    <Compile Include="DTOs\BorrowDetails\BorrowTicketDto.vb" />
     <Compile Include="DTOs\BorrowTickets\BorrowTicketCreateDto.vb" />
-    <Compile Include="DTOs\BorrowTickets\BorrowTicketDto.vb" />
     <Compile Include="DTOs\Categories\CategoryBookDto.vb" />
     <Compile Include="DTOs\Categories\CategoryDetailDto.vb" />
     <Compile Include="DTOs\Categories\CategoryDto.vb" />
@@ -227,11 +228,13 @@
     <Compile Include="Services\Implementations\AuthorService.vb" />
     <Compile Include="Services\Implementations\AuthService.vb" />
     <Compile Include="Services\Implementations\BookService.vb" />
+    <Compile Include="Services\Implementations\BorrowService.vb" />
     <Compile Include="Services\Implementations\PublisherService.vb" />
     <Compile Include="Services\Implementations\UserService.vb" />
     <Compile Include="Services\Interface\IAuthorService.vb" />
     <Compile Include="Services\Interface\IAuthService.vb" />
     <Compile Include="Services\Interface\IBookService.vb" />
+    <Compile Include="Services\Interface\IBorrowService.vb" />
     <Compile Include="Services\Interface\IUserService.vb" />
     <Compile Include="Services\Interface\IPublisherService.vb" />
     <Compile Include="Services\Implementations\CategoryService.vb" />

@@ -105,6 +105,7 @@
     </Compile>
     <Compile Include="Repositories\Implementations\AuthorRepository.vb" />
     <Compile Include="Repositories\Implementations\BookRepository.vb" />
+    <Compile Include="Repositories\Implementations\BorrowTicketRepository.vb" />
     <Compile Include="Repositories\Implementations\CategoryRepository.vb" />
     <Compile Include="Repositories\Implementations\GenericRepository.vb" />
     <Compile Include="Repositories\Implementations\PublisherRepository.vb" />
@@ -113,6 +114,7 @@
     <Compile Include="Repositories\Implementations\UserRepository.vb" />
     <Compile Include="Repositories\Implementations\UserRoleRepository.vb" />
     <Compile Include="Repositories\Interfaces\IBookRepository.vb" />
+    <Compile Include="Repositories\Interfaces\IBorrowTicketRepository.vb" />
     <Compile Include="Repositories\Interfaces\ICategoryRepository.vb" />
     <Compile Include="Repositories\Interfaces\IGenericRepository.vb" />
     <Compile Include="Repositories\Interfaces\IPublisherRepository.vb" />

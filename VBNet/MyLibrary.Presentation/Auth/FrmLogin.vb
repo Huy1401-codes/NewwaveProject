@@ -8,8 +8,6 @@ Public Class FrmLogin
 
     Public Sub New()
         InitializeComponent()
-
-        ' Khởi tạo service
         Dim uow As New UnitOfWork()
         Dim emailService As New EmailService("huydo272@gmail.com", "app-password")
         _authService = New AuthService(uow, emailService)
@@ -30,7 +28,7 @@ Public Class FrmLogin
                 Dim f As New FrmAdminMain()
                 f.Show()
             Else
-                Dim f As New FrmUserMain()
+                Dim f As New FrmUserMenu()
                 f.Show()
             End If
 

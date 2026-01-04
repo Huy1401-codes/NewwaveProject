@@ -3,6 +3,7 @@
 Public Interface IUnitOfWork
     Inherits IDisposable
 
+    ReadOnly Property Context As AppDbContext
     ReadOnly Property Authors As IAuthorRepository
     ReadOnly Property Books As IBookRepository
     ReadOnly Property Categories As ICategoryRepository
@@ -12,7 +13,7 @@ Public Interface IUnitOfWork
     ReadOnly Property Roles As IRoleRepository
     ReadOnly Property UserRoles As IUserRoleRepository
 
-    ReadOnly Property BorrowTickets As IGenericRepository(Of BorrowTicket)
+    ReadOnly Property BorrowTickets As IBorrowTicketRepository
     ReadOnly Property BorrowDetails As IGenericRepository(Of BorrowDetail)
 
     ReadOnly Property Deposits As IGenericRepository(Of Deposit)

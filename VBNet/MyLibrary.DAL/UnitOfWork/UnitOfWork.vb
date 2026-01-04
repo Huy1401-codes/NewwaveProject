@@ -9,6 +9,13 @@ Public Class UnitOfWork
         _context = New AppDbContext()
     End Sub
 
+    Public ReadOnly Property Context As AppDbContext _
+        Implements IUnitOfWork.Context
+        Get
+            Return _context
+        End Get
+    End Property
+
     Private _authors As IAuthorRepository
     Public ReadOnly Property Authors As IAuthorRepository _
         Implements IUnitOfWork.Authors
@@ -86,12 +93,12 @@ Public Class UnitOfWork
         End Get
     End Property
 
-    Private _borrowTickets As IGenericRepository(Of BorrowTicket)
-    Public ReadOnly Property BorrowTickets As IGenericRepository(Of BorrowTicket) _
+    Private _borrowTickets As IBorrowTicketRepository
+    Public ReadOnly Property BorrowTickets As IBorrowTicketRepository _
         Implements IUnitOfWork.BorrowTickets
         Get
             If _borrowTickets Is Nothing Then
-                _borrowTickets = New GenericRepository(Of BorrowTicket)(_context)
+                _borrowTickets = New BorrowTicketRepository(_context)
             End If
             Return _borrowTickets
         End Get
