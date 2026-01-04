@@ -143,6 +143,12 @@
     <Compile Include="Admin\Category\FrmCategoryList.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Admin\FrmAdminApproval.Designer.vb">
+      <DependentUpon>FrmAdminApproval.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Admin\FrmAdminApproval.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Admin\FrmAdminMain.Designer.vb">
       <DependentUpon>FrmAdminMain.vb</DependentUpon>
     </Compile>
@@ -159,12 +165,6 @@
       <DependentUpon>FrmBookManagement.vb</DependentUpon>
     </Compile>
     <Compile Include="Admin\Book\FrmBookManagement.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Admin\FrmBorrowManagement.Designer.vb">
-      <DependentUpon>FrmBorrowManagement.vb</DependentUpon>
-    </Compile>
-    <Compile Include="Admin\FrmBorrowManagement.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Admin\FrmStatistics.Designer.vb">
@@ -232,10 +232,34 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="User\FrmUserMain.Designer.vb">
-      <DependentUpon>FrmUserMain.vb</DependentUpon>
+    <Compile Include="User\FrmAvailableBooks.Designer.vb">
+      <DependentUpon>FrmAvailableBooks.vb</DependentUpon>
     </Compile>
-    <Compile Include="User\FrmUserMain.vb">
+    <Compile Include="User\FrmAvailableBooks.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\FrmBookDetail.Designer.vb">
+      <DependentUpon>FrmBookDetail.vb</DependentUpon>
+    </Compile>
+    <Compile Include="User\FrmBookDetail.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\FrmMyHistory.Designer.vb">
+      <DependentUpon>FrmMyHistory.vb</DependentUpon>
+    </Compile>
+    <Compile Include="User\FrmMyHistory.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\FrmUserMenu.Designer.vb">
+      <DependentUpon>FrmUserMenu.vb</DependentUpon>
+    </Compile>
+    <Compile Include="User\FrmUserMenu.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="User\FrmUserReturnBook.Designer.vb">
+      <DependentUpon>FrmUserReturnBook.vb</DependentUpon>
+    </Compile>
+    <Compile Include="User\FrmUserReturnBook.vb">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
@@ -281,6 +305,15 @@
       <LastGenOutput>Resources.Designer.vb</LastGenOutput>
       <CustomToolNamespace>My.Resources</CustomToolNamespace>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\FrmAvailableBooks.resx">
+      <DependentUpon>FrmAvailableBooks.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\FrmBookDetail.resx">
+      <DependentUpon>FrmBookDetail.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="User\FrmUserMenu.resx">
+      <DependentUpon>FrmUserMenu.vb</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

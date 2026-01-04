@@ -1,9 +1,8 @@
-﻿Imports System.ComponentModel
-Imports System.IO
+﻿Imports System.IO
+Imports System.Security.Policy
 Imports AutoMapper
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
-Imports MyLibrary.Domain.MyApp.Domain.Common
 Imports NLog
 Imports OfficeOpenXml
 
@@ -157,7 +156,7 @@ Public Class BookService
         Return _uow.Categories.GetAll().ToList()
     End Function
 
-    Public Function GetPublishers() As List(Of Publisher) Implements IBookService.GetPublishers
+    Public Function GetPublishers() As List(Of MyLibrary.Domain.Publisher) Implements IBookService.GetPublishers
         Return _uow.Publishers.GetAll().ToList()
     End Function
 
@@ -248,7 +247,7 @@ Public Class BookService
                     Dim publisherName = ws.Cells(row, 6).Text.Trim()
                     Dim publisher = _uow.Publishers.GetByName(publisherName)
                     If publisher Is Nothing Then
-                        publisher = New Publisher With {
+                        publisher = New MyLibrary.Domain.Publisher With {
                         .PublisherName = publisherName,
                         .CreatedAt = DateTime.Now,
                         .IsDeleted = False
@@ -290,5 +289,35 @@ Public Class BookService
         Return r
     End Function
 
+    Public Function GetAvailableBooks(keyword As String, publisherId As Integer?,
+                   categoryId As Integer?) As List(Of BookDetailDto) Implements IBookService.GetAvailableBooks
+        Dim query = _uow.Books.GetAll()
 
+        query = query.Where(Function(b) b.IsDeleted = False AndAlso
+                                        b.Quantity > 0 AndAlso
+                                        b.AvailableQuantity > 0)
+
+        If Not String.IsNullOrEmpty(keyword) Then
+            query = query.Where(Function(b) b.Title.Contains(keyword))
+        End If
+
+        If publisherId.HasValue AndAlso publisherId.Value > 0 Then
+            query = query.Where(Function(b) b.PublisherId = publisherId.Value)
+        End If
+
+        If categoryId.HasValue AndAlso categoryId.Value > 0 Then
+            query = query.Where(Function(b) b.CategoryId = categoryId.Value)
+        End If
+
+        Dim entities = query.ToList()
+
+        Return _mapper.Map(Of List(Of BookDetailDto))(entities)
+    End Function
+
+    Public Function GetBookDetail(bookId As Integer) As BookDetailDto Implements IBookService.GetBookDetail
+        Dim book = _uow.Books.GetById(bookId)
+        If book Is Nothing Then Return Nothing
+
+        Return _mapper.Map(Of BookDetailDto)(book)
+    End Function
 End Class

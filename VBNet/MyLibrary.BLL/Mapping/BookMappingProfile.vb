@@ -17,5 +17,11 @@ Public Class BookMappingProfile
             .ForMember(Function(dest) dest.PublisherId, Sub(opt) opt.MapFrom(Function(src) src.PublisherId)) _
             .ForMember(Function(dest) dest.ImagePath, Sub(opt) opt.MapFrom(Function(src) src.ImagePath)) _
             .ForMember(Function(dest) dest.CreatedAt, Sub(opt) opt.Ignore())
+
+        CreateMap(Of Book, BookDetailDto)() _
+            .ForMember(Function(dest) dest.AuthorName, Sub(opt) opt.MapFrom(Function(src) If(src.Author IsNot Nothing, src.Author.AuthorName, ""))) _
+            .ForMember(Function(dest) dest.CategoryName, Sub(opt) opt.MapFrom(Function(src) If(src.Category IsNot Nothing, src.Category.CategoryName, ""))) _
+            .ForMember(Function(dest) dest.TotalQuantity, Sub(opt) opt.MapFrom(Function(src) src.Quantity)) _
+            .ForMember(Function(dest) dest.BorrowedCount, Sub(opt) opt.MapFrom(Function(src) src.Quantity - src.AvailableQuantity))
     End Sub
 End Class
