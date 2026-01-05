@@ -1,5 +1,4 @@
-﻿Imports System.Data.SqlClient
-Imports System.Security.Cryptography
+﻿Imports System.Security.Cryptography
 Imports System.Text
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
@@ -194,8 +193,8 @@ Public Class AuthService
         logger.Info("Thành công")
         _uow.Users.Update(user)
         _uow.Save()
-
-        _emailService.SendEmail(
+        Try
+            _emailService.SendEmail(
             user.Email,
             "Mã xác thực Quên mật khẩu",
             $"<h3>Yêu cầu cấp lại mật khẩu</h3>
@@ -203,6 +202,10 @@ Public Class AuthService
               <h2 style='color:red;'>{otpCode}</h2>
               <p>Vui lòng nhập mã này vào phần mềm để đặt lại mật khẩu mới.</p>"
         )
+        Catch ex As Exception
+            logger.Error(ex, "Lỗi gửi email ForgotPassword")
+        Throw New Exception("Không gửi được email. Vui lòng thử lại.")
+        End Try
     End Sub
 
     Public Sub CompletePasswordReset(email As String, otp As String, newPassword As String) _

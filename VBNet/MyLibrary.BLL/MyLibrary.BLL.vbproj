@@ -181,6 +181,7 @@
     <Compile Include="DTOs\BorrowDetails\BorrowDetailCreateDto.vb" />
     <Compile Include="DTOs\BorrowDetails\BookForBorrowDto.vb" />
     <Compile Include="DTOs\BorrowDetails\BorrowTicketDto.vb" />
+    <Compile Include="DTOs\BorrowTickets\BorrowItemDto.vb" />
     <Compile Include="DTOs\BorrowTickets\BorrowTicketCreateDto.vb" />
     <Compile Include="DTOs\Categories\CategoryBookDto.vb" />
     <Compile Include="DTOs\Categories\CategoryDetailDto.vb" />

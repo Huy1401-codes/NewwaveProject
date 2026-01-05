@@ -13,23 +13,29 @@ Public Class EmailService
     End Sub
 
     Public Sub SendEmail(toEmail As String, subject As String, body As String) _
-        Implements IEmailService.SendEmail
+      Implements IEmailService.SendEmail
 
-        Dim smtp As New SmtpClient("smtp.gmail.com") With {
+        If String.IsNullOrWhiteSpace(toEmail) Then
+            Throw New Exception("Email người nhận rỗng")
+        End If
+
+        Dim smtp As New SmtpClient() With {
+            .Host = "smtp.gmail.com",
             .Port = 587,
+            .EnableSsl = True,
+            .UseDefaultCredentials = False,
             .Credentials = New NetworkCredential(_fromEmail, _appPassword),
-            .EnableSsl = True
+            .DeliveryMethod = SmtpDeliveryMethod.Network
         }
 
-        Dim mail As New MailMessage() With {
-            .From = New MailAddress(_fromEmail, "My App"),
-            .Subject = subject,
-            .Body = body,
-            .IsBodyHtml = True
-        }
-
-        mail.To.Add(toEmail)
+        Dim mail As New MailMessage()
+        mail.From = New MailAddress(_fromEmail, "My App")
+        mail.To.Add(toEmail.Trim())
+        mail.Subject = subject
+        mail.Body = body
+        mail.IsBodyHtml = True
 
         smtp.Send(mail)
     End Sub
+
 End Class

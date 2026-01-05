@@ -1,4 +1,5 @@
-﻿Imports System.Text.RegularExpressions
+﻿Imports System.Configuration
+Imports System.Text.RegularExpressions
 Imports MyLibrary.BLL
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
@@ -11,12 +12,15 @@ Public Class FrmRegister
     Public Sub New()
         InitializeComponent()
 
-        ' Khởi tạo Service
+        Dim emailFrom = ConfigurationManager.AppSettings("EmailFrom")
+        Dim emailPass = ConfigurationManager.AppSettings("EmailAppPassword")
+
         _auth = New AuthService(
-            New UnitOfWork(),
-            New EmailService("huydo272@gmail.com", "seky quuk rnev lyzc")
-        )
+        New UnitOfWork(),
+        New EmailService(emailFrom, emailPass)
+    )
     End Sub
+
 
     Private Sub btnRegister_Click(sender As Object, e As EventArgs) Handles btnRegister.Click
         lblError.Text = ""

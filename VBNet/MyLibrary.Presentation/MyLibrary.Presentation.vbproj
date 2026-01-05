@@ -256,12 +256,6 @@
     <Compile Include="User\FrmUserMenu.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="User\FrmUserReturnBook.Designer.vb">
-      <DependentUpon>FrmUserReturnBook.vb</DependentUpon>
-    </Compile>
-    <Compile Include="User\FrmUserReturnBook.vb">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Admin\Author\FrmAuthorDetail.resx">

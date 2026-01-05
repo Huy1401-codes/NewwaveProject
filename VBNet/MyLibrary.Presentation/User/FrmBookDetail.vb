@@ -1,8 +1,6 @@
-﻿Imports System.IO
-Imports AutoMapper
+﻿Imports AutoMapper
 Imports MyLibrary.BLL
 Imports MyLibrary.DAL
-Imports MyLibrary.Service
 
 Public Class FrmBookDetail
     Private _bookId As Integer
@@ -73,7 +71,6 @@ Public Class FrmBookDetail
 
             If SessionManager.CurrentUser Is Nothing Then
                 MessageBox.Show("Phiên đăng nhập đã hết hạn hoặc bạn chưa đăng nhập.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
-                ' Có thể redirect về form Login tại đây nếu muốn
                 Return
             End If
             ' 2. Xác nhận lại người dùng
@@ -82,16 +79,30 @@ Public Class FrmBookDetail
                                          "Xác nhận mượn", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
 
             If result = DialogResult.Yes Then
-                ' 3. Tạo list sách (hiện tại UI chỉ mượn 1 cuốn, nhưng Service hỗ trợ List)
-                Dim bookIds As New List(Of Integer) From {_bookId}
 
-                ' 4. Gọi Service
-                _borrowService.RequestBorrow(SessionManager.CurrentUser.UserId, bookIds, dtpDueDate.Value)
+                Dim borrowItems As New List(Of BorrowItemDto) From {
+                    New BorrowItemDto With {
+                        .BookId = _bookId,
+                        .Quantity = 1
+                    }
+                }
 
-                MessageBox.Show("Gửi yêu cầu mượn thành công! Vui lòng chờ Admin duyệt.", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information)
+                _borrowService.RequestBorrow(
+                    SessionManager.CurrentUser.UserId,
+                    borrowItems,
+                    dtpDueDate.Value
+                )
+
+                MessageBox.Show(
+                    "Gửi yêu cầu mượn thành công! Vui lòng chờ Admin duyệt.",
+                    "Thành công",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                )
 
                 Me.Close()
             End If
+
 
         Catch ex As Exception
             MessageBox.Show("Lỗi: " & ex.Message, "Thất bại", MessageBoxButtons.OK, MessageBoxIcon.Error)
