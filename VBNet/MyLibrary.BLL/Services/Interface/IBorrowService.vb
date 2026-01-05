@@ -2,7 +2,7 @@
 
 Public Interface IBorrowService
     '  User gửi yêu cầu mượn
-    Sub RequestBorrow(userId As Integer, bookIds As List(Of Integer), dueDate As DateTime)
+    Sub RequestBorrow(userId As Integer, bookIds As List(Of BorrowItemDto), dueDate As DateTime)
 
     ' Admin duyệt hoặc từ chối
     Sub ApproveBorrow(ticketId As Integer, isApproved As Boolean)

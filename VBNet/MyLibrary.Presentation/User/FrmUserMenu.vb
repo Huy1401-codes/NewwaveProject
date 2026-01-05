@@ -17,15 +17,15 @@
         End If
     End Sub
 
-    Private Sub btnPayReturn_Click(sender As Object, e As EventArgs) Handles btnPayReturn.Click
-        If Not Me.DesignMode Then
-            Dim frm As New FrmUserReturnBook()
-            Me.Hide()
-            frm.ShowDialog()
-            Me.Show()
-        End If
+    'Private Sub btnPayReturn_Click(sender As Object, e As EventArgs) Handles btnPayReturn.Click
+    '    If Not Me.DesignMode Then
+    '        Dim frm As New FrmUserReturnBook()
+    '        Me.Hide()
+    '        frm.ShowDialog()
+    '        Me.Show()
+    '    End If
 
-    End Sub
+    'End Sub
 
     Private Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
         Dim result = MessageBox.Show("Bạn có chắc chắn muốn đăng xuất?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question)

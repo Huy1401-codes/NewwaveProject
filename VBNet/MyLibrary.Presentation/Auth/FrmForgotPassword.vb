@@ -1,4 +1,5 @@
-﻿Imports System.Text.RegularExpressions
+﻿Imports System.Configuration
+Imports System.Text.RegularExpressions
 Imports MyLibrary.BLL
 Imports MyLibrary.DAL
 
@@ -10,10 +11,17 @@ Public Class FrmForgotPassword
     Public Sub New()
         InitializeComponent()
 
+        Dim emailFrom = ConfigurationManager.AppSettings("EmailFrom")
+        Dim emailPass = ConfigurationManager.AppSettings("EmailAppPassword")
+        If String.IsNullOrEmpty(emailPass) Then
+            MessageBox.Show("LỖI: Không đọc được mật khẩu từ Config! Biến emailPass đang rỗng.")
+        Else
+            MessageBox.Show("Đã đọc mật khẩu từ Config: " & emailPass.Substring(0, 3) & "***")
+        End If
         _auth = New AuthService(
-            New UnitOfWork(),
-            New EmailService("huydo272@gmail.com", "seky quuk rnev lyzc")
-        )
+        New UnitOfWork(),
+        New EmailService(emailFrom, emailPass)
+    )
     End Sub
 
     Private Sub btnGetCode_Click(sender As Object, e As EventArgs) Handles btnGetCode.Click

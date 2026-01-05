@@ -61,15 +61,28 @@ Public Class FrmLogin
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        Try
-            Using context As New AppDbContext()
+        'Try
+        '    Using context As New AppDbContext()
 
-                Dim count = context.Users.Count()
+        '        Dim count = context.Users.Count()
 
-                MessageBox.Show($"Kết nối THÀNH CÔNG! Hiện có {count} user trong DB.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            End Using
-        Catch ex As Exception
-            MessageBox.Show("Lỗi kết nối: " & ex.Message & vbCrLf & "Inner: " & If(ex.InnerException IsNot Nothing, ex.InnerException.Message, ""), "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
-        End Try
+        '        MessageBox.Show($"Kết nối THÀNH CÔNG! Hiện có {count} user trong DB.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        '    End Using
+        'Catch ex As Exception
+        '    MessageBox.Show("Lỗi kết nối: " & ex.Message & vbCrLf & "Inner: " & If(ex.InnerException IsNot Nothing, ex.InnerException.Message, ""), "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        'End Try
+
+        Dim emailService As New EmailService(
+     "huydo272@gmail.com",
+     "vxsfydbwjyrytxne"
+ )
+
+        emailService.SendEmail(
+            "huydqhe173522@fpt.edu.vn",
+            "SMTP OK",
+            "Test thành công"
+        )
+
+        MessageBox.Show("Gửi mail OK")
     End Sub
 End Class

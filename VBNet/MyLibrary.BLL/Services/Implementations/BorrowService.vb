@@ -13,62 +13,85 @@ Public Class BorrowService
         _uow = uow
     End Sub
 
-    Public Sub RequestBorrow(userId As Integer, bookIds As List(Of Integer), dueDate As DateTime) _
-        Implements IBorrowService.RequestBorrow
+    Public Sub RequestBorrow(userId As Integer,
+                          borrowItems As List(Of BorrowItemDto),
+                          dueDate As DateTime) _
+    Implements IBorrowService.RequestBorrow
 
         logger.Info("RequestBorrow START | UserId={0}, Books={1}, DueDate={2}",
-                userId, String.Join(",", bookIds), dueDate)
-        If bookIds Is Nothing OrElse bookIds.Count = 0 Then
-            logger.Warn("RequestBorrow FAILED | UserId={0} | No books selected", userId)
+                userId,
+                String.Join(",",
+                    borrowItems.Select(Function(x) $"{x.BookId}({x.Quantity})")),
+                dueDate)
+
+        If borrowItems Is Nothing OrElse borrowItems.Count = 0 Then
             Throw New Exception("Chưa chọn sách nào.")
         End If
-        If dueDate <= DateTime.Now Then Throw New Exception("Ngày trả không hợp lệ.")
-        If dueDate > DateTime.Now.AddYears(1) Then Throw New Exception("Chỉ được mượn tối đa 1 năm.")
+
+        If dueDate <= DateTime.Now Then
+            Throw New Exception("Ngày trả không hợp lệ.")
+        End If
+
+        If dueDate > DateTime.Now.AddYears(1) Then
+            Throw New Exception("Chỉ được mượn tối đa 1 năm.")
+        End If
 
         Using transaction = _uow.Context.Database.BeginTransaction()
             Try
                 Dim ticket As New BorrowTicket With {
-                    .UserId = userId,
-                    .BorrowDate = DateTime.Now,
-                    .DueDate = dueDate,
-                    .Status = BorrowStatus.Pending,
-                    .CreatedAt = DateTime.Now,
-                    .IsDeleted = False
-                }
+                .UserId = userId,
+                .BorrowDate = DateTime.Now,
+                .DueDate = dueDate,
+                .Status = BorrowStatus.Pending,
+                .CreatedAt = DateTime.Now,
+                .IsDeleted = False
+            }
+
                 _uow.BorrowTickets.Add(ticket)
                 _uow.Save()
+                For Each item In borrowItems
+                    Dim book = _uow.Books.GetById(item.BookId)
 
-                For Each bId In bookIds
-                    Dim book = _uow.Books.GetById(bId)
+                    If book Is Nothing Then
+                        Throw New Exception($"Sách ID {item.BookId} không tồn tại.")
+                    End If
 
-                    If book Is Nothing OrElse book.Quantity <= 0 OrElse book.AvailableQuantity <= 0 Then
-                        Throw New Exception($"Sách '{If(book IsNot Nothing, book.Title, bId)}' đã hết hàng.")
+                    If item.Quantity <= 0 Then
+                        Throw New Exception($"Số lượng mượn của sách '{book.Title}' không hợp lệ.")
+                    End If
+
+                    If book.AvailableQuantity < item.Quantity Then
+                        Throw New Exception($"Sách '{book.Title}' không đủ số lượng.")
                     End If
 
                     Dim detail As New BorrowDetail With {
-                        .BorrowTicketId = ticket.Id,
-                        .BookId = bId,
-                        .Quantity = 1,
-                        .CreatedAt = DateTime.Now,
-                        .IsDeleted = False
-                    }
+                    .BorrowTicketId = ticket.Id,
+                    .BookId = item.BookId,
+                    .Quantity = item.Quantity,
+                    .CreatedAt = DateTime.Now,
+                    .IsDeleted = False
+                }
+
                     _uow.BorrowDetails.Add(detail)
 
-                    book.AvailableQuantity -= 1
+                    book.AvailableQuantity -= item.Quantity
                     _uow.Books.Update(book)
                 Next
 
                 _uow.Save()
                 transaction.Commit()
-                logger.Info("RequestBorrow SUCCESS | UserId={0}, TicketId={1}", userId, ticket.Id)
+
+                logger.Info("RequestBorrow SUCCESS | UserId={0}, TicketId={1}",
+                        userId, ticket.Id)
 
             Catch ex As Exception
                 transaction.Rollback()
                 logger.Error(ex, "RequestBorrow ERROR | UserId={0}", userId)
-                Throw ex
+                Throw
             End Try
         End Using
     End Sub
+
 
     Public Sub ApproveBorrow(ticketId As Integer, isApproved As Boolean) _
         Implements IBorrowService.ApproveBorrow
