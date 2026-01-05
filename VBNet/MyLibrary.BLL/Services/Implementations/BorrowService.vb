@@ -13,15 +13,14 @@ Public Class BorrowService
         _uow = uow
     End Sub
 
-    Public Sub RequestBorrow(userId As Integer,
-                          borrowItems As List(Of BorrowItemDto),
-                          dueDate As DateTime) _
-    Implements IBorrowService.RequestBorrow
+    Public Async Function RequestBorrowAsync(userId As Integer,
+                              borrowItems As List(Of BorrowItemDto),
+                              dueDate As DateTime) As Task _
+        Implements IBorrowService.RequestBorrowAsync
 
         logger.Info("RequestBorrow START | UserId={0}, Books={1}, DueDate={2}",
                 userId,
-                String.Join(",",
-                    borrowItems.Select(Function(x) $"{x.BookId}({x.Quantity})")),
+                String.Join(",", borrowItems.Select(Function(x) $"{x.BookId}({x.Quantity})")),
                 dueDate)
 
         If borrowItems Is Nothing OrElse borrowItems.Count = 0 Then
@@ -39,18 +38,20 @@ Public Class BorrowService
         Using transaction = _uow.Context.Database.BeginTransaction()
             Try
                 Dim ticket As New BorrowTicket With {
-                .UserId = userId,
-                .BorrowDate = DateTime.Now,
-                .DueDate = dueDate,
-                .Status = BorrowStatus.Pending,
-                .CreatedAt = DateTime.Now,
-                .IsDeleted = False
-            }
+                    .UserId = userId,
+                    .BorrowDate = DateTime.Now,
+                    .DueDate = dueDate,
+                    .Status = BorrowStatus.Pending,
+                    .CreatedAt = DateTime.Now,
+                    .IsDeleted = False
+                }
 
                 _uow.BorrowTickets.Add(ticket)
-                _uow.Save()
+
+                Await _uow.SaveAsync()
+
                 For Each item In borrowItems
-                    Dim book = _uow.Books.GetById(item.BookId)
+                    Dim book = Await _uow.Books.GetByIdAsync(item.BookId)
 
                     If book Is Nothing Then
                         Throw New Exception($"Sách ID {item.BookId} không tồn tại.")
@@ -61,7 +62,7 @@ Public Class BorrowService
                     End If
 
                     If book.AvailableQuantity < item.Quantity Then
-                        Throw New Exception($"Sách '{book.Title}' không đủ số lượng.")
+                        Throw New Exception($"Sách '{book.Title}' không đủ số lượng (Còn: {book.AvailableQuantity}).")
                     End If
 
                     Dim detail As New BorrowDetail With {
@@ -78,11 +79,11 @@ Public Class BorrowService
                     _uow.Books.Update(book)
                 Next
 
-                _uow.Save()
+                Await _uow.SaveAsync()
+
                 transaction.Commit()
 
-                logger.Info("RequestBorrow SUCCESS | UserId={0}, TicketId={1}",
-                        userId, ticket.Id)
+                logger.Info("RequestBorrow SUCCESS | UserId={0}, TicketId={1}", userId, ticket.Id)
 
             Catch ex As Exception
                 transaction.Rollback()
@@ -90,14 +91,15 @@ Public Class BorrowService
                 Throw
             End Try
         End Using
-    End Sub
+    End Function
 
+    Public Async Function ApproveBorrowAsync(ticketId As Integer, isApproved As Boolean) As Task _
+        Implements IBorrowService.ApproveBorrowAsync
 
-    Public Sub ApproveBorrow(ticketId As Integer, isApproved As Boolean) _
-        Implements IBorrowService.ApproveBorrow
         logger.Info("ApproveBorrow START | TicketId={0}, Approved={1}", ticketId, isApproved)
 
-        Dim ticket = _uow.BorrowTickets.GetByIdWithDetails(ticketId)
+        Dim ticket = Await _uow.BorrowTickets.GetByIdWithDetailsAsync(ticketId)
+
         If ticket Is Nothing Then Throw New Exception("Phiếu mượn không tồn tại.")
 
         If ticket.Status <> BorrowStatus.Pending Then
@@ -107,14 +109,13 @@ Public Class BorrowService
         Using trans = _uow.Context.Database.BeginTransaction()
             Try
                 If isApproved Then
-
                     ticket.Status = BorrowStatus.Approved
                 Else
                     ticket.Status = BorrowStatus.Rejected
 
                     If ticket.BorrowDetails IsNot Nothing Then
                         For Each d In ticket.BorrowDetails
-                            Dim book = _uow.Books.GetById(d.BookId)
+                            Dim book = Await _uow.Books.GetByIdAsync(d.BookId)
                             If book IsNot Nothing Then
                                 book.AvailableQuantity += d.Quantity
                                 _uow.Books.Update(book)
@@ -125,24 +126,24 @@ Public Class BorrowService
 
                 ticket.UpdatedAt = DateTime.Now
                 _uow.BorrowTickets.Update(ticket)
-                _uow.Save()
+
+                Await _uow.SaveAsync()
                 trans.Commit()
 
-                logger.Info("ApproveBorrow SUCCESS | TicketId={0}, Status={1}",
-                            ticketId, ticket.Status)
+                logger.Info("ApproveBorrow SUCCESS | TicketId={0}, Status={1}", ticketId, ticket.Status)
             Catch ex As Exception
                 logger.Error(ex, "ApproveBorrow ERROR | TicketId={0}", ticketId)
                 trans.Rollback()
-                Throw ex
+                Throw
             End Try
         End Using
-    End Sub
+    End Function
 
 
-    Public Sub ReturnBook(ticketId As Integer, paymentMethod As PaymentMethod) _
-        Implements IBorrowService.ReturnBook
+    Public Async Function ReturnBookAsync(ticketId As Integer, paymentMethod As PaymentMethod) As Task _
+        Implements IBorrowService.ReturnBookAsync
 
-        Dim ticket = _uow.BorrowTickets.GetByIdWithDetails(ticketId)
+        Dim ticket = Await _uow.BorrowTickets.GetByIdWithDetailsAsync(ticketId)
         If ticket Is Nothing Then Throw New Exception("Phiếu không tồn tại.")
 
         If ticket.Status <> BorrowStatus.Approved Then Throw New Exception("Phiếu này không trong trạng thái đang mượn.")
@@ -155,6 +156,7 @@ Public Class BorrowService
                     fineAmount = overdueDays * 5000
                 End If
 
+
                 If fineAmount > 0 Then
                     Dim deposit As New Deposit With {
                         .BorrowTicketId = ticketId,
@@ -163,7 +165,9 @@ Public Class BorrowService
                         .CreatedAt = DateTime.Now
                     }
                     _uow.Deposits.Add(deposit)
-                    _uow.Save()
+
+
+                    Await _uow.SaveAsync()
 
                     Dim payment As New Payment With {
                         .DepositId = deposit.Id,
@@ -175,15 +179,15 @@ Public Class BorrowService
                     _uow.Payments.Add(payment)
                 End If
 
-                ' Cập nhật trạng thái
+
                 ticket.Status = BorrowStatus.Returned
                 ticket.UpdatedAt = DateTime.Now
                 _uow.BorrowTickets.Update(ticket)
 
-                ' Trả sách  
+
                 If ticket.BorrowDetails IsNot Nothing Then
                     For Each d In ticket.BorrowDetails
-                        Dim book = _uow.Books.GetById(d.BookId)
+                        Dim book = Await _uow.Books.GetByIdAsync(d.BookId)
                         If book IsNot Nothing Then
                             book.AvailableQuantity += d.Quantity
                             _uow.Books.Update(book)
@@ -191,21 +195,21 @@ Public Class BorrowService
                     Next
                 End If
 
-                _uow.Save()
+                Await _uow.SaveAsync()
                 trans.Commit()
             Catch ex As Exception
                 trans.Rollback()
-                Throw ex
+                Throw
             End Try
         End Using
-    End Sub
+    End Function
 
-    Public Function GetPendingListPaged(sortOrder As String, page As Integer, pageSize As Integer) As PagedResult(Of BorrowTicketDto) _
-    Implements IBorrowService.GetPendingListPaged
+    Public Async Function GetPendingListPagedAsync(sortOrder As String, page As Integer, pageSize As Integer) As Task(Of PagedResult(Of BorrowTicketDto)) _
+        Implements IBorrowService.GetPendingListPagedAsync
 
         Dim isNewest = (sortOrder = "Mới nhất")
 
-        Dim result = _uow.BorrowTickets.GetPendingRequestsPaged(isNewest, page, pageSize)
+        Dim result = Await _uow.BorrowTickets.GetPendingRequestsPagedAsync(isNewest, page, pageSize)
 
         Dim dtos = result.Item1.Select(Function(t) MapToDto(t)).ToList()
         Dim totalRecords = result.Item2
@@ -216,24 +220,25 @@ Public Class BorrowService
         End If
 
         Return New PagedResult(Of BorrowTicketDto) With {
-        .Items = dtos,
-        .TotalCount = totalRecords,
-        .TotalPages = totalPages
-    }
+            .Items = dtos,
+            .TotalCount = totalRecords,
+            .TotalPages = totalPages
+        }
     End Function
 
-    Public Function GetMyHistory(userId As Integer) As List(Of BorrowTicketDto) _
-        Implements IBorrowService.GetMyHistory
+    Public Async Function GetMyHistoryAsync(userId As Integer) As Task(Of List(Of BorrowTicketDto)) _
+        Implements IBorrowService.GetMyHistoryAsync
 
-        Dim tickets = _uow.BorrowTickets.GetHistoryByUserId(userId)
+        Dim tickets = Await _uow.BorrowTickets.GetHistoryByUserIdAsync(userId)
+
         logger.Info("GetMyHistory | UserId={0}", userId)
         Return tickets.Select(Function(t) MapToDto(t)).ToList()
     End Function
 
-    Public Function CalculateFine(ticketId As Integer) As Decimal _
-        Implements IBorrowService.CalculateFine
+    Public Async Function CalculateFineAsync(ticketId As Integer) As Task(Of Decimal) _
+        Implements IBorrowService.CalculateFineAsync
 
-        Dim ticket = _uow.BorrowTickets.GetById(ticketId)
+        Dim ticket = Await _uow.BorrowTickets.GetByIdAsync(ticketId)
         If ticket Is Nothing Then Return 0
 
         If ticket.Status = BorrowStatus.Approved AndAlso DateTime.Now > ticket.DueDate Then
@@ -242,7 +247,6 @@ Public Class BorrowService
         End If
         Return 0
     End Function
-
 
     Private Function MapToDto(t As BorrowTicket) As BorrowTicketDto
         Dim dto As New BorrowTicketDto With {
@@ -272,7 +276,7 @@ Public Class BorrowService
                 Else
                     dto.StatusDisplay = "Đang mượn"
                 End If
-            Case Else : dto.StatusDisplay = t.Status
+            Case Else : dto.StatusDisplay = t.Status.ToString()
         End Select
         Return dto
     End Function

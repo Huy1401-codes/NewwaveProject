@@ -28,15 +28,15 @@ Public Class FrmAvailableBooks
         LoadData("", Nothing, Nothing)
     End Sub
 
-    Private Sub LoadFilters()
-        Dim publishers = _bookService.GetPublishers()
+    Private Async Sub LoadFilters()
+        Dim publishers = Await _bookService.GetPublishersAsync()
         publishers.Insert(0, New Publisher With {.Id = 0, .PublisherName = "Tất cả NXB"})
         cboPublisher.DataSource = publishers
         cboPublisher.DisplayMember = "PublisherName"
         cboPublisher.ValueMember = "Id"
         cboPublisher.SelectedIndex = 0
 
-        Dim categories = _bookService.GetCategories()
+        Dim categories = Await _bookService.GetCategoriesAsync()
         categories.Insert(0, New Category With {.Id = 0, .CategoryName = "Tất cả Danh Mục"})
         cboCategory.DataSource = categories
         cboCategory.DisplayMember = "CategoryName"
@@ -44,9 +44,9 @@ Public Class FrmAvailableBooks
         cboCategory.SelectedIndex = 0
     End Sub
 
-    Private Sub LoadData(keyword As String, Optional publisherId As Integer? = Nothing, Optional categoryId As Integer? = Nothing)
+    Private Async Sub LoadData(keyword As String, Optional publisherId As Integer? = Nothing, Optional categoryId As Integer? = Nothing)
         Try
-            _allBooks = _bookService.GetAvailableBooks(keyword, publisherId, categoryId)
+            _allBooks = Await _bookService.GetAvailableBooksAsync(keyword, publisherId, categoryId)
             _currentPage = 1
             RenderGrid()
         Catch ex As Exception

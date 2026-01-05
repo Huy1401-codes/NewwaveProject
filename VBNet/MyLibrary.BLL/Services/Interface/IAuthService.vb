@@ -1,14 +1,13 @@
 ﻿Public Interface IAuthService
-    Function Login(email As String, password As String) As LoginResponseDto
+    Function LoginAsync(email As String, password As String) As Task(Of LoginResponseDto)
 
-    Sub Register(dto As RegisterRequestDto)
+    Function RegisterAsync(dto As RegisterRequestDto) As Task
 
-    Function EmailExists(email As String) As Boolean
+    Function EmailExistsAsync(email As String) As Task(Of Boolean)
 
-    ' Xác thực tài khoản sau khi đăng ký
-    Sub VerifyAccount(email As String, code As String)
-    ' Gửi OTP quên mật khẩu
-    Sub ForgotPassword(email As String)
-    ' Đổi mật khẩu mới bằng OTP
-    Sub CompletePasswordReset(email As String, otp As String, newPassword As String)
+    Function VerifyAccountAsync(email As String, code As String) As Task
+
+    Function ForgotPasswordAsync(email As String) As Task
+
+    Function CompletePasswordResetAsync(email As String, otp As String, newPassword As String) As Task
 End Interface

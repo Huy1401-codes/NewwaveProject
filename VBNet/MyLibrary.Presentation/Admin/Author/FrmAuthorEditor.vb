@@ -33,9 +33,9 @@ Public Class FrmAuthorEditor
         End If
     End Sub
 
-    Private Sub LoadAuthorData()
+    Private Async Sub LoadAuthorData()
         Try
-            Dim author = _service.GetById(_authorId)
+            Dim author = Await _service.GetByIdAsync(_authorId)
             If author IsNot Nothing Then
                 txtName.Text = author.AuthorName
                 txtBio.Text = author.Biography
@@ -96,10 +96,10 @@ Public Class FrmAuthorEditor
 
 
             If _authorId = 0 Then
-                _service.Add(dto)
+                Await _service.AddAsync(dto)
                 MessageBox.Show("Thêm mới thành công!")
             Else
-                _service.Update(_authorId, dto)
+                Await _service.UpdateAsync(_authorId, dto)
                 MessageBox.Show("Cập nhật thành công!")
             End If
 

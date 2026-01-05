@@ -49,9 +49,9 @@ Public Class FrmPublisherList
 
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
-            Dim result = _publisherService.GetPaged(txtSearch.Text.Trim(), _currentPage, _pageSize)
+            Dim result = Await _publisherService.GetPagedAsync(txtSearch.Text.Trim(), _currentPage, _pageSize)
 
             dgvCategories.DataSource = result.Items
             _totalPages = result.TotalPages
@@ -111,14 +111,14 @@ Public Class FrmPublisherList
         End Using
     End Sub
 
-    Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
+    Private Async Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
         Dim id = GetSelectedId()
         If id = 0 Then Return
 
         If MessageBox.Show("Bạn có chắc chắn muốn xóa Nhà xuất bản này?", "Cảnh báo",
                            MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
             Try
-                _publisherService.Delete(id)
+                Await _publisherService.DeleteAsync(id)
                 MessageBox.Show("Xóa thành công!")
                 LoadData()
             Catch ex As Exception

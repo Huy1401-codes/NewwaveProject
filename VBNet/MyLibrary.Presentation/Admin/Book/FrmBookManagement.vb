@@ -127,8 +127,8 @@ Public Class FrmBookManagement
         dgvBooks.Columns.Add(col)
     End Sub
 
-    Private Sub LoadFilters()
-        Dim publishers = _bookService.GetPublishers()
+    Private Async Sub LoadFilters()
+        Dim publishers = Await _bookService.GetPublishersAsync()
         publishers.Insert(0, New Publisher With {.Id = 0, .PublisherName = "Tất cả NXB"})
 
         cboFilterPublisher.DataSource = publishers
@@ -145,7 +145,7 @@ Public Class FrmBookManagement
         cboFilterYear.SelectedIndex = 0
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Dim keyword As String = txtSearch.Text.Trim()
 
         Dim pubId As Integer? = Nothing
@@ -161,7 +161,7 @@ Public Class FrmBookManagement
             year = Convert.ToInt32(cboFilterYear.SelectedItem)
         End If
 
-        Dim result = _bookService.GetBooksCombined(keyword, pubId, year, _currentPage, _pageSize)
+        Dim result = Await _bookService.GetBooksCombinedAsync(keyword, pubId, year, _currentPage, _pageSize)
 
         dgvBooks.DataSource = result.Items
         _totalPages = result.TotalPages
@@ -224,13 +224,13 @@ Public Class FrmBookManagement
         End Using
     End Sub
 
-    Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
+    Private Async Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
         If dgvBooks.SelectedRows.Count = 0 Then Return
         Dim selectedId As Integer = Convert.ToInt32(dgvBooks.SelectedRows(0).Cells("Id").Value)
 
         If MessageBox.Show("Bạn có chắc muốn xóa ?", "Xác nhận", MessageBoxButtons.YesNo) = DialogResult.Yes Then
             Try
-                _bookService.DeleteBook(selectedId)
+                Await _bookService.DeleteBookAsync(selectedId)
                 LoadData()
             Catch ex As Exception
                 MessageBox.Show(ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -242,8 +242,8 @@ Public Class FrmBookManagement
         If e.RowIndex >= 0 Then btnEdit.PerformClick()
     End Sub
 
-    Private Sub btnExcel_Click(sender As Object, e As EventArgs) Handles btnExcel.Click
-        Dim books As List(Of BookDto) = _bookService.GetAllBooksForView()
+    Private Async Sub btnExcel_Click(sender As Object, e As EventArgs) Handles btnExcel.Click
+        Dim books As List(Of BookDto) = Await _bookService.GetAllBooksForViewAsync()
         Dim fileBytes = _bookService.ExportBooksToExcel(books)
 
         Dim saveFile As New SaveFileDialog() With {
@@ -269,7 +269,7 @@ Public Class FrmBookManagement
         End If
     End Sub
 
-    Private Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
+    Private Async Sub btnImport_Click(sender As Object, e As EventArgs) Handles btnImport.Click
         Using ofd As New OpenFileDialog()
             ofd.Title = "Chọn file Excel"
             ofd.Filter = "Excel Files (*.xlsx)|*.xlsx"
@@ -279,7 +279,7 @@ Public Class FrmBookManagement
                 Dim filePath As String = ofd.FileName
                 Dim fileBytes As Byte() = IO.File.ReadAllBytes(filePath)
 
-                _bookService.ImportBooksFromExcelToDb(fileBytes)
+                Await _bookService.ImportBooksFromExcelToDbAsync(fileBytes)
 
                 MessageBox.Show("Import thành công!",
                             "Thông báo",

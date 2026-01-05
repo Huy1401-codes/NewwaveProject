@@ -49,16 +49,16 @@ Public Class FrmBookEditor
         End If
     End Sub
 
-    Private Sub LoadComboBoxes()
-        cboAuthor.DataSource = _bookService.GetAuthors()
+    Private Async Sub LoadComboBoxes()
+        cboAuthor.DataSource = Await _bookService.GetAuthorsAsync()
         cboAuthor.DisplayMember = "AuthorName"
         cboAuthor.ValueMember = "Id"
 
-        cboCategory.DataSource = _bookService.GetCategories()
+        cboCategory.DataSource = Await _bookService.GetCategoriesAsync()
         cboCategory.DisplayMember = "CategoryName"
         cboCategory.ValueMember = "Id"
 
-        cboPublisher.DataSource = _bookService.GetPublishers()
+        cboPublisher.DataSource = Await _bookService.GetPublishersAsync()
         cboPublisher.DisplayMember = "PublisherName"
         cboPublisher.ValueMember = "Id"
     End Sub
@@ -79,8 +79,8 @@ Public Class FrmBookEditor
         _isImageChanged = False
     End Sub
 
-    Private Sub LoadDataToEdit()
-        Dim book = _bookService.GetBookById(_bookId)
+    Private Async Sub LoadDataToEdit()
+        Dim book = Await _bookService.GetBookByIdAsync(_bookId)
         If book IsNot Nothing Then
             txtCode.Text = book.BookCode
             txtCode.Enabled = False
@@ -158,7 +158,7 @@ Public Class FrmBookEditor
             End If
 
             If _bookId > 0 Then
-                Dim oldBook = _bookService.GetBookById(_bookId)
+                Dim oldBook = Await _bookService.GetBookByIdAsync(_bookId)
                 If oldBook Is Nothing Then
                     MessageBox.Show("Không tìm thấy sách")
                     Return
@@ -212,10 +212,10 @@ Public Class FrmBookEditor
         }
 
             If _bookId = 0 Then
-                _bookService.AddBook(book)
+                Await _bookService.AddBookAsync(book)
                 MessageBox.Show("Thêm mới thành công!")
             Else
-                _bookService.UpdateBook(book)
+                Await _bookService.UpdateBookAsync(book)
                 MessageBox.Show("Cập nhật thành công!")
             End If
 

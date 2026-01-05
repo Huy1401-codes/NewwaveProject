@@ -63,9 +63,9 @@ Public Class FrmAuthorDetail
         dgvBooks.Columns("Price").DefaultCellStyle.Format = "N0"
     End Sub
 
-    Private Sub LoadPublishers()
+    Private Async Sub LoadPublishers()
 
-        Dim publishers = _serviceBook.GetPublishers()
+        Dim publishers = Await _serviceBook.GetPublishersAsync()
         publishers.Insert(0, New Publisher With {.Id = 0, .PublisherName = "Tất cả NXB"})
 
         cboPublisher.DataSource = publishers
@@ -74,11 +74,11 @@ Public Class FrmAuthorDetail
         cboPublisher.SelectedIndex = 0
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
-            Dim author = _service.GetById(_authorId)
+            Dim author = Await _service.GetByIdAsync(_authorId)
 
-            Dim detail = _service.GetDetail(_authorId,
+            Dim detail = Await _service.GetDetailAsync(_authorId,
                                             _currentKeyword,
                                             _currentPage,
                                             _pageSize,

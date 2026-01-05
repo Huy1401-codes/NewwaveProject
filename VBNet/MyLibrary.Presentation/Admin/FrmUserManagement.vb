@@ -83,7 +83,7 @@ Public Class FrmUserManagement
         cboStatus.SelectedIndex = 0
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
             ' Lấy giá trị lọc Status
             Dim statusFilter As Boolean? = Nothing
@@ -93,7 +93,7 @@ Public Class FrmUserManagement
                 statusFilter = (selectedStatus = 1)
             End If
 
-            Dim result = _userService.GetPaged(txtSearch.Text.Trim(), statusFilter, _currentPage, _pageSize)
+            Dim result = Await _userService.GetPagedAsync(txtSearch.Text.Trim(), statusFilter, _currentPage, _pageSize)
 
             dgvUsers.DataSource = result.Items
 
@@ -129,7 +129,7 @@ Public Class FrmUserManagement
         End If
     End Sub
 
-    Private Sub btnToggleStatus_Click(sender As Object, e As EventArgs) Handles btnToggleStatus.Click
+    Private Async Sub btnToggleStatus_Click(sender As Object, e As EventArgs) Handles btnToggleStatus.Click
         If dgvUsers.SelectedRows.Count = 0 Then
             MessageBox.Show("Vui lòng chọn một tài khoản để thao tác.", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
@@ -140,16 +140,14 @@ Public Class FrmUserManagement
 
         If user Is Nothing Then Return
 
-        ' Xác định hành động sắp làm
         Dim actionName As String = If(user.IsActive, "KHÓA (Vô hiệu hóa)", "MỞ KHÓA (Khôi phục)")
         Dim msg As String = $"Bạn có chắc chắn muốn {actionName} tài khoản [{user.Email}] không?"
 
         If MessageBox.Show(msg, "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                _userService.ToggleStatus(user.Id)
+                Await _userService.ToggleStatusAsync(user.Id)
                 MessageBox.Show("Thao tác thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
-                ' Tải lại dữ liệu để cập nhật trạng thái mới
                 LoadData()
             Catch ex As Exception
                 MessageBox.Show("Lỗi: " & ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -157,13 +155,11 @@ Public Class FrmUserManagement
         End If
     End Sub
 
-    ' --- 6. CÁC SỰ KIỆN TÌM KIẾM & PHÂN TRANG ---
     Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
-        _currentPage = 1 ' Reset về trang 1 khi tìm kiếm mới
+        _currentPage = 1
         LoadData()
     End Sub
 
-    ' Cho phép nhấn Enter ở ô tìm kiếm
     Private Sub txtSearch_KeyDown(sender As Object, e As KeyEventArgs) Handles txtSearch.KeyDown
         If e.KeyCode = Keys.Enter Then
             btnSearch.PerformClick()

@@ -26,11 +26,11 @@ Public Class FrmAdminApproval
         LoadData()
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
             Dim sortOrder = cboSort.SelectedItem.ToString()
 
-            Dim result = _borrowService.GetPendingListPaged(sortOrder, _currentPage, _pageSize)
+            Dim result = Await _borrowService.GetPendingListPagedAsync(sortOrder, _currentPage, _pageSize)
 
             dgvRequests.DataSource = result.Items
             _totalPages = result.TotalPages
@@ -123,7 +123,7 @@ Public Class FrmAdminApproval
         ProcessRequest(False)
     End Sub
 
-    Private Sub ProcessRequest(isApproved As Boolean)
+    Private Async Sub ProcessRequest(isApproved As Boolean)
         If dgvRequests.SelectedRows.Count = 0 Then
             MessageBox.Show("Vui lòng chọn phiếu cần xử lý.")
             Return
@@ -136,7 +136,7 @@ Public Class FrmAdminApproval
 
         If MessageBox.Show($"Bạn chắc chắn muốn {actionText} phiếu này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                _borrowService.ApproveBorrow(ticketId, isApproved)
+                Await _borrowService.ApproveBorrowAsync(ticketId, isApproved)
 
                 MessageBox.Show("Thành công!")
                 LoadData()

@@ -1,4 +1,5 @@
-﻿Imports MyLibrary.Domain
+﻿Imports System.Data.Entity
+Imports MyLibrary.Domain
 
 Public Class AuthorRepository
     Inherits GenericRepository(Of Author)
@@ -6,17 +7,17 @@ Public Class AuthorRepository
     Public Sub New(context As AppDbContext)
         MyBase.New(context)
     End Sub
-    Public Function GetByName(name As String) As Author _
-        Implements IAuthorRepository.GetByName
+    Public Async Function GetByNameAsync(name As String) As Task(Of Author) _
+        Implements IAuthorRepository.GetByNameAsync
 
-        Return _dbSet.FirstOrDefault(Function(a) _
+        Return Await _dbSet.FirstOrDefaultAsync(Function(a) _
             a.AuthorName = name AndAlso a.IsDeleted = False)
     End Function
 
-    Public Function HasBorrowedBooks(authorId As Integer) As Boolean _
-        Implements IAuthorRepository.HasBorrowedBooks
+    Public Async Function HasBorrowedBooksAsync(authorId As Integer) As Task(Of Boolean) _
+        Implements IAuthorRepository.HasBorrowedBooksAsync
 
-        Return _context.Books.Any(Function(b) _
+        Return Await _context.Books.AnyAsync(Function(b) _
             b.AuthorId = authorId AndAlso
             b.IsDeleted = False AndAlso
             b.Quantity <> b.AvailableQuantity)

@@ -29,8 +29,8 @@ Public Class FrmBookDetail
         dtpDueDate.MaxDate = DateTime.Now.AddYears(1)
     End Sub
 
-    Private Sub LoadBookInfo()
-        Dim book = _bookService.GetBookDetail(_bookId)
+    Private Async Sub LoadBookInfo()
+        Dim book = Await _bookService.GetBookDetailAsync(_bookId)
         If book Is Nothing Then
             MessageBox.Show("Sách không tồn tại hoặc đã bị xóa.")
             Me.Close()
@@ -62,7 +62,7 @@ Public Class FrmBookDetail
 
     End Sub
 
-    Private Sub btnBorrow_Click(sender As Object, e As EventArgs) Handles btnBorrow.Click
+    Private Async Sub btnBorrow_Click(sender As Object, e As EventArgs) Handles btnBorrow.Click
         Try
             If dtpDueDate.Value <= DateTime.Now Then
                 MessageBox.Show("Ngày trả phải lớn hơn ngày hiện tại.")
@@ -87,7 +87,7 @@ Public Class FrmBookDetail
                     }
                 }
 
-                _borrowService.RequestBorrow(
+                Await _borrowService.RequestBorrowAsync(
                     SessionManager.CurrentUser.UserId,
                     borrowItems,
                     dtpDueDate.Value

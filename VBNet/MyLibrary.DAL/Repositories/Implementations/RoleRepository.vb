@@ -1,4 +1,5 @@
-﻿Imports MyLibrary.Domain
+﻿Imports System.Data.Entity
+Imports MyLibrary.Domain
 
 Public Class RoleRepository
     Inherits GenericRepository(Of Role)
@@ -8,18 +9,13 @@ Public Class RoleRepository
         MyBase.New(context)
     End Sub
 
-    Public Function GetByName(roleName As String) As Role _
-    Implements IRoleRepository.GetByName
-
-        Dim allData = _dbSet.ToList()
-        Dim count = allData.Count
+    Public Async Function GetByNameAsync(roleName As String) As Task(Of Role) _
+                 Implements IRoleRepository.GetByNameAsync
 
         If String.IsNullOrWhiteSpace(roleName) Then Return Nothing
-        Dim nameToFind As String = roleName.Trim().ToLower()
 
-        Return _dbSet.FirstOrDefault(Function(r) _
-        r.IsDeleted = False AndAlso
-        r.RoleName.Trim().ToLower() = nameToFind)
+        Return Await _dbSet.FirstOrDefaultAsync(Function(r) _
+            Not r.IsDeleted AndAlso r.RoleName = roleName)
     End Function
 
 End Class

@@ -22,7 +22,7 @@ Public Class FrmRegister
     End Sub
 
 
-    Private Sub btnRegister_Click(sender As Object, e As EventArgs) Handles btnRegister.Click
+    Private Async Sub btnRegister_Click(sender As Object, e As EventArgs) Handles btnRegister.Click
         lblError.Text = ""
         Dim email = txtEmail.Text.Trim()
         Dim pass = txtPassword.Text
@@ -42,7 +42,7 @@ Public Class FrmRegister
                 .Email = email,
                 .Password = pass
             }
-            _auth.Register(dto)
+            Await _auth.RegisterAsync(dto)
 
             Cursor = Cursors.Default
 
@@ -71,7 +71,7 @@ Public Class FrmRegister
         End Try
     End Sub
 
-    Private Sub btnConfirmOTP_Click(sender As Object, e As EventArgs) Handles btnConfirmOTP.Click
+    Private Async Sub btnConfirmOTP_Click(sender As Object, e As EventArgs) Handles btnConfirmOTP.Click
         lblErrorVerify.Text = ""
         Dim otp = txtOTP.Text.Trim()
 
@@ -83,7 +83,7 @@ Public Class FrmRegister
         Try
             Cursor = Cursors.WaitCursor
 
-            _auth.VerifyAccount(_registeredEmail, otp)
+            Await _auth.VerifyAccountAsync(_registeredEmail, otp)
 
             Cursor = Cursors.Default
 

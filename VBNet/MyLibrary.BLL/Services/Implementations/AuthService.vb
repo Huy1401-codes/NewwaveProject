@@ -1,5 +1,6 @@
 ﻿Imports System.Security.Cryptography
 Imports System.Text
+Imports System.Threading.Tasks ' <-- Import Task
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
 Imports NLog
@@ -16,23 +17,24 @@ Public Class AuthService
         _emailService = emailService
     End Sub
 
-
-    Public Function Login(email As String, password As String) As LoginResponseDto _
-        Implements IAuthService.Login
+    ' --- 1. LOGIN ASYNC ---
+    Public Async Function LoginAsync(email As String, password As String) As Task(Of LoginResponseDto) _
+        Implements IAuthService.LoginAsync
 
         If String.IsNullOrWhiteSpace(email) OrElse String.IsNullOrWhiteSpace(password) Then
             Throw New Exception(AuthMessages.EmailOrPasswordEmpty)
         End If
 
-        Dim user = _uow.Users.GetByEmail(email)
+        ' Gọi Async
+        Dim user = Await _uow.Users.GetByEmailAsync(email)
+
         If user Is Nothing Then
             logger.Warn("Sai email hoặc mật khẩu")
             Throw New Exception(AuthMessages.EmailOrPasswordErorr)
-
         End If
 
-        If user Is Nothing OrElse user.IsDeleted Then
-            logger.Warn($"Login thất bại: Email {email} không tồn tại hoặc đã bị xóa.")
+        If user.IsDeleted Then
+            logger.Warn($"Login thất bại: Email {email} đã bị xóa.")
             Throw New Exception(AuthMessages.EmailOrPasswordErorr)
         End If
 
@@ -43,11 +45,13 @@ Public Class AuthService
         End If
 
         If Not user.IsActive Then
-            logger.Warn("Tài khoản chưa được kích hoạt. Vui lòng kiểm tra email để lấy mã xác thực.")
+            logger.Warn("Tài khoản chưa được kích hoạt.")
             Throw New Exception(AuthMessages.AccountNotActive)
         End If
 
-        Dim roleName = _uow.UserRoles.GetRoleNameByUserId(user.Id)
+        ' Gọi Async lấy tên Role
+        Dim roleName = Await _uow.UserRoles.GetRoleNameByUserIdAsync(user.Id)
+
         If String.IsNullOrEmpty(roleName) Then
             logger.Warn("Tài khoản chưa được phân quyền.")
             Throw New Exception(AuthMessages.AccountNotRole)
@@ -62,7 +66,9 @@ Public Class AuthService
         }
     End Function
 
-    Public Sub Register(dto As RegisterRequestDto) Implements IAuthService.Register
+    Public Async Function RegisterAsync(dto As RegisterRequestDto) As Task _
+        Implements IAuthService.RegisterAsync
+
         If dto Is Nothing Then Throw New Exception(AuthMessages.InforError)
         If String.IsNullOrWhiteSpace(dto.FullName) Then Throw New Exception(AuthMessages.FullNameNotNull)
         If String.IsNullOrWhiteSpace(dto.Email) Then Throw New Exception(AuthMessages.EmailOrPasswordErorr)
@@ -70,19 +76,21 @@ Public Class AuthService
 
         Dim email As String = dto.Email.Trim().ToLower()
 
-        Dim defaultRole = _uow.Roles.GetByName("Customer")
+
+        Dim defaultRole = Await _uow.Roles.GetByNameAsync("Customer")
 
         If defaultRole Is Nothing Then
             defaultRole = New Role With {
-            .RoleName = "Customer",
-            .IsDeleted = False
-        }
+                .RoleName = "Customer",
+                .IsDeleted = False
+            }
             logger.Info("Tạo role mới thành công")
             _uow.Roles.Add(defaultRole)
-            _uow.Save()
+            Await _uow.SaveAsync()
         End If
 
-        If _uow.Users.ExistsByEmail(email) Then
+        Dim existingUser = Await _uow.Users.GetByEmailAsync(email)
+        If existingUser IsNot Nothing Then
             logger.Warn("Email tồn tại")
             Throw New Exception(AuthMessages.EmailExist)
         End If
@@ -90,62 +98,58 @@ Public Class AuthService
         Dim otpCode As String = GenerateOTP()
 
         Dim user As New User With {
-        .Email = email,
-        .PasswordHash = HashPassword(dto.Password),
-        .FullName = dto.FullName.Trim(),
-        .IsActive = False,
-        .VerificationCode = otpCode,
-        .CodeExpiration = DateTime.Now.AddMinutes(3),
-        .CreatedAt = DateTime.Now,
-        .IsDeleted = False,
-        .UpdatedAt = DateTime.Now
-    }
+            .Email = email,
+            .PasswordHash = HashPassword(dto.Password),
+            .FullName = dto.FullName.Trim(),
+            .IsActive = False,
+            .VerificationCode = otpCode,
+            .CodeExpiration = DateTime.Now.AddMinutes(3),
+            .CreatedAt = DateTime.Now,
+            .IsDeleted = False,
+            .UpdatedAt = DateTime.Now
+        }
 
         _uow.Users.Add(user)
 
         _uow.UserRoles.Add(New UserRole With {
-        .User = user,
-        .RoleId = defaultRole.Id
-    })
-
+            .User = user,
+            .RoleId = defaultRole.Id
+        })
 
         Try
             logger.Info("Tạo account mới thành công")
-            _uow.Save()
+            Await _uow.SaveAsync()
         Catch ex As Exception
             Dim msg As String = ex.Message
             If ex.InnerException IsNot Nothing Then
                 msg &= vbCrLf & "Inner: " & ex.InnerException.Message
-                If ex.InnerException.InnerException IsNot Nothing Then
-                    msg &= vbCrLf & "SQL Error: " & ex.InnerException.InnerException.Message
-                End If
             End If
             Throw New Exception("Lỗi lưu Database: " & msg)
         End Try
 
         Try
-            _emailService.SendEmail(
-            user.Email,
-            "Xác thực đăng ký tài khoản",
-            $"<h3>Xin chào {user.FullName}</h3><p>Mã OTP: {otpCode}</p>"
-        )
+
+            Await Task.Run(Sub()
+                               _emailService.SendEmail(
+                                   user.Email,
+                                   "Xác thực đăng ký tài khoản",
+                                   $"<h3>Xin chào {user.FullName}</h3><p>Mã OTP: {otpCode}</p>"
+                               )
+                           End Sub)
             logger.Info("Gửi email thành công")
         Catch ex As Exception
-
+            logger.Error(ex, "Lỗi gửi email")
         End Try
+    End Function
 
-    End Sub
+    Public Async Function VerifyAccountAsync(email As String, code As String) As Task _
+        Implements IAuthService.VerifyAccountAsync
 
-
-
-    Public Sub VerifyAccount(email As String, code As String) _
-    Implements IAuthService.VerifyAccount
-
-        Dim user = _uow.Users.GetByEmail(email.Trim().ToLower())
+        Dim user = Await _uow.Users.GetByEmailAsync(email.Trim().ToLower())
 
         If user Is Nothing Then
-            logger.Warn("Email tồn tại")
-            Throw New Exception(AuthMessages.EmailExist)
+            logger.Warn("User không tồn tại")
+            Throw New Exception(AuthMessages.AccountNotExist)
         End If
 
         If user.IsActive Then
@@ -167,19 +171,19 @@ Public Class AuthService
         user.VerificationCode = Nothing
         user.CodeExpiration = Nothing
 
-        logger.Info("Tạo mới thành công")
-        _uow.Users.Update(user)
-        _uow.Save()
-    End Sub
+        logger.Info("Kích hoạt thành công")
 
-    Public Sub ForgotPassword(email As String) _
-    Implements IAuthService.ForgotPassword
+        _uow.Users.Update(user)
+        Await _uow.SaveAsync()
+    End Function
+
+    Public Async Function ForgotPasswordAsync(email As String) As Task _
+        Implements IAuthService.ForgotPasswordAsync
 
         If String.IsNullOrWhiteSpace(email) Then Return
 
         Dim emailTrim As String = email.Trim().ToLower()
-        Dim user = _uow.Users.GetByEmail(emailTrim)
-
+        Dim user = Await _uow.Users.GetByEmailAsync(emailTrim)
 
         If user Is Nothing OrElse Not user.IsActive Then
             Return
@@ -190,30 +194,30 @@ Public Class AuthService
         user.VerificationCode = otpCode
         user.CodeExpiration = DateTime.Now.AddMinutes(15)
 
-        logger.Info("Thành công")
+        logger.Info("Tạo OTP quên mật khẩu thành công")
         _uow.Users.Update(user)
-        _uow.Save()
+        Await _uow.SaveAsync()
+
         Try
-            _emailService.SendEmail(
-            user.Email,
-            "Mã xác thực Quên mật khẩu",
-            $"<h3>Yêu cầu cấp lại mật khẩu</h3>
-              <p>Mã xác thực (OTP) của bạn là:</p>
-              <h2 style='color:red;'>{otpCode}</h2>
-              <p>Vui lòng nhập mã này vào phần mềm để đặt lại mật khẩu mới.</p>"
-        )
+            Await Task.Run(Sub()
+                               _emailService.SendEmail(
+                                  user.Email,
+                                  "Mã xác thực Quên mật khẩu",
+                                  $"<h3>Yêu cầu cấp lại mật khẩu</h3><p>OTP: {otpCode}</p>"
+                              )
+                           End Sub)
         Catch ex As Exception
             logger.Error(ex, "Lỗi gửi email ForgotPassword")
-        Throw New Exception("Không gửi được email. Vui lòng thử lại.")
+            Throw New Exception("Không gửi được email. Vui lòng thử lại.")
         End Try
-    End Sub
+    End Function
 
-    Public Sub CompletePasswordReset(email As String, otp As String, newPassword As String) _
-    Implements IAuthService.CompletePasswordReset
+    Public Async Function CompletePasswordResetAsync(email As String, otp As String, newPassword As String) As Task _
+        Implements IAuthService.CompletePasswordResetAsync
 
-        Dim user = _uow.Users.GetByEmail(email.Trim().ToLower())
+        Dim user = Await _uow.Users.GetByEmailAsync(email.Trim().ToLower())
+
         If user Is Nothing Then Throw New Exception(AuthMessages.AccountNotExist)
-
 
         If String.IsNullOrEmpty(user.VerificationCode) OrElse user.VerificationCode <> otp Then
             logger.Warn("Code lỗi")
@@ -226,15 +230,22 @@ Public Class AuthService
         End If
 
         user.PasswordHash = HashPassword(newPassword)
-
         user.VerificationCode = Nothing
         user.CodeExpiration = Nothing
 
         logger.Warn("Reset password thành công")
         _uow.Users.Update(user)
-        _uow.Save()
-    End Sub
+        Await _uow.SaveAsync()
+    End Function
 
+    Public Async Function EmailExistsAsync(email As String) As Task(Of Boolean) _
+        Implements IAuthService.EmailExistsAsync
+
+        If String.IsNullOrWhiteSpace(email) Then Return False
+
+        Dim user = Await _uow.Users.GetByEmailAsync(email)
+        Return (user IsNot Nothing)
+    End Function
 
     Private Function HashPassword(password As String) As String
         Using sha As SHA256 = SHA256.Create()
@@ -247,12 +258,6 @@ Public Class AuthService
     Private Function GenerateOTP() As String
         Dim random As New Random()
         Return random.Next(100000, 999999).ToString()
-    End Function
-
-    Public Function EmailExists(email As String) As Boolean _
-    Implements IAuthService.EmailExists
-        If String.IsNullOrWhiteSpace(email) Then Return False
-        Return _uow.Users.ExistsByEmail(email)
     End Function
 
 End Class

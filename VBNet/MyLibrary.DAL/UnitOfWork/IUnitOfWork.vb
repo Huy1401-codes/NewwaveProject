@@ -19,5 +19,5 @@ Public Interface IUnitOfWork
     ReadOnly Property Deposits As IGenericRepository(Of Deposit)
     ReadOnly Property Payments As IGenericRepository(Of Payment)
 
-    Sub Save()
+    Function SaveAsync() As Task
 End Interface

@@ -11,8 +11,8 @@ Public Class UserService
         _uow = uow
     End Sub
 
-    Public Function GetPaged(keyword As String, status As Boolean?, pageIndex As Integer,
-                             pageSize As Integer) As PagedResult(Of UserDto) Implements IUserService.GetPaged
+    Public Async Function GetPagedAsync(keyword As String, status As Boolean?, pageIndex As Integer,
+                             pageSize As Integer) As Task(Of PagedResult(Of UserDto)) Implements IUserService.GetPagedAsync
 
 
         Dim query = _uow.Users.GetAllIncludedDeleted().Include("UserRoles.Role")
@@ -31,7 +31,7 @@ Public Class UserService
             query = query.Where(Function(u) u.IsActive = status.Value)
         End If
 
-        Dim totalRow = query.Count()
+        Dim totalRow = Await query.CountAsync()
 
         Dim items = query.OrderByDescending(Function(u) u.Id) _
                          .Skip((pageIndex - 1) * pageSize) _
@@ -53,13 +53,13 @@ Public Class UserService
         }
     End Function
 
-    Public Sub ToggleStatus(userId As Integer) Implements IUserService.ToggleStatus
-        Dim user = _uow.Users.GetById(userId)
+    Public Async Function ToggleStatusAsync(userId As Integer) As Task Implements IUserService.ToggleStatusAsync
+        Dim user = Await _uow.Users.GetByIdAsync(userId)
         If user Is Nothing Then Throw New Exception("Người dùng không tồn tại")
 
         user.IsActive = Not user.IsActive
 
         _uow.Users.Update(user)
-        _uow.Save()
-    End Sub
+        Await _uow.SaveAsync()
+    End Function
 End Class

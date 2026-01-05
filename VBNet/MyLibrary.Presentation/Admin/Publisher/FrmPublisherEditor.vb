@@ -29,9 +29,9 @@ Public Class FrmPublisherEditor
         End If
     End Sub
 
-    Private Sub LoadCategoryData()
+    Private Async Sub LoadCategoryData()
         Try
-            Dim category = _service.GetById(_publisherId)
+            Dim category = Await _service.GetByIdAsync(_publisherId)
             If category IsNot Nothing Then
                 txtName.Text = category.PublisherName
             End If
@@ -63,10 +63,10 @@ Public Class FrmPublisherEditor
 
 
             If _publisherId = 0 Then
-                _service.Add(dto)
+                Await _service.AddAsync(dto)
                 MessageBox.Show("Thêm mới thành công!")
             Else
-                _service.Update(_publisherId, dto)
+                Await _service.UpdateAsync(_publisherId, dto)
                 MessageBox.Show("Cập nhật thành công!")
             End If
 

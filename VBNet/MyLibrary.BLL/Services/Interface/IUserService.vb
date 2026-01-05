@@ -1,6 +1,6 @@
 ﻿Public Interface IUserService
-    Function GetPaged(keyword As String, status As Boolean?,
-                      pageIndex As Integer, pageSize As Integer) As PagedResult(Of UserDto)
+    Function GetPagedAsync(keyword As String, status As Boolean?,
+                      pageIndex As Integer, pageSize As Integer) As Task(Of PagedResult(Of UserDto))
 
-    Sub ToggleStatus(userId As Integer)
+    Function ToggleStatusAsync(userId As Integer) As Task
 End Interface
