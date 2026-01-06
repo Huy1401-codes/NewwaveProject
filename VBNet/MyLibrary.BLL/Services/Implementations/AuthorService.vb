@@ -1,4 +1,5 @@
-﻿Imports AutoMapper
+﻿Imports System.Data.Entity
+Imports AutoMapper
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
 
@@ -7,15 +8,16 @@ Public Class AuthorService
 
     Private ReadOnly _uow As IUnitOfWork
     Private ReadOnly _mapper As IMapper
+
     Public Sub New(uow As IUnitOfWork, mapper As IMapper)
         _uow = uow
         _mapper = mapper
     End Sub
 
-    Public Function GetPaged(keyword As String,
-                         pageIndex As Integer,
-                         pageSize As Integer) As PagedResult(Of Author) _
-    Implements IAuthorService.GetPaged
+    Public Async Function GetPagedAsync(keyword As String,
+                                        pageIndex As Integer,
+                                        pageSize As Integer) As Task(Of PagedResult(Of Author)) _
+        Implements IAuthorService.GetPagedAsync
 
         Dim query = _uow.Authors.GetAll()
 
@@ -23,24 +25,25 @@ Public Class AuthorService
             query = query.Where(Function(a) a.AuthorName.Contains(keyword))
         End If
 
-        Dim totalCount = query.Count()
+        Dim totalCount = Await query.CountAsync()
+
         Dim totalPages = Math.Ceiling(totalCount / pageSize)
 
-        Dim items = query _
-        .OrderBy(Function(a) a.AuthorName) _
-        .Skip((pageIndex - 1) * pageSize) _
-        .Take(pageSize) _
-        .ToList()
+        Dim items = Await query.OrderBy(Function(a) a.AuthorName) _
+                               .Skip((pageIndex - 1) * pageSize) _
+                               .Take(pageSize) _
+                               .ToListAsync()
 
         Return New PagedResult(Of Author) With {
-        .Items = items,
-        .TotalCount = totalCount,
-        .TotalPages = totalPages
-    }
+            .Items = items,
+            .TotalCount = totalCount,
+            .TotalPages = totalPages
+        }
     End Function
 
+    Public Async Function AddAsync(dto As AuthorDto) As Task _
+        Implements IAuthorService.AddAsync
 
-    Public Sub Add(dto As AuthorDto) Implements IAuthorService.Add
         If String.IsNullOrWhiteSpace(dto.AuthorName) Then
             Throw New Exception("Tên tác giả không được rỗng")
         End If
@@ -52,15 +55,22 @@ Public Class AuthorService
         author.IsDeleted = False
 
         _uow.Authors.Add(author)
-        _uow.Save()
-    End Sub
-    Public Sub Update(id As Integer, dto As AuthorDto) Implements IAuthorService.Update
-        Dim author = _uow.Authors.GetById(id)
+
+        Await _uow.SaveAsync()
+    End Function
+
+    Public Async Function UpdateAsync(id As Integer, dto As AuthorDto) As Task _
+        Implements IAuthorService.UpdateAsync
+
+        ' GetByIdAsync
+        Dim author = Await _uow.Authors.GetByIdAsync(id)
+
         If author Is Nothing OrElse author.IsDeleted Then
             Throw New Exception("Không tìm thấy tác giả")
         End If
 
-        If _uow.Authors.HasBorrowedBooks(id) Then
+
+        If Await _uow.Authors.HasBorrowedBooksAsync(id) Then
             Throw New Exception("Không thể chỉnh sửa vì đang có sách cho mượn")
         End If
 
@@ -69,33 +79,36 @@ Public Class AuthorService
         author.UpdatedAt = DateTime.Now
         author.Id = id
 
-        _uow.Save()
-    End Sub
+        Await _uow.SaveAsync()
+    End Function
 
-    Public Sub Delete(id As Integer) _
-        Implements IAuthorService.Delete
+    Public Async Function DeleteAsync(id As Integer) As Task _
+        Implements IAuthorService.DeleteAsync
 
-        Dim author = _uow.Authors.GetById(id)
+        Dim author = Await _uow.Authors.GetByIdAsync(id)
+
         If author Is Nothing OrElse author.IsDeleted Then
             Throw New Exception("Không tìm thấy tác giả")
         End If
 
-        If _uow.Authors.HasBorrowedBooks(id) Then
+        If Await _uow.Authors.HasBorrowedBooksAsync(id) Then
             Throw New Exception("Không thể xóa vì đang có sách cho mượn")
         End If
 
         _uow.Authors.SoftDelete(author)
-        _uow.Save()
-    End Sub
 
-    Public Function GetDetail(authorId As Integer,
-                              bookKeyword As String,
-                              pageIndex As Integer,
-                              pageSize As Integer,
-                              publisherId As Integer?) As AuthorDetailDto _
-                              Implements IAuthorService.GetDetail
+        Await _uow.SaveAsync()
+    End Function
 
-        Dim author = _uow.Authors.GetById(authorId)
+    Public Async Function GetDetailAsync(authorId As Integer,
+                                         bookKeyword As String,
+                                         pageIndex As Integer,
+                                         pageSize As Integer,
+                                         publisherId As Integer?) As Task(Of AuthorDetailDto) _
+        Implements IAuthorService.GetDetailAsync
+
+        Dim author = Await _uow.Authors.GetByIdAsync(authorId)
+
         If author Is Nothing OrElse author.IsDeleted Then
             Throw New Exception("Không tìm thấy tác giả")
         End If
@@ -112,23 +125,22 @@ Public Class AuthorService
             query = query.Where(Function(b) b.PublisherId = publisherId.Value)
         End If
 
-
-        Dim totalCount = query.Count()
+        Dim totalCount = Await query.CountAsync()
         Dim totalPages = CInt(Math.Ceiling(totalCount / pageSize))
 
-        Dim bookItems = query.OrderByDescending(Function(b) b.Id) _
-                             .Skip((pageIndex - 1) * pageSize) _
-                             .Take(pageSize) _
-                             .Select(Function(b) New AuthorBookDto With {
-                                 .BookId = b.Id,
-                                 .BookCode = b.BookCode,
-                                 .Title = b.Title,
-                                 .ImagePath = b.ImagePath,
-                                 .Price = b.Price,
-                                 .PublishYear = b.PublishYear,
-                                 .CategoryName = If(b.Category IsNot Nothing, b.Category.CategoryName, "N/A"),
-                                 .PublisherName = If(b.Publisher IsNot Nothing, b.Publisher.PublisherName, "N/A")
-                             }).ToList()
+        Dim bookItems = Await query.OrderByDescending(Function(b) b.Id) _
+                                   .Skip((pageIndex - 1) * pageSize) _
+                                   .Take(pageSize) _
+                                   .Select(Function(b) New AuthorBookDto With {
+                                       .BookId = b.Id,
+                                       .BookCode = b.BookCode,
+                                       .Title = b.Title,
+                                       .ImagePath = b.ImagePath,
+                                       .Price = b.Price,
+                                       .PublishYear = b.PublishYear,
+                                       .CategoryName = If(b.Category IsNot Nothing, b.Category.CategoryName, "N/A"),
+                                       .PublisherName = If(b.Publisher IsNot Nothing, b.Publisher.PublisherName, "N/A")
+                                   }).ToListAsync()
 
         Return New AuthorDetailDto With {
             .AuthorId = author.Id,
@@ -141,10 +153,14 @@ Public Class AuthorService
         }
     End Function
 
-    Public Function GetById(id As Integer) As AuthorDto Implements IAuthorService.GetById
-        Dim entity = _uow.Authors.GetById(id)
+    Public Async Function GetByIdAsync(id As Integer) As Task(Of AuthorDto) _
+        Implements IAuthorService.GetByIdAsync
+
+        Dim entity = Await _uow.Authors.GetByIdAsync(id)
+
         If entity Is Nothing OrElse entity.IsDeleted Then Return Nothing
 
         Return _mapper.Map(Of AuthorDto)(entity)
     End Function
+
 End Class

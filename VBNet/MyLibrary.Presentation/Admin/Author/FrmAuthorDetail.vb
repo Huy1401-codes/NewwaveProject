@@ -24,10 +24,10 @@ Public Class FrmAuthorDetail
         _serviceBook = serviceBook
     End Sub
 
-    Private Sub FrmAuthorDetail_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub FrmAuthorDetail_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SetupGrid()
-        LoadPublishers()
-        LoadData()
+        Await LoadPublishers()
+        Await LoadData()
     End Sub
 
     Private Sub SetupGrid()
@@ -63,22 +63,22 @@ Public Class FrmAuthorDetail
         dgvBooks.Columns("Price").DefaultCellStyle.Format = "N0"
     End Sub
 
-    Private Sub LoadPublishers()
+    Private Async Function LoadPublishers() As Task
 
-        Dim publishers = _serviceBook.GetPublishers()
+        Dim publishers = Await _serviceBook.GetPublishersAsync()
         publishers.Insert(0, New Publisher With {.Id = 0, .PublisherName = "Tất cả NXB"})
 
         cboPublisher.DataSource = publishers
         cboPublisher.DisplayMember = "PublisherName"
         cboPublisher.ValueMember = "Id"
         cboPublisher.SelectedIndex = 0
-    End Sub
+    End Function
 
-    Private Sub LoadData()
+    Private Async Function LoadData() As Task
         Try
-            Dim author = _service.GetById(_authorId)
+            Dim author = Await _service.GetByIdAsync(_authorId)
 
-            Dim detail = _service.GetDetail(_authorId,
+            Dim detail = Await _service.GetDetailAsync(_authorId,
                                             _currentKeyword,
                                             _currentPage,
                                             _pageSize,
@@ -103,10 +103,10 @@ Public Class FrmAuthorDetail
         Catch ex As Exception
             MessageBox.Show("Lỗi: " & ex.Message)
         End Try
-    End Sub
+    End Function
 
 
-    Private Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
+    Private Async Sub btnSearch_Click(sender As Object, e As EventArgs) Handles btnSearch.Click
         _currentKeyword = txtSearchBook.Text.Trim()
 
         Dim pubId = Convert.ToInt32(cboPublisher.SelectedValue)
@@ -118,20 +118,20 @@ Public Class FrmAuthorDetail
 
 
         _currentPage = 1
-        LoadData()
+        Await LoadData()
     End Sub
 
-    Private Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
+    Private Async Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
         If _currentPage > 1 Then
             _currentPage -= 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
 
-    Private Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
+    Private Async Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
         If _currentPage < _totalPages Then
             _currentPage += 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
     Private Sub dgvBooks_CellFormatting(

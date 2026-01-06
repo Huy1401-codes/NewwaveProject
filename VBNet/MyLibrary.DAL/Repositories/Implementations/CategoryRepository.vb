@@ -1,4 +1,5 @@
-﻿Imports MyLibrary.Domain
+﻿Imports System.Data.Entity
+Imports MyLibrary.Domain
 
 Public Class CategoryRepository
     Inherits GenericRepository(Of Category)
@@ -6,25 +7,26 @@ Public Class CategoryRepository
     Public Sub New(context As AppDbContext)
         MyBase.New(context)
     End Sub
-    Public Function GetByName(name As String) As Category _
-        Implements ICategoryRepository.GetByName
 
-        Return _dbSet.FirstOrDefault(Function(c) _
+    Public Async Function GetByNameAsync(name As String) As Task(Of Category) _
+        Implements ICategoryRepository.GetByNameAsync
+
+        Return Await _dbSet.FirstOrDefaultAsync(Function(c) _
             c.CategoryName = name AndAlso c.IsDeleted = False)
     End Function
 
-    Public Function HasBorrowedBooks(categoryId As Integer) As Boolean _
-     Implements ICategoryRepository.HasBorrowedBooks
+    Public Async Function HasBorrowedBooksAsync(categoryId As Integer) As Task(Of Boolean) _
+     Implements ICategoryRepository.HasBorrowedBooksAsync
 
-        Return _context.Books.Any(Function(b) _
+        Return Await _context.Books.AnyAsync(Function(b) _
             b.CategoryId = categoryId AndAlso
             b.IsDeleted = False AndAlso
             b.Quantity <> b.AvailableQuantity)
     End Function
 
-    Public Function ExistsByName(name As String, Optional excludeId As Integer? = Nothing) As Boolean _
-        Implements ICategoryRepository.ExistsByName
-        Dim normalized = name.Trim().ToLower()
+    Public Async Function ExistsByNameAsync(name As String, Optional excludeId As Integer? = Nothing) As Task(Of Boolean) _
+        Implements ICategoryRepository.ExistsByNameAsync
+        Dim normalized = name.Trim().ToLower() 
 
         Dim query = _context.Categories.Where(Function(c) _
         Not c.IsDeleted AndAlso c.CategoryName.ToLower() = normalized)
@@ -33,7 +35,7 @@ Public Class CategoryRepository
             query = query.Where(Function(c) c.Id <> excludeId.Value)
         End If
 
-        Return query.Any()
+        Return Await query.AnyAsync()
     End Function
 
 End Class

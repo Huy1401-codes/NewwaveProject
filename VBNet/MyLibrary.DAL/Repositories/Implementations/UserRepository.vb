@@ -9,18 +9,18 @@ Public Class UserRepository
         MyBase.New(context)
     End Sub
 
-    Public Function GetByEmail(email As String) As User _
-        Implements IUserRepository.GetByEmail
+    Public Async Function GetByEmailAsync(email As String) As Task(Of User) _
+        Implements IUserRepository.GetByEmailAsync
 
-        Return _dbSet.
+        Return Await _dbSet.
             Include("UserRoles.Role").
-            FirstOrDefault(Function(u) u.Email = email AndAlso u.IsDeleted = False)
+            FirstOrDefaultAsync(Function(u) u.Email = email AndAlso u.IsDeleted = False)
     End Function
 
-    Public Function ExistsByEmail(email As String) As Boolean _
-        Implements IUserRepository.ExistsByEmail
+    Public Async Function ExistsByEmailAsync(email As String) As Task(Of Boolean) _
+        Implements IUserRepository.ExistsByEmailAsync
 
-        Return _dbSet.Any(Function(u) u.Email = email AndAlso u.IsDeleted = False)
+        Return Await _dbSet.AnyAsync(Function(u) u.Email = email AndAlso u.IsDeleted = False)
     End Function
 
     Public Function GetAllIncludedDeleted() As IQueryable(Of User) Implements IUserRepository.GetAllIncludedDeleted

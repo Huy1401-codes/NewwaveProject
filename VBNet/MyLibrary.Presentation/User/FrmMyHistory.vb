@@ -21,7 +21,7 @@ Public Class FrmMyHistory
         LoadData()
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
             If SessionManager.CurrentUser Is Nothing Then
                 MessageBox.Show("Bạn chưa đăng nhập!")
@@ -30,7 +30,7 @@ Public Class FrmMyHistory
             End If
 
             Dim userId = SessionManager.CurrentUser.UserId
-            Dim listTickets = _borrowService.GetMyHistory(userId)
+            Dim listTickets = Await _borrowService.GetMyHistoryAsync(userId)
 
             dgvHistory.DataSource = listTickets
             FormatGrid()
@@ -69,7 +69,7 @@ Public Class FrmMyHistory
         End If
     End Sub
 
-    Private Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
+    Private Async Sub btnReturn_Click(sender As Object, e As EventArgs) Handles btnReturn.Click
         If dgvHistory.SelectedRows.Count = 0 Then
             MessageBox.Show("Vui lòng chọn phiếu mượn muốn trả.")
             Return
@@ -91,7 +91,7 @@ Public Class FrmMyHistory
         Try
 
 
-            Dim fineAmount As Decimal = _borrowService.CalculateFine(ticketId)
+            Dim fineAmount As Decimal = Await _borrowService.CalculateFineAsync(ticketId)
             Dim msg As String = "Bạn xác nhận trả các sách trong phiếu này?"
 
             If fineAmount > 0 Then
@@ -102,7 +102,7 @@ Public Class FrmMyHistory
 
             If MessageBox.Show(msg, "Xác nhận trả sách", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
 
-                _borrowService.ReturnBook(ticketId, PaymentMethod.Cash)
+                Await _borrowService.ReturnBookAsync(ticketId, PaymentMethod.Cash)
 
                 MessageBox.Show("Trả sách thành công! Cảm ơn bạn.")
                 LoadData()

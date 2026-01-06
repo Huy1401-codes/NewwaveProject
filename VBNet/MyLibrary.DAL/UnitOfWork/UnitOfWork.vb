@@ -137,9 +137,9 @@ Public Class UnitOfWork
         End Get
     End Property
 
-    Public Sub Save() Implements IUnitOfWork.Save
-        _context.SaveChanges()
-    End Sub
+    Public Async Function SaveAsync() As Task Implements IUnitOfWork.SaveAsync
+        Await _context.SaveChangesAsync()
+    End Function
 
     Public Sub Dispose() Implements IDisposable.Dispose
         _context.Dispose()

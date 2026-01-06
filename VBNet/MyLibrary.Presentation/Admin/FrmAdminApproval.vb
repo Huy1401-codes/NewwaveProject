@@ -17,20 +17,20 @@ Public Class FrmAdminApproval
         _borrowService = New BorrowService(_uow)
     End Sub
 
-    Private Sub FrmAdminApproval_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub FrmAdminApproval_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         cboSort.Items.Clear()
         cboSort.Items.Add("Mới nhất")
         cboSort.Items.Add("Cũ nhất")
         cboSort.SelectedIndex = 0
 
-        LoadData()
+        Await LoadData()
     End Sub
 
-    Private Sub LoadData()
+    Private Async Function LoadData() As Task
         Try
             Dim sortOrder = cboSort.SelectedItem.ToString()
 
-            Dim result = _borrowService.GetPendingListPaged(sortOrder, _currentPage, _pageSize)
+            Dim result = Await _borrowService.GetPendingListPagedAsync(sortOrder, _currentPage, _pageSize)
 
             dgvRequests.DataSource = result.Items
             _totalPages = result.TotalPages
@@ -45,7 +45,7 @@ Public Class FrmAdminApproval
         Catch ex As Exception
             MessageBox.Show("Lỗi tải dữ liệu: " & ex.Message)
         End Try
-    End Sub
+    End Function
 
     Private Sub FormatGrid()
         Dim hiddenCols = {"Id", "UserId", "Status", "FineAmount", "UpdatedAt", "StatusDisplay"}
@@ -96,22 +96,22 @@ Public Class FrmAdminApproval
         dgvRequests.RowTemplate.Height = 30
     End Sub
 
-    Private Sub cboSort_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSort.SelectedIndexChanged
+    Private Async Sub cboSort_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSort.SelectedIndexChanged
         _currentPage = 1
-        LoadData()
+        Await LoadData()
     End Sub
 
-    Private Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
+    Private Async Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
         If _currentPage > 1 Then
             _currentPage -= 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
 
-    Private Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
+    Private Async Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
         If _currentPage < _totalPages Then
             _currentPage += 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
 
@@ -123,7 +123,7 @@ Public Class FrmAdminApproval
         ProcessRequest(False)
     End Sub
 
-    Private Sub ProcessRequest(isApproved As Boolean)
+    Private Async Sub ProcessRequest(isApproved As Boolean)
         If dgvRequests.SelectedRows.Count = 0 Then
             MessageBox.Show("Vui lòng chọn phiếu cần xử lý.")
             Return
@@ -136,10 +136,10 @@ Public Class FrmAdminApproval
 
         If MessageBox.Show($"Bạn chắc chắn muốn {actionText} phiếu này?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Try
-                _borrowService.ApproveBorrow(ticketId, isApproved)
+                Await _borrowService.ApproveBorrowAsync(ticketId, isApproved)
 
                 MessageBox.Show("Thành công!")
-                LoadData()
+                Await LoadData()
             Catch ex As Exception
                 MessageBox.Show("Lỗi: " & ex.Message)
             End Try

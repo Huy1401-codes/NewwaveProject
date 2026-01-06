@@ -3,6 +3,6 @@
 Public Interface IAuthorRepository
     Inherits IGenericRepository(Of Author)
 
-    Function GetByName(name As String) As Author
-    Function HasBorrowedBooks(authorId As Integer) As Boolean
+    Function GetByNameAsync(name As String) As Task(Of Author)
+    Function HasBorrowedBooksAsync(authorId As Integer) As Task(Of Boolean)
 End Interface

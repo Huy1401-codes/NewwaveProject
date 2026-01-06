@@ -1,4 +1,5 @@
-﻿Imports AutoMapper
+﻿Imports System.Data.Entity
+Imports AutoMapper
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
 Imports NLog
@@ -16,10 +17,10 @@ Public Class PublisherService
 
 #Region "Get Paged Publishers"
 
-    Public Function GetPaged(keyword As String,
+    Public Async Function GetPagedAsync(keyword As String,
                              pageIndex As Integer,
-                             pageSize As Integer) As PagedResult(Of Publisher) _
-        Implements IPublisherService.GetPaged
+                             pageSize As Integer) As Task(Of PagedResult(Of Publisher)) _
+        Implements IPublisherService.GetPagedAsync
 
         Try
             logger.Info("GetPaged Publishers: Keyword={0}, PageIndex={1}, PageSize={2}",
@@ -31,14 +32,14 @@ Public Class PublisherService
                 query = query.Where(Function(a) a.PublisherName.Contains(keyword))
             End If
 
-            Dim totalCount = query.Count()
+            Dim totalCount = Await query.CountAsync()
             Dim totalPages = CInt(Math.Ceiling(totalCount / pageSize))
 
-            Dim items = query _
+            Dim items = Await query _
                 .OrderBy(Function(a) a.PublisherName) _
                 .Skip((pageIndex - 1) * pageSize) _
                 .Take(pageSize) _
-                .ToList()
+                .ToListAsync()
 
             Return New PagedResult(Of Publisher) With {
                 .Items = items,
@@ -56,7 +57,7 @@ Public Class PublisherService
 
 #Region "Add Publisher"
     'Create new Publisher
-    Public Sub Add(dto As PublisherDto) Implements IPublisherService.Add
+    Public Async Function AddAsync(dto As PublisherDto) As Task Implements IPublisherService.AddAsync
         Try
             logger.Info("Add Publisher START: Name={0}", dto.PublisherName)
 
@@ -65,7 +66,7 @@ Public Class PublisherService
                 Throw New Exception(PublisherMessages.PublisherNameNotNull)
             End If
 
-            If _uow.Publishers.ExistsByName(dto.PublisherName) Then
+            If Await _uow.Publishers.ExistsByNameAsync(dto.PublisherName) Then
                 logger.Warn("Tên NXB đã tồn tại.")
                 Throw New Exception(PublisherMessages.PublisherNameExist)
             End If
@@ -76,7 +77,7 @@ Public Class PublisherService
             Publisher.IsDeleted = False
 
             _uow.Publishers.Add(Publisher)
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Info("Add Publisher SUCCESS: Name={0}", dto.PublisherName)
 
@@ -84,28 +85,28 @@ Public Class PublisherService
             logger.Error(ex, "Add Publisher FAILED: Name={0}", dto.PublisherName)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Update Publisher"
     'Update Publisher
-    Public Sub Update(id As Integer, dto As PublisherDto) Implements IPublisherService.Update
+    Public Async Function UpdateAsync(id As Integer, dto As PublisherDto) As Task Implements IPublisherService.UpdateAsync
         Try
             logger.Info("Update Publisher START: Id={0}, Name={1}", id, dto.PublisherName)
 
-            Dim Publisher = _uow.Publishers.GetById(id)
+            Dim Publisher = Await _uow.Publishers.GetByIdAsync(id)
             If Publisher Is Nothing OrElse Publisher.IsDeleted Then
                 logger.Warn("Không tìm thấy NXB")
                 Throw New Exception(PublisherMessages.PublisherNameNotFound)
             End If
 
-            If _uow.Publishers.HasBorrowedBooks(id) Then
+            If Await _uow.Publishers.HasBorrowedBooksAsync(id) Then
                 logger.Warn("Không thể chỉnh sửa vì đang có sách cho mượn")
                 Throw New Exception(PublisherMessages.BookHasBorrowed)
             End If
 
-            If _uow.Publishers.ExistsByName(dto.PublisherName, id) Then
+            If Await _uow.Publishers.ExistsByNameAsync(dto.PublisherName, id) Then
                 logger.Warn("Tên NXB tồn tại")
                 Throw New Exception(PublisherMessages.PublisherNameExist)
             End If
@@ -113,7 +114,7 @@ Public Class PublisherService
             _mapper.Map(dto, Publisher)
             Publisher.UpdatedAt = DateTime.Now
 
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Info("Update Publisher SUCCESS: Id={0}", id)
 
@@ -121,29 +122,29 @@ Public Class PublisherService
             logger.Error(ex, "Update Publisher FAILED: Id={0}", id)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Delete Publisher"
     'Delete Publisher by soft delete
-    Public Sub Delete(id As Integer) Implements IPublisherService.Delete
+    Public Async Function DeleteAsync(id As Integer) As Task Implements IPublisherService.DeleteAsync
         Try
             logger.Warn("Delete Publisher REQUEST: Id={0}", id)
 
-            Dim Publisher = _uow.Publishers.GetById(id)
+            Dim Publisher = Await _uow.Publishers.GetByIdAsync(id)
             If Publisher Is Nothing OrElse Publisher.IsDeleted Then
                 logger.Warn("Không tìm thấy NXB")
                 Throw New Exception(PublisherMessages.PublisherNameNotFound)
             End If
 
-            If _uow.Publishers.HasBorrowedBooks(id) Then
+            If Await _uow.Publishers.HasBorrowedBooksAsync(id) Then
                 logger.Warn("Không thể chỉnh sửa vì đang có sách cho mượn")
                 Throw New Exception(PublisherMessages.BookHasBorrowed)
             End If
 
             _uow.Publishers.SoftDelete(Publisher)
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Warn("Delete Publisher SUCCESS: Id={0}", id)
 
@@ -151,24 +152,24 @@ Public Class PublisherService
             logger.Error(ex, "Delete Publisher FAILED: Id={0}", id)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Get Publisher Detail (Books in Publisher)"
 
-    Public Function GetDetail(publisherId As Integer,
+    Public Async Function GetDetailAsync(publisherId As Integer,
                               bookKeyword As String,
                               pageIndex As Integer,
                               pageSize As Integer,
-                              categoryId As Integer?) As PublisherDetailDto _
-        Implements IPublisherService.GetDetail
+                              categoryId As Integer?) As Task(Of PublisherDetailDto) _
+        Implements IPublisherService.GetDetailAsync
 
         Try
             logger.Info("GetDetail PublisherId={0}, Keyword={1}, Page={2}, Size={3}, CategoryId={4}",
                         publisherId, bookKeyword, pageIndex, pageSize, categoryId)
 
-            Dim Publisher = _uow.Publishers.GetById(publisherId)
+            Dim Publisher = Await _uow.Publishers.GetByIdAsync(publisherId)
 
             If Publisher Is Nothing OrElse Publisher.IsDeleted Then
                 logger.Warn("Không tìm thấy NXB")
@@ -188,10 +189,10 @@ Public Class PublisherService
                 query = query.Where(Function(b) b.PublisherId = categoryId.Value)
             End If
 
-            Dim totalCount = query.Count()
+            Dim totalCount = Await query.CountAsync()
             Dim totalPages = CInt(Math.Ceiling(totalCount / pageSize))
 
-            Dim bookItems = query _
+            Dim bookItems = Await query _
                 .OrderByDescending(Function(b) b.Id) _
                 .Skip((pageIndex - 1) * pageSize) _
                 .Take(pageSize) _
@@ -204,7 +205,7 @@ Public Class PublisherService
                     .PublishYear = b.PublishYear,
                     .AuthorName = If(b.Author IsNot Nothing, b.Author.AuthorName, "N/A"),
                     .CategoryName = If(b.Category IsNot Nothing, b.Category.CategoryName, "N/A")
-                }).ToList()
+                }).ToListAsync()
 
             Return New PublisherDetailDto With {
                 .PublisherId = Publisher.Id,
@@ -226,13 +227,13 @@ Public Class PublisherService
 
 #Region "Get Publisher By Id"
 
-    Public Function GetById(id As Integer) As PublisherDto _
-        Implements IPublisherService.GetById
+    Public Async Function GetByIdAsync(id As Integer) As Task(Of PublisherDto) _
+        Implements IPublisherService.GetByIdAsync
 
         Try
             logger.Info("GetPublisherById: Id={0}", id)
 
-            Dim entity = _uow.Publishers.GetById(id)
+            Dim entity = Await _uow.Publishers.GetByIdAsync(id)
             If entity Is Nothing OrElse entity.IsDeleted Then Return Nothing
 
             Return _mapper.Map(Of PublisherDto)(entity)

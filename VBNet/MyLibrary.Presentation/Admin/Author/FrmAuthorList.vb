@@ -51,9 +51,9 @@ Public Class FrmAuthorList
         dgvAuthors.Columns("BirthDate").DataPropertyName = "BirthDate"
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
-            Dim result = _authorService.GetPaged(txtSearch.Text.Trim(), _currentPage, _pageSize)
+            Dim result = Await _authorService.GetPagedAsync(txtSearch.Text.Trim(), _currentPage, _pageSize)
 
             dgvAuthors.DataSource = result.Items
             _totalPages = result.TotalPages
@@ -113,13 +113,13 @@ Public Class FrmAuthorList
         End Using
     End Sub
 
-    Private Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
+    Private Async Sub btnDelete_Click(sender As Object, e As EventArgs) Handles btnDelete.Click
         Dim id = GetSelectedId()
         If id = 0 Then Return
 
         If MessageBox.Show("Bạn có chắc chắn muốn xóa tác giả này?", "Cảnh báo", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) = DialogResult.Yes Then
             Try
-                _authorService.Delete(id)
+                Await _authorService.DeleteAsync(id)
                 MessageBox.Show("Xóa thành công!")
                 LoadData()
             Catch ex As Exception

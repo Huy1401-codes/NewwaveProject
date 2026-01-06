@@ -13,10 +13,10 @@ Public Class GenericRepository(Of T As Class)
         _dbSet = context.Set(Of T)()
     End Sub
 
-    Public Function GetById(id As Integer) As T _
-        Implements IGenericRepository(Of T).GetById
+    Public Async Function GetByIdAsync(id As Integer) As Task(Of T) _
+        Implements IGenericRepository(Of T).GetByIdAsync
 
-        Return _dbSet.Find(id)
+        Return Await _dbSet.FindAsync(id)
     End Function
 
     Public Function GetAll() As IQueryable(Of T) Implements IGenericRepository(Of T).GetAll
@@ -36,10 +36,10 @@ Public Class GenericRepository(Of T As Class)
         Return _dbSet
     End Function
 
-    Public Function Find(predicate As Expression(Of Func(Of T, Boolean))) _
-        As IEnumerable(Of T) Implements IGenericRepository(Of T).Find
+    Public Async Function FindAsync(predicate As Expression(Of Func(Of T, Boolean))) _
+        As Task(Of IEnumerable(Of T)) Implements IGenericRepository(Of T).FindAsync
 
-        Return _dbSet.Where(predicate).ToList()
+        Return Await _dbSet.Where(predicate).ToListAsync()
     End Function
 
     Public Sub Add(entity As T) _

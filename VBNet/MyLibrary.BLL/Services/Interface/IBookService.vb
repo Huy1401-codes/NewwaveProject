@@ -1,20 +1,29 @@
 ﻿Imports MyLibrary.Domain
 
 Public Interface IBookService
-    Function GetAllBooksForView() As List(Of BookDto)
-    Function GetBooksCombined(keyword As String, publisherId As Integer?, year As Integer?, pageIndex As Integer, pageSize As Integer) As PagedResult(Of BookDto)
-    Function GetAuthors() As List(Of Author)
-    Function GetCategories() As List(Of Category)
-    Function GetPublishers() As List(Of MyLibrary.Domain.Publisher)
+    Function GetAllBooksForViewAsync() As Task(Of List(Of BookDto))
 
-    Sub AddBook(bookDto As BookDto)
-    Sub UpdateBook(bookDto As BookDto)
-    Sub DeleteBook(id As Integer)
-    Function GetBookById(id As Integer) As Book
+    Function GetBooksCombinedAsync(keyword As String,
+                                   publisherId As Integer?,
+                                   year As Integer?,
+                                   pageIndex As Integer,
+                                   pageSize As Integer) As Task(Of PagedResult(Of BookDto))
+
+    Function GetAvailableBooksAsync(keyword As String,
+                                    publisherId As Integer?,
+                                    categoryId As Integer?) As Task(Of List(Of BookDetailDto))
+
+    Function GetBookDetailAsync(bookId As Integer) As Task(Of BookDetailDto)
+    Function GetBookByIdAsync(id As Integer) As Task(Of Book)
+
+    Function GetAuthorsAsync() As Task(Of List(Of Author))
+    Function GetCategoriesAsync() As Task(Of List(Of Category))
+    Function GetPublishersAsync() As Task(Of List(Of Publisher))
+
+    Function AddBookAsync(bookDto As BookDto) As Task
+    Function UpdateBookAsync(bookDto As BookDto) As Task
+    Function DeleteBookAsync(id As Integer) As Task
+
     Function ExportBooksToExcel(books As List(Of BookDto)) As Byte()
-    Sub ImportBooksFromExcelToDb(fileBytes As Byte())
-
-    Function GetAvailableBooks(keyword As String, publisherId As Integer?,
-                   categoryId As Integer?) As List(Of BookDetailDto)
-    Function GetBookDetail(bookId As Integer) As BookDetailDto
+    Function ImportBooksFromExcelToDbAsync(fileBytes As Byte()) As Task
 End Interface

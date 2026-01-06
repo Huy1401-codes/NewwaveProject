@@ -1,21 +1,15 @@
 ﻿Imports MyLibrary.Domain.MyApp.Domain.Enums
 
 Public Interface IBorrowService
-    '  User gửi yêu cầu mượn
-    Sub RequestBorrow(userId As Integer, bookIds As List(Of BorrowItemDto), dueDate As DateTime)
+    Function RequestBorrowAsync(userId As Integer, bookIds As List(Of BorrowItemDto), dueDate As DateTime) As Task
 
-    ' Admin duyệt hoặc từ chối
-    Sub ApproveBorrow(ticketId As Integer, isApproved As Boolean)
+    Function ApproveBorrowAsync(ticketId As Integer, isApproved As Boolean) As Task
 
-    ' Trả sách 
-    Sub ReturnBook(ticketId As Integer, paymentMethod As PaymentMethod)
+    Function ReturnBookAsync(ticketId As Integer, paymentMethod As PaymentMethod) As Task
 
-    ' User xem lịch sử bản thân
-    Function GetMyHistory(userId As Integer) As List(Of BorrowTicketDto)
+    Function GetMyHistoryAsync(userId As Integer) As Task(Of List(Of BorrowTicketDto))
 
-    ' Tính toán tiền phạt trước khi trả (để hiển thị lên màn hình)
-    Function CalculateFine(ticketId As Integer) As Decimal
+    Function CalculateFineAsync(ticketId As Integer) As Task(Of Decimal)
 
-    ' Hiển thị danh sách book
-    Function GetPendingListPaged(sortOrder As String, page As Integer, pageSize As Integer) As PagedResult(Of BorrowTicketDto)
+    Function GetPendingListPagedAsync(sortOrder As String, page As Integer, pageSize As Integer) As Task(Of PagedResult(Of BorrowTicketDto))
 End Interface

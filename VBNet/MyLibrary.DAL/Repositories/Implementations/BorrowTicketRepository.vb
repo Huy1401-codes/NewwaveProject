@@ -1,4 +1,6 @@
 ﻿Imports MyLibrary.Domain
+Imports System.Data.Entity ' <-- QUAN TRỌNG: Để dùng ToListAsync, CountAsync...
+Imports System.Threading.Tasks
 
 Public Class BorrowTicketRepository
     Inherits GenericRepository(Of BorrowTicket)
@@ -8,67 +10,67 @@ Public Class BorrowTicketRepository
         MyBase.New(context)
     End Sub
 
-    ' Hàm 1: Lấy lịch sử user
-    Public Function GetHistoryByUserId(userId As Integer) As IEnumerable(Of BorrowTicket) _
-        Implements IBorrowTicketRepository.GetHistoryByUserId
+    'Lấy lịch sử mượn sách của 1 user
+    Public Async Function GetHistoryByUserIdAsync(userId As Integer) As Task(Of IEnumerable(Of BorrowTicket)) _
+        Implements IBorrowTicketRepository.GetHistoryByUserIdAsync
 
-        Return _dbSet.Include("BorrowDetails.Book") _
-                     .Where(Function(t) t.UserId = userId) _
-                     .OrderByDescending(Function(t) t.CreatedAt) _
-                     .ToList()
+        Return Await _dbSet.Include("BorrowDetails.Book") _
+                           .Where(Function(t) t.UserId = userId) _
+                           .OrderByDescending(Function(t) t.CreatedAt) _
+                           .ToListAsync()
     End Function
 
-    ' Hàm 2: Lấy danh sách chờ duyệt
-    Public Function GetPendingRequests() As IEnumerable(Of BorrowTicket) _
-        Implements IBorrowTicketRepository.GetPendingRequests
+    ' Lấy danh sách yêu cầu mượn giành cho admin
+    Public Async Function GetPendingRequestsAsync() As Task(Of IEnumerable(Of BorrowTicket)) _
+        Implements IBorrowTicketRepository.GetPendingRequestsAsync
 
-        Return _dbSet.Include("User") _
-                     .Include("BorrowDetails.Book") _
-                     .Where(Function(t) t.Status = BorrowStatus.Pending) _
-                     .OrderBy(Function(t) t.CreatedAt) _
-                     .ToList()
+        Return Await _dbSet.Include("User") _
+                           .Include("BorrowDetails.Book") _
+                           .Where(Function(t) t.Status = BorrowStatus.Pending) _
+                           .OrderBy(Function(t) t.CreatedAt) _
+                           .ToListAsync()
     End Function
 
-    ' Hàm 3 [MỚI]: Lấy 1 phiếu cụ thể kèm full thông tin (Dùng cho chức năng Trả sách/Duyệt)
-    Public Function GetByIdWithDetails(ticketId As Integer) As BorrowTicket _
-        Implements IBorrowTicketRepository.GetByIdWithDetails
+    'Xem thông tin chi tiết của sách mượn của 1 user
+    Public Async Function GetByIdWithDetailsAsync(ticketId As Integer) As Task(Of BorrowTicket) _
+        Implements IBorrowTicketRepository.GetByIdWithDetailsAsync
 
-        Return _dbSet.Include("User") _
-                     .Include("BorrowDetails.Book") _
-                     .FirstOrDefault(Function(t) t.Id = ticketId)
+        Return Await _dbSet.Include("User") _
+                           .Include("BorrowDetails.Book") _
+                           .FirstOrDefaultAsync(Function(t) t.Id = ticketId)
     End Function
 
-    ' Thêm hàm này vào Class (Implement Interface)
-    Public Function GetPendingRequestsPaged(isNewest As Boolean, pageIndex As Integer, pageSize As Integer) As (List(Of BorrowTicket), Integer) _
-        Implements IBorrowTicketRepository.GetPendingRequestsPaged
+    ' Lấy danh sách yêu cầu mượn giành cho admin
+    Public Async Function GetPendingRequestsPagedAsync(isNewest As Boolean, pageIndex As Integer, pageSize As Integer) _
+        As Task(Of (List(Of BorrowTicket), Integer)) _
+        Implements IBorrowTicketRepository.GetPendingRequestsPagedAsync
 
-        ' 1. Tạo câu truy vấn (chưa execute)
         Dim query = _dbSet.Include("User") _
                           .Include("BorrowDetails.Book") _
                           .Where(Function(t) t.Status = BorrowStatus.Pending)
 
-        ' 2. Xử lý Lọc (Mới nhất / Cũ nhất)
         If isNewest Then
             query = query.OrderByDescending(Function(t) t.CreatedAt)
         Else
             query = query.OrderBy(Function(t) t.CreatedAt)
         End If
 
-        ' 3. Đếm tổng số lượng (để tính số trang)
-        Dim totalCount = query.Count()
+        Dim totalCount = Await query.CountAsync()
 
-        ' 4. Phân trang (Chỉ lấy đúng số lượng cần thiết)
-        Dim items = query.Skip((pageIndex - 1) * pageSize) _
-                         .Take(pageSize) _
-                         .ToList()
+        Dim items = Await query.Skip((pageIndex - 1) * pageSize) _
+                               .Take(pageSize) _
+                               .ToListAsync()
 
         Return (items, totalCount)
     End Function
 
-    Public Function GetCurrentBorrows(userId As Integer) As List(Of BorrowTicket) _
-        Implements IBorrowTicketRepository.GetCurrentBorrows
-        Return _dbSet.Include("BorrowDetails.Book") _
-                     .Where(Function(t) t.UserId = userId And t.Status = BorrowStatus.Approved) _
-                     .ToList()
+    ' Danh sách đang được mượn hiện tại
+    Public Async Function GetCurrentBorrowsAsync(userId As Integer) As Task(Of List(Of BorrowTicket)) _
+        Implements IBorrowTicketRepository.GetCurrentBorrowsAsync
+
+        Return Await _dbSet.Include("BorrowDetails.Book") _
+                           .Where(Function(t) t.UserId = userId And t.Status = BorrowStatus.Approved) _
+                           .ToListAsync()
     End Function
+
 End Class

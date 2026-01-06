@@ -3,8 +3,8 @@
 Public Interface IPublisherRepository
     Inherits IGenericRepository(Of Publisher)
 
-    Function GetByName(name As String) As Publisher
-    Function HasBorrowedBooks(publisherId As Integer) As Boolean
+    Function GetByNameAsync(name As String) As Task(Of Publisher)
+    Function HasBorrowedBooksAsync(publisherId As Integer) As Task(Of Boolean)
 
-    Function ExistsByName(name As String, Optional excludeId As Integer? = Nothing) As Boolean
+    Function ExistsByNameAsync(name As String, Optional excludeId As Integer? = Nothing) As Task(Of Boolean)
 End Interface
