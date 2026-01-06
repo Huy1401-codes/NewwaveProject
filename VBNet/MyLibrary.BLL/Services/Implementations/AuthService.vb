@@ -1,5 +1,6 @@
 ﻿Imports System.Security.Cryptography
 Imports System.Text
+Imports System.Text.RegularExpressions
 Imports System.Threading.Tasks ' <-- Import Task
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
@@ -17,7 +18,6 @@ Public Class AuthService
         _emailService = emailService
     End Sub
 
-    ' --- 1. LOGIN ASYNC ---
     Public Async Function LoginAsync(email As String, password As String) As Task(Of LoginResponseDto) _
         Implements IAuthService.LoginAsync
 
@@ -25,7 +25,6 @@ Public Class AuthService
             Throw New Exception(AuthMessages.EmailOrPasswordEmpty)
         End If
 
-        ' Gọi Async
         Dim user = Await _uow.Users.GetByEmailAsync(email)
 
         If user Is Nothing Then
@@ -49,7 +48,7 @@ Public Class AuthService
             Throw New Exception(AuthMessages.AccountNotActive)
         End If
 
-        ' Gọi Async lấy tên Role
+        ' lấy tên Role
         Dim roleName = Await _uow.UserRoles.GetRoleNameByUserIdAsync(user.Id)
 
         If String.IsNullOrEmpty(roleName) Then
@@ -73,6 +72,7 @@ Public Class AuthService
         If String.IsNullOrWhiteSpace(dto.FullName) Then Throw New Exception(AuthMessages.FullNameNotNull)
         If String.IsNullOrWhiteSpace(dto.Email) Then Throw New Exception(AuthMessages.EmailOrPasswordErorr)
         If String.IsNullOrWhiteSpace(dto.Password) Then Throw New Exception(AuthMessages.PasswordNotNull)
+        ValidatePassword(dto.Password)
 
         Dim email As String = dto.Email.Trim().ToLower()
 
@@ -259,5 +259,32 @@ Public Class AuthService
         Dim random As New Random()
         Return random.Next(100000, 999999).ToString()
     End Function
+
+    Private Sub ValidatePassword(password As String)
+        If String.IsNullOrWhiteSpace(password) Then
+            Throw New Exception("Mật khẩu không được để trống")
+        End If
+
+        If password.Length < 6 Then
+            Throw New Exception("Mật khẩu phải có ít nhất 6 ký tự")
+        End If
+
+        If Not Regex.IsMatch(password, "[A-Za-z]") Then
+            Throw New Exception("Mật khẩu phải chứa ít nhất 1 chữ cái")
+        End If
+
+        If Not Regex.IsMatch(password, "\d") Then
+            Throw New Exception("Mật khẩu phải chứa ít nhất 1 chữ số")
+        End If
+
+        If password.Contains(" ") Then
+            Throw New Exception("Mật khẩu không được chứa khoảng trắng")
+        End If
+
+        If Not Regex.IsMatch(password, "[^a-zA-Z0-9]") Then
+            Throw New Exception("Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt")
+        End If
+
+    End Sub
 
 End Class

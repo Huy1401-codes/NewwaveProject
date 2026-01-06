@@ -20,12 +20,12 @@ Public Class FrmBookEditor
         _isViewOnly = isViewOnly
     End Sub
 
-    Private Sub FrmBookEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        LoadComboBoxes()
+    Private Async Sub FrmBookEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Await LoadComboBoxes()
 
         If _bookId > 0 Then
             Me.Text = "CẬP NHẬT SÁCH"
-            LoadDataToEdit()
+            Await LoadDataToEdit()
         Else
             Me.Text = "THÊM SÁCH MỚI"
             ResetForm()
@@ -49,7 +49,7 @@ Public Class FrmBookEditor
         End If
     End Sub
 
-    Private Async Sub LoadComboBoxes()
+    Private Async Function LoadComboBoxes() As Task
         cboAuthor.DataSource = Await _bookService.GetAuthorsAsync()
         cboAuthor.DisplayMember = "AuthorName"
         cboAuthor.ValueMember = "Id"
@@ -61,7 +61,7 @@ Public Class FrmBookEditor
         cboPublisher.DataSource = Await _bookService.GetPublishersAsync()
         cboPublisher.DisplayMember = "PublisherName"
         cboPublisher.ValueMember = "Id"
-    End Sub
+    End Function
 
     Private Sub ResetForm()
         txtCode.Clear()
@@ -79,7 +79,7 @@ Public Class FrmBookEditor
         _isImageChanged = False
     End Sub
 
-    Private Async Sub LoadDataToEdit()
+    Private Async Function LoadDataToEdit() As Task
         Dim book = Await _bookService.GetBookByIdAsync(_bookId)
         If book IsNot Nothing Then
             txtCode.Text = book.BookCode
@@ -104,7 +104,7 @@ Public Class FrmBookEditor
                 picCover.Image = Nothing
             End If
         End If
-    End Sub
+    End Function
 
     Private Sub btnBrowse_Click(sender As Object, e As EventArgs) Handles btnBrowse.Click
         If ofdImage.ShowDialog() = DialogResult.OK Then

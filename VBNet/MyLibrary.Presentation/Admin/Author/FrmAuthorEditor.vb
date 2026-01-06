@@ -20,7 +20,7 @@ Public Class FrmAuthorEditor
         _cloudinaryService = cloudService
     End Sub
 
-    Private Sub FrmAuthorEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub FrmAuthorEditor_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If _authorId = 0 Then
             Me.Text = "Thêm Tác Giả Mới"
             btnSave.Text = "Thêm mới"
@@ -29,11 +29,11 @@ Public Class FrmAuthorEditor
         Else
             Me.Text = "Cập Nhật Tác Giả"
             btnSave.Text = "Lưu thay đổi"
-            LoadAuthorData()
+            Await LoadAuthorData()
         End If
     End Sub
 
-    Private Async Sub LoadAuthorData()
+    Private Async Function LoadAuthorData() As Task
         Try
             Dim author = Await _service.GetByIdAsync(_authorId)
             If author IsNot Nothing Then
@@ -51,7 +51,7 @@ Public Class FrmAuthorEditor
             MessageBox.Show("Lỗi tải dữ liệu: " & ex.Message)
             Me.Close()
         End Try
-    End Sub
+    End Function
 
     Private Sub btnBrowse_Click(sender As Object, e As EventArgs) Handles btnBrowse.Click
         Using dialog As New OpenFileDialog()

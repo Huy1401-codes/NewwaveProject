@@ -17,16 +17,16 @@ Public Class FrmAdminApproval
         _borrowService = New BorrowService(_uow)
     End Sub
 
-    Private Sub FrmAdminApproval_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub FrmAdminApproval_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         cboSort.Items.Clear()
         cboSort.Items.Add("Mới nhất")
         cboSort.Items.Add("Cũ nhất")
         cboSort.SelectedIndex = 0
 
-        LoadData()
+        Await LoadData()
     End Sub
 
-    Private Async Sub LoadData()
+    Private Async Function LoadData() As Task
         Try
             Dim sortOrder = cboSort.SelectedItem.ToString()
 
@@ -45,7 +45,7 @@ Public Class FrmAdminApproval
         Catch ex As Exception
             MessageBox.Show("Lỗi tải dữ liệu: " & ex.Message)
         End Try
-    End Sub
+    End Function
 
     Private Sub FormatGrid()
         Dim hiddenCols = {"Id", "UserId", "Status", "FineAmount", "UpdatedAt", "StatusDisplay"}
@@ -96,22 +96,22 @@ Public Class FrmAdminApproval
         dgvRequests.RowTemplate.Height = 30
     End Sub
 
-    Private Sub cboSort_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSort.SelectedIndexChanged
+    Private Async Sub cboSort_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboSort.SelectedIndexChanged
         _currentPage = 1
-        LoadData()
+        Await LoadData()
     End Sub
 
-    Private Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
+    Private Async Sub btnPrev_Click(sender As Object, e As EventArgs) Handles btnPrev.Click
         If _currentPage > 1 Then
             _currentPage -= 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
 
-    Private Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
+    Private Async Sub btnNext_Click(sender As Object, e As EventArgs) Handles btnNext.Click
         If _currentPage < _totalPages Then
             _currentPage += 1
-            LoadData()
+            Await LoadData()
         End If
     End Sub
 
@@ -139,7 +139,7 @@ Public Class FrmAdminApproval
                 Await _borrowService.ApproveBorrowAsync(ticketId, isApproved)
 
                 MessageBox.Show("Thành công!")
-                LoadData()
+                Await LoadData()
             Catch ex As Exception
                 MessageBox.Show("Lỗi: " & ex.Message)
             End Try
