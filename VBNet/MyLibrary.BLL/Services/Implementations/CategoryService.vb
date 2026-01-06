@@ -1,4 +1,5 @@
-﻿Imports AutoMapper
+﻿Imports System.Data.Entity
+Imports AutoMapper
 Imports MyLibrary.DAL
 Imports MyLibrary.Domain
 Imports NLog
@@ -17,10 +18,10 @@ Public Class CategoryService
 
 #Region "Get Paged Categories"
 
-    Public Function GetPaged(keyword As String,
+    Public Async Function GetPagedAsync(keyword As String,
                              pageIndex As Integer,
-                             pageSize As Integer) As PagedResult(Of Category) _
-        Implements ICategoryService.GetPaged
+                             pageSize As Integer) As Task(Of PagedResult(Of Category)) _
+        Implements ICategoryService.GetPagedAsync
 
         Try
             logger.Info("GetPaged Categories: Keyword={0}, PageIndex={1}, PageSize={2}",
@@ -32,14 +33,14 @@ Public Class CategoryService
                 query = query.Where(Function(a) a.CategoryName.Contains(keyword))
             End If
 
-            Dim totalCount = query.Count()
+            Dim totalCount = Await query.CountAsync()
             Dim totalPages = CInt(Math.Ceiling(totalCount / pageSize))
 
-            Dim items = query _
+            Dim items = Await query _
                 .OrderBy(Function(a) a.CategoryName) _
                 .Skip((pageIndex - 1) * pageSize) _
                 .Take(pageSize) _
-                .ToList()
+                .ToListAsync()
 
             Return New PagedResult(Of Category) With {
                 .Items = items,
@@ -57,7 +58,8 @@ Public Class CategoryService
 
 #Region "Add Category"
     'Create new Category
-    Public Sub Add(dto As CategoryDto) Implements ICategoryService.Add
+    Public Async Function AddAsync(dto As CategoryDto) As Task _
+        Implements ICategoryService.AddAsync
         Try
             logger.Info("Add Category START: Name={0}", dto.CategoryName)
 
@@ -66,7 +68,7 @@ Public Class CategoryService
                 Throw New Exception(CategoryMessages.CategoryNameNotNull)
             End If
 
-            If _uow.Categories.ExistsByName(dto.CategoryName) Then
+            If Await _uow.Categories.ExistsByNameAsync(dto.CategoryName) Then
                 logger.Warn("Tên danh mục đã tồn tại")
                 Throw New Exception(CategoryMessages.CategoryNameExist)
             End If
@@ -77,7 +79,7 @@ Public Class CategoryService
             category.IsDeleted = False
 
             _uow.Categories.Add(category)
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Info("Add Category SUCCESS: Name={0}", dto.CategoryName)
 
@@ -85,28 +87,29 @@ Public Class CategoryService
             logger.Error(ex, "Add Category FAILED: Name={0}", dto.CategoryName)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Update Category"
     'Update category
-    Public Sub Update(id As Integer, dto As CategoryDto) Implements ICategoryService.Update
+    Public Async Function UpdateAsync(id As Integer, dto As CategoryDto) As Task _
+        Implements ICategoryService.UpdateAsync
         Try
             logger.Info("Update Category START: Id={0}, Name={1}", id, dto.CategoryName)
 
-            Dim category = _uow.Categories.GetById(id)
+            Dim category = Await _uow.Categories.GetByIdAsync(id)
             If category Is Nothing OrElse category.IsDeleted Then
                 logger.Warn("Không tìm thấy danh mục")
                 Throw New Exception(CategoryMessages.CategoryNameNotFound)
             End If
 
-            If _uow.Categories.HasBorrowedBooks(id) Then
+            If Await _uow.Categories.HasBorrowedBooksAsync(id) Then
                 logger.Warn("Không thể chỉnh sửa vì đang có sách cho mượn")
                 Throw New Exception(CategoryMessages.BookHasBorrowed)
             End If
 
-            If _uow.Categories.ExistsByName(dto.CategoryName, id) Then
+            If Await _uow.Categories.ExistsByNameAsync(dto.CategoryName, id) Then
                 logger.Warn("Tên danh mục tồn tại")
                 Throw New Exception(CategoryMessages.CategoryNameExist)
             End If
@@ -114,7 +117,7 @@ Public Class CategoryService
             _mapper.Map(dto, category)
             category.UpdatedAt = DateTime.Now
 
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Info("Update Category SUCCESS: Id={0}", id)
 
@@ -122,29 +125,30 @@ Public Class CategoryService
             logger.Error(ex, "Update Category FAILED: Id={0}", id)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Delete Category"
     'Delete Category by soft delete
-    Public Sub Delete(id As Integer) Implements ICategoryService.Delete
+    Public Async Function DeleteAsync(id As Integer) As Task _
+        Implements ICategoryService.DeleteAsync
         Try
             logger.Warn("Delete Category REQUEST: Id={0}", id)
 
-            Dim category = _uow.Categories.GetById(id)
+            Dim category = Await _uow.Categories.GetByIdAsync(id)
             If category Is Nothing OrElse category.IsDeleted Then
                 logger.Warn("Không tìm thấy danh mục")
                 Throw New Exception(CategoryMessages.CategoryNameNotFound)
             End If
 
-            If _uow.Categories.HasBorrowedBooks(id) Then
+            If Await _uow.Categories.HasBorrowedBooksAsync(id) Then
                 logger.Warn("Không thể chỉnh sửa vì đang có sách cho mượn")
                 Throw New Exception(CategoryMessages.BookHasBorrowed)
             End If
 
             _uow.Categories.SoftDelete(category)
-            _uow.Save()
+            Await _uow.SaveAsync()
 
             logger.Warn("Delete Category SUCCESS: Id={0}", id)
 
@@ -152,24 +156,24 @@ Public Class CategoryService
             logger.Error(ex, "Delete Category FAILED: Id={0}", id)
             Throw
         End Try
-    End Sub
+    End Function
 
 #End Region
 
 #Region "Get Category Detail (Books in Category)"
 
-    Public Function GetDetail(categoryId As Integer,
+    Public Async Function GetDetailAsync(categoryId As Integer,
                               bookKeyword As String,
                               pageIndex As Integer,
                               pageSize As Integer,
-                              publisherId As Integer?) As CategoryDetailDto _
-        Implements ICategoryService.GetDetail
+                              publisherId As Integer?) As Task(Of CategoryDetailDto) _
+        Implements ICategoryService.GetDetailAsync
 
         Try
             logger.Info("GetDetail CategoryId={0}, Keyword={1}, Page={2}, Size={3}, PublisherId={4}",
                         categoryId, bookKeyword, pageIndex, pageSize, publisherId)
 
-            Dim category = _uow.Categories.GetById(categoryId)
+            Dim category = Await _uow.Categories.GetByIdAsync(categoryId)
 
             If category Is Nothing OrElse category.IsDeleted Then
                 logger.Warn("Không tìm thấy danh mục")
@@ -189,10 +193,10 @@ Public Class CategoryService
                 query = query.Where(Function(b) b.PublisherId = publisherId.Value)
             End If
 
-            Dim totalCount = query.Count()
+            Dim totalCount = Await query.CountAsync()
             Dim totalPages = CInt(Math.Ceiling(totalCount / pageSize))
 
-            Dim bookItems = query _
+            Dim bookItems = Await query _
                 .OrderByDescending(Function(b) b.Id) _
                 .Skip((pageIndex - 1) * pageSize) _
                 .Take(pageSize) _
@@ -205,7 +209,7 @@ Public Class CategoryService
                     .PublishYear = b.PublishYear,
                     .AuthorName = If(b.Author IsNot Nothing, b.Author.AuthorName, "N/A"),
                     .PublisherName = If(b.Publisher IsNot Nothing, b.Publisher.PublisherName, "N/A")
-                }).ToList()
+                }).ToListAsync()
 
             Return New CategoryDetailDto With {
                 .CategoryId = category.Id,
@@ -227,13 +231,13 @@ Public Class CategoryService
 
 #Region "Get Category By Id"
 
-    Public Function GetById(id As Integer) As CategoryDto _
-        Implements ICategoryService.GetById
+    Public Async Function GetByIdAsync(id As Integer) As Task(Of CategoryDto) _
+        Implements ICategoryService.GetByIdAsync
 
         Try
             logger.Info("GetCategoryById: Id={0}", id)
 
-            Dim entity = _uow.Categories.GetById(id)
+            Dim entity = Await _uow.Categories.GetByIdAsync(id)
             If entity Is Nothing OrElse entity.IsDeleted Then Return Nothing
 
             Return _mapper.Map(Of CategoryDto)(entity)

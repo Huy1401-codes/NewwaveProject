@@ -1,5 +1,5 @@
-﻿Imports MyLibrary.Domain
-
+﻿Imports System.Data.Entity
+Imports MyLibrary.Domain
 Public Class UserRoleRepository
     Inherits GenericRepository(Of UserRole)
     Implements IUserRoleRepository
@@ -8,14 +8,14 @@ Public Class UserRoleRepository
         MyBase.New(context)
     End Sub
 
-    Public Function GetRoleNameByUserId(userId As Integer) As String _
-        Implements IUserRoleRepository.GetRoleNameByUserId
+    Public Async Function GetRoleNameByUserIdAsync(userId As Integer) As Task(Of String) _
+        Implements IUserRoleRepository.GetRoleNameByUserIdAsync
 
-        Return _dbSet _
+        Return Await _dbSet _
             .Include("Role") _
             .Where(Function(ur) ur.UserId = userId) _
             .Select(Function(ur) ur.Role.RoleName) _
-            .FirstOrDefault()
+            .FirstOrDefaultAsync()
     End Function
 
 End Class

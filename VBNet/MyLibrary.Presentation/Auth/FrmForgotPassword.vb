@@ -24,7 +24,7 @@ Public Class FrmForgotPassword
     )
     End Sub
 
-    Private Sub btnGetCode_Click(sender As Object, e As EventArgs) Handles btnGetCode.Click
+    Private Async Sub btnGetCode_Click(sender As Object, e As EventArgs) Handles btnGetCode.Click
         lblError.Text = ""
         Dim email As String = txtEmail.Text.Trim()
 
@@ -40,13 +40,13 @@ Public Class FrmForgotPassword
 
         Try
 
-            If Not _auth.EmailExists(email) Then
+            If Not Await _auth.EmailExistsAsync(email) Then
                 lblError.Text = "Email này chưa đăng ký tài khoản."
                 Return
             End If
 
             Cursor = Cursors.WaitCursor
-            _auth.ForgotPassword(email)
+            Await _auth.ForgotPasswordAsync(email)
             Cursor = Cursors.Default
 
             _currentEmail = email
@@ -61,7 +61,7 @@ Public Class FrmForgotPassword
         End Try
     End Sub
 
-    Private Sub btnConfirm_Click(sender As Object, e As EventArgs) Handles btnConfirm.Click
+    Private Async Sub btnConfirm_Click(sender As Object, e As EventArgs) Handles btnConfirm.Click
         lblErrorStep2.Text = ""
 
         Dim otp As String = txtOTP.Text.Trim()
@@ -87,7 +87,7 @@ Public Class FrmForgotPassword
         Try
             Cursor = Cursors.WaitCursor
 
-            _auth.CompletePasswordReset(_currentEmail, otp, newPass)
+            Await _auth.CompletePasswordResetAsync(_currentEmail, otp, newPass)
 
             Cursor = Cursors.Default
 

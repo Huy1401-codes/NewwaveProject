@@ -63,9 +63,9 @@ Public Class FrmPublisherDetail
         dgvBooks.Columns("Price").DefaultCellStyle.Format = "N0"
     End Sub
 
-    Private Sub LoadCategories()
+    Private Async Sub LoadCategories()
 
-        Dim publishers = _serviceBook.GetCategories()
+        Dim publishers = Await _serviceBook.GetCategoriesAsync()
         publishers.Insert(0, New Category With {.Id = 0, .CategoryName = "Tất cả Danh Mục"})
 
         cboCategory.DataSource = publishers
@@ -74,9 +74,9 @@ Public Class FrmPublisherDetail
         cboCategory.SelectedIndex = 0
     End Sub
 
-    Private Sub LoadData()
+    Private Async Sub LoadData()
         Try
-            Dim detail = _service.GetDetail(_publisherId,
+            Dim detail = Await _service.GetDetailAsync(_publisherId,
                                             _currentKeyword,
                                             _currentPage,
                                             _pageSize,

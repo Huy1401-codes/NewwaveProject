@@ -13,14 +13,14 @@ Public Class FrmLogin
         _authService = New AuthService(uow, emailService)
     End Sub
 
-    Private Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
+    Private Async Sub btnLogin_Click(sender As Object, e As EventArgs) Handles btnLogin.Click
         Try
             lblError.Text = ""
 
             Dim email = txtEmail.Text.Trim()
             Dim password = txtPassword.Text
 
-            Dim result = _authService.Login(email, password)
+            Dim result = Await _authService.LoginAsync(email, password)
 
             SessionManager.CurrentUser = result
 
@@ -39,14 +39,14 @@ Public Class FrmLogin
         End Try
     End Sub
 
-    Private Sub lnkForgotPassword_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) _
+    Private Async Sub lnkForgotPassword_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) _
         Handles lnkForgotPassword.LinkClicked
 
         Dim email = InputBox("Nhập email của bạn:", "Quên mật khẩu")
         If String.IsNullOrWhiteSpace(email) Then Return
 
         Try
-            _authService.ForgotPassword(email)
+            Await _authService.ForgotPasswordAsync(email)
             MessageBox.Show("Mật khẩu mới đã được gửi qua email", "Thông báo")
         Catch ex As Exception
             MessageBox.Show(ex.Message)

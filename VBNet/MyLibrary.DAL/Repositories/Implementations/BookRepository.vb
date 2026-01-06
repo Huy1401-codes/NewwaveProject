@@ -1,4 +1,5 @@
-﻿Imports MyLibrary.Domain
+﻿Imports System.Data.Entity
+Imports MyLibrary.Domain
 
 Public Class BookRepository
     Inherits GenericRepository(Of Book)
@@ -8,18 +9,18 @@ Public Class BookRepository
         MyBase.New(context)
     End Sub
 
-    Public Function GetBooksFullInfo() As List(Of Book) Implements IBookRepository.GetBooksFullInfo
-        Return _dbSet.Include("Author") _
+    Public Async Function GetBooksFullInfoAsync() As Task(Of List(Of Book)) Implements IBookRepository.GetBooksFullInfoAsync
+        Return Await _dbSet.Include("Author") _
                      .Include("Category") _
                      .Include("Publisher") _
                      .Where(Function(b) Not b.IsDeleted) _
-                     .ToList()
+                     .ToListAsync()
     End Function
 
-    Public Function ExistsByCode(bookCode As String) As Boolean _
-       Implements IBookRepository.ExistsByCode
+    Public Async Function ExistsByCodeAsync(bookCode As String) As Task(Of Boolean) _
+       Implements IBookRepository.ExistsByCodeAsync
 
-        Return _dbSet.Any(Function(b) _
+        Return Await _dbSet.AnyAsync(Function(b) _
             b.BookCode = bookCode AndAlso b.IsDeleted = False)
     End Function
 End Class
